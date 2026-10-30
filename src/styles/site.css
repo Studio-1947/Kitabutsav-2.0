@@ -519,7 +519,7 @@ html[data-theme="dark"] body { background: var(--ku-bg); }
 .speaker__at a { color: inherit; text-decoration: none; }
 .speaker__at a:hover { text-decoration: underline; }
 [data-filter-list] > [hidden] { display: none; }
-@media (max-width: 600px) { .speaker { grid-template-columns: 64px 1fr; gap: 14px; } .speaker .portrait--md { width: 64px; } .speaker .portrait--md .portrait__ini { font-size: 1.7rem; } }
+@media (max-width: 600px) { .speaker { grid-template-columns: 64px 1fr; gap: 14px; } .speaker .portrait.portrait--md { width: 64px; } .speaker .portrait.portrait--md .portrait__ini { font-size: 1.7rem; } }
 
 /* chips */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 auto 26px; }

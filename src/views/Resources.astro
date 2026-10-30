@@ -3,7 +3,6 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import SpeakerCard from "../components/SpeakerCard.astro";
 import { allSpeakers } from "../data/speakers";
-import { editions } from "../data/editions";
 import { t, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
@@ -16,19 +15,20 @@ const description = hi
   : "The writers, poets and speakers who have taken part in Kitab Utsav editions so far, in one place.";
 const crumbs = [{ name: hi ? "लेखक" : "Authors", path: "/resources/" }];
 
-// Filter chips: one per city that has at least one documented speaker.
-const cityOf = (slug: string) => editions.find((e) => e.slug === slug)?.city;
-const tagsFor = (sp: (typeof allSpeakers)[number]) => {
-  const set = new Set<string>([sp.edition.split("-")[0]]);
-  sp.appearances?.forEach((a) => set.add(a.city.en.toLowerCase()));
-  return [...set];
-};
-const cities = [...new Map(allSpeakers.flatMap((sp) => {
-  const out: [string, string][] = [];
-  const c = cityOf(sp.edition); if (c) out.push([sp.edition.split("-")[0], c[lang]]);
-  sp.appearances?.forEach((a) => out.push([a.city.en.toLowerCase(), a.city[lang]]));
-  return out;
-})).entries()];
+// Filter chips: one per city that has at least one documented speaker, busiest city first.
+const tagsFor = (sp: (typeof allSpeakers)[number]) => [...new Set(sp.appearances?.map((a) => a.city.en.toLowerCase()) ?? [])];
+const cityCount = new Map<string, { label: string; n: number }>();
+allSpeakers.forEach((sp) => {
+  const seen = new Set<string>();
+  sp.appearances?.forEach((a) => {
+    const k = a.city.en.toLowerCase();
+    if (seen.has(k)) return;
+    seen.add(k);
+    const c = cityCount.get(k) ?? { label: a.city[lang], n: 0 };
+    c.n++; cityCount.set(k, c);
+  });
+});
+const cities = [...cityCount.entries()].sort((a, b) => b[1].n - a[1].n).map(([k, c]) => [k, c.label] as const);
 const names = [...allSpeakers, ...allSpeakers].map((sp) => sp.name.hi);
 ---
 <Base lang={lang} route="/resources/" title={title} description={description} crumbs={crumbs}>

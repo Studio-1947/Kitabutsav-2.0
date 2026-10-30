@@ -10,7 +10,7 @@ const { s, lang } = Astro.props;
   <div>
     <h3>{s.name[lang]}</h3>
     <span class="role">{s.role[lang]}</span>
-    <p>{s.bio[lang]}</p>
+    {s.bio && <p>{s.bio[lang]}</p>}
     {s.appearances && s.appearances.length > 0 && (
       <ul class="speaker__at">
         {s.appearances.map((a) => (
