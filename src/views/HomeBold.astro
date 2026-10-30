@@ -1,0 +1,393 @@
+---
+/**
+ * "Bold" design option for the home page: loud colour fields, chunky display type, pill rows and
+ * wavy section edges. A self-contained preview at /bold/ and /en/bold/ (noindex, not in nav)
+ * so it can be compared with the current home page; it reads the same data files.
+ */
+import { bookSeatUrl, festivalSocial, org } from "../site.config";
+import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
+import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
+import { partners } from "../data/partners";
+import { formatRange, localePath, htmlLang, t, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const L = (p: string) => localePath(lang, p);
+const up = !!nextEdition;
+const seat = bookSeatUrl ?? L(`/editions/${fe.slug}/`);
+const other = hi ? "/en/bold/" : "/bold/";
+
+const byDate = [...editions].sort((a, b) => (b.start ?? `${b.year}`).localeCompare(a.start ?? `${a.year}`));
+const rows = byDate.slice(0, 6);
+const tones = ["blue", "saffron", "navy", "sand", "red", "sky"] as const;
+const initial = (x: string) => [...new Intl.Segmenter("hi", { granularity: "grapheme" }).segment(x)][0]?.segment ?? x[0];
+
+const headline = ["gulzar", "javed-akhtar", "geetanjali-shree", "piyush-mishra", "raghubir-yadav", "alok-dhanwa", "mridula-garg"]
+  .map((slug) => allSpeakers.find((p) => p.slug === slug))
+  .filter((p): p is NonNullable<typeof p> => !!p);
+
+const formats = hi
+  ? ["लेखक से मुलाक़ात", "काव्य-पाठ", "लोकार्पण", "परिचर्चा", "पुस्तक प्रदर्शनी", "दास्तानगोई", "कार्यशाला", "बाल-साहित्य", "हस्ताक्षर"]
+  : ["Author meets", "Poetry", "Book launches", "Conversations", "Book exhibition", "Dastangoi", "Workshops", "Children's books", "Signings"];
+
+const title = hi ? "किताब उत्सव · बोल्ड डिज़ाइन (प्रीव्यू)" : "Kitab Utsav · Bold design (preview)";
+---
+<!doctype html>
+<html lang={htmlLang[lang]}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title}</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@500;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="top">
+    <a class="pill pill--logo" href={L("/bold/")} aria-label={s.siteName}>
+      <img src="/brand/kitab-utsav-logo.svg" alt="" width="44" height="40" />
+      <span>{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
+    </a>
+    <nav class="pill pill--nav" aria-label={hi ? "मुख्य" : "Main"}>
+      <a href={L("/about/")}>{hi ? "परिचय" : "About"}</a>
+      <a href={L("/programme/")}>{s.nav.programme}</a>
+      <a href={L("/partners/")}>{s.nav.partners}</a>
+      <a href={other} lang={hi ? "en" : "hi"}>{hi ? "EN" : "हिं"}</a>
+    </nav>
+    <a class="pill pill--ink top__book" href={seat}>{s.bookSeat}</a>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <img class="hero__blob" src="/brand/hero-element.svg" alt="" aria-hidden="true" />
+      <div class="hero__chev" aria-hidden="true"></div>
+      <p class="hero__kicker">{up ? (hi ? "अगला पड़ाव" : "Next stop") : (hi ? "हाल का पड़ाव" : "Latest stop")} · {formatRange(fe, lang)}</p>
+      <div class="hero__foot">
+        <h1 class="hero__title">
+          <span class="hero__brand">{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
+          <span>{fe.city[lang]} <em>{fe.year}</em></span>
+        </h1>
+        <div class="hero__ctas">
+          <a class="btn btn--cream" href={seat}>{s.bookSeat}</a>
+          <a class="btn btn--line" href={L("/programme/")}>{s.upcomingEvents}</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITION PILLS -->
+    <section class="stack" aria-label={hi ? "संस्करण" : "Editions"}>
+      {rows.map((e, i) => {
+        const tile = (
+          <a class:list={["tile", `tile--${tones[i % tones.length]}`]} href={L(`/editions/${e.slug}/`)} aria-hidden="true" tabindex="-1">
+            <span class="tile__ini" lang="hi">{initial(e.city.hi)}</span>
+            <span class="tile__yr">{e.year}</span>
+          </a>
+        );
+        const cap = (
+          <div class="cap">
+            <div>
+              <h2 class="cap__t">{e.city[lang]} <small>{e.year}</small></h2>
+              <p class="cap__d">{formatRange(e, lang)}{e.venue ? ` · ${e.venue[lang].split(",")[0]}` : ""}</p>
+            </div>
+            <a class="btn btn--ink" href={L(`/editions/${e.slug}/`)}>{hi ? "देखें" : "Explore"}</a>
+          </div>
+        );
+        return <div class:list={["row", i % 2 && "row--flip", i === 0 && "row--lead"]}>{i % 2 ? <>{tile}{cap}</> : <>{cap}{tile}</>}</div>;
+      })}
+      <a class="more" href={L("/about/#editions")}>{hi ? "सभी 16 संस्करण" : "All 16 editions"} →</a>
+    </section>
+
+    <!-- MANIFESTO -->
+    <section class="mani">
+      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 40 C240 0 420 90 720 60 C980 34 1160 -10 1440 50 L1440 120 Z" /></svg>
+      <div class="mani__blob" aria-hidden="true"></div>
+      <div class="mani__in">
+        <p class="kick">{hi ? "राजकमल प्रकाशन समूह का घूमता पुस्तक उत्सव" : "Rajkamal Prakashan's travelling book festival"}</p>
+        <h2 class="mega">{tagline[lang]}</h2>
+        <ul class="totals">
+          {festivalTotals.map((x) => <li><b>{x.value}</b> {x.label[lang]}</li>)}
+        </ul>
+        <a class="btn btn--ink" href={L("/about/")}>{hi ? "हमारी कहानी" : "Our story"}</a>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="agenda">
+      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 70 C300 120 520 10 820 40 C1080 66 1260 110 1440 30 L1440 120 Z" /></svg>
+      <h2 class="big">{hi ? "कब, कहाँ" : "When & where"}</h2>
+      <ol class="agenda__list">
+        {byDate.slice(0, 5).map((e) => {
+          const live = nextEdition?.slug === e.slug;
+          return (
+            <li class="ag">
+              <span class="ag__p ag__date">{formatRange(e, lang, true)}</span>
+              <span class="ag__p ag__where"><b>{e.city[lang]}</b>{e.state[lang]}</span>
+              <span class:list={["ag__p", "ag__tag", live && "ag__tag--live"]}>{live ? (hi ? "आगामी" : "Upcoming") : (hi ? "सम्पन्न" : "Past")}</span>
+              <span class="ag__p ag__name">{hi ? `किताब उत्सव ${e.city.hi}` : `Kitab Utsav ${e.city.en}`}</span>
+              <a class="ag__p ag__go" href={live ? seat : L(`/editions/${e.slug}/`)}>{live ? s.bookSeat : (hi ? "झलकियाँ" : "Highlights")}</a>
+            </li>
+          );
+        })}
+      </ol>
+      <a class="under" href={L("/programme/")}>{s.upcomingEvents}</a>
+    </section>
+
+    <!-- NAMES -->
+    <section class="names">
+      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 30 C200 90 460 100 700 50 C960 0 1220 40 1440 90 L1440 120 Z" /></svg>
+      <p class="kick">{hi ? "मंच पर अब तक" : "On our stage so far"}</p>
+      <ul class="names__list">
+        {headline.map((p, i) => (
+          <li style={`--r:${(i % 3) - 1}deg`}>
+            <a href={L(`/resources/#${p.slug}`)}><span>{p.name[lang]}</span><i aria-hidden="true"></i></a>
+          </li>
+        ))}
+      </ul>
+      <a class="btn btn--cream" href={L("/resources/")}>{hi ? `सभी ${allSpeakers.length} नाम` : `All ${allSpeakers.length} names`} →</a>
+    </section>
+
+    <!-- FORMATS -->
+    <section class="formats">
+      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 80 C260 20 520 20 760 70 C1000 120 1240 60 1440 20 L1440 120 Z" /></svg>
+      <h2 class="big">{hi ? "उत्सव में क्या-क्या" : "What happens"}</h2>
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker__t">{[...formats, ...formats].map((f, i) => <span class={`sticker s${i % 5}`}>{f}</span>)}</div>
+      </div>
+      <ul class="sr">{formats.map((f) => <li>{f}</li>)}</ul>
+      <div class="invite">
+        <div>
+          <h3 class="invite__t">{hi ? "उत्सव को अपने शहर बुलाएँ" : "Bring the festival to your city"}</h3>
+          <p>{hi ? "संस्थान, कॉलेज या साहित्यिक समूह हैं? हमें लिखें, अगला पड़ाव आपका शहर हो सकता है।" : "An institution, college or literary group? Write to us; your city could be the next stop."}</p>
+        </div>
+        <a class="btn btn--ink" href={`mailto:${org.email}?subject=${encodeURIComponent("Kitab Utsav in our city")}`}>{hi ? "हमें लिखें" : "Write to us"}</a>
+      </div>
+    </section>
+
+    <!-- PARTNERS -->
+    <section class="partners">
+      <h2 class="big big--light">{hi ? "साथ चलने वाले" : "Our partners"}</h2>
+      <ul class="logos">
+        {partners.slice(0, 12).map((p) => <li><img src={p.logo} alt={p.name[lang]} /></li>)}
+      </ul>
+      <a class="under under--light" href={L("/partners/")}>{hi ? `सभी ${partners.length} साथी` : `All ${partners.length} partners`}</a>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot__nav">
+      <a href={L("/about/")}>{hi ? "परिचय" : "About"}</a>
+      <a href={L("/programme/")}>{s.nav.programme}</a>
+      <a href={L("/resources/")}>{hi ? "लेखक" : "Authors"}</a>
+      <a href={L("/partners/")}>{s.nav.partners}</a>
+      <a href={L("/visit/")}>{s.nav.visit}</a>
+      <a href={L("/faq/")}>{s.nav.faq}</a>
+    </div>
+    <div class="foot__card">
+      <h3>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h3>
+      <p>{org.address.streetAddress}<br />{org.address.addressLocality} {org.address.postalCode}</p>
+      <div class="foot__pills">
+        <a class="pill pill--cream" href={`mailto:${org.email}`}>{org.email} ↗</a>
+        <a class="pill pill--cream" href={`tel:${org.phones[0].tel}`}>{org.phones[0].label} ↗</a>
+        {festivalSocial.map((x) => <a class="pill pill--cream" href={x.url} rel="noopener">{x.name} ↗</a>)}
+      </div>
+    </div>
+    <a class="foot__book" href={seat}><span>{s.bookSeat}</span><i aria-hidden="true">→</i></a>
+    <p class="foot__note">{hi ? "डिज़ाइन प्रीव्यू · मौजूदा मुखपृष्ठ" : "Design preview · current home page"}: <a href={L("/")}>{L("/")}</a></p>
+  </footer>
+</body>
+</html>
+
+<style is:global>
+  :root {
+    --red: #de2026; --ink: #17110f; --cream: #fbf0d9; --blue: #114b9c; --navy: #0b2e63;
+    --saffron: #f2a33a; --sand: #e6cf94; --yellow: #ffe18a; --sky: #8fd0f2; --lilac: #c9b8ff; --lime: #d9f26b;
+    --display: "Baloo 2", "Mukta", system-ui, sans-serif;
+    --text: "Mukta", "Baloo 2", system-ui, sans-serif;
+    --g: clamp(10px, 1.4vw, 18px);
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--red); color: var(--ink); font: 500 17px/1.5 var(--text); overflow-x: hidden; }
+  a { color: inherit; }
+  img { max-width: 100%; display: block; }
+  :lang(en) .kick { letter-spacing: .14em; }
+  :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  main { overflow: clip; }
+
+  /* type */
+  .mega, .big, .hero__title, .cap__t, .names__list a, .foot__nav a, .invite__t, .foot__book, .tile__ini {
+    font-family: var(--display); font-weight: 800; letter-spacing: -.01em; text-transform: uppercase;
+  }
+  .kick { font: 800 .9rem/1.2 var(--text); text-transform: uppercase; margin: 0 0 18px; }
+  .big { font-size: clamp(2.6rem, 7vw, 6.2rem); line-height: 1.05; margin: 0 0 36px; text-align: center; }
+  .big--light { color: var(--cream); }
+
+  /* pills + buttons */
+  .pill { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; padding: 10px 20px; text-decoration: none; font: 800 .95rem/1 var(--display); }
+  .pill--cream { background: var(--cream); }
+  .pill--ink { background: var(--ink); color: var(--cream); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 64px; padding: 0 32px; border-radius: 999px; text-decoration: none; font: 800 1.05rem/1 var(--display); text-transform: uppercase; white-space: nowrap; transition: transform .25s cubic-bezier(.3,1.6,.5,1), background .2s, color .2s; }
+  .btn:hover { transform: scale(1.06) rotate(-2deg); }
+  .btn--ink { background: var(--ink); color: var(--cream); }
+  .btn--cream { background: var(--cream); color: var(--ink); }
+  .btn--line { border: 3px solid var(--cream); color: var(--cream); }
+  .btn--line:hover { background: var(--cream); color: var(--ink); }
+
+  /* header */
+  .top { position: fixed; z-index: 20; inset: 14px 14px auto; display: flex; align-items: center; gap: 10px; pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .pill--logo { background: var(--cream); padding: 6px 18px 6px 8px; font-size: 1.15rem; }
+  .pill--logo img { width: 40px; height: auto; }
+  .pill--nav { margin-left: auto; background: var(--cream); gap: 4px; padding: 6px; }
+  .pill--nav a { padding: 10px 14px; border-radius: 999px; text-decoration: none; }
+  .pill--nav a:hover { background: var(--red); color: var(--cream); }
+  .top__book { padding: 16px 22px; }
+  .top__book:hover { background: var(--navy); }
+
+  /* hero */
+  .hero { position: relative; isolation: isolate; margin: var(--g); min-height: min(88vh, 860px); border-radius: clamp(28px, 5vw, 64px); background: var(--navy); color: var(--cream); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(96px, 12vw, 140px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
+  .hero__blob { position: absolute; z-index: -1; right: -6%; top: 2%; width: min(980px, 92%); opacity: .95; animation: bob 9s ease-in-out infinite; }
+  .hero__chev { position: absolute; z-index: -1; inset: auto -10% -30% auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: repeating-linear-gradient(-45deg, transparent 0 34px, rgba(242,163,58,.16) 34px 50px); }
+  .hero__kicker { align-self: flex-start; margin: 0; padding: 10px 18px; border-radius: 999px; background: var(--yellow); color: var(--ink); font: 800 .95rem/1 var(--display); }
+  .hero__foot { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px 32px; }
+  .hero__title { margin: 0; font-size: clamp(3.4rem, 12.5vw, 12rem); line-height: 1; }
+  .hero__title span { display: block; }
+  :lang(en) .hero__title { font-size: clamp(3rem, 8.4vw, 8.4rem); }
+  .hero__title > span:last-child { text-shadow: 0 6px 30px rgba(11,46,99,.6); }
+  .hero__title em { font-style: normal; color: var(--saffron); }
+  .hero__brand { font-size: .34em; line-height: 1.2; margin-bottom: .06em; color: var(--yellow); }
+  .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+  @keyframes bob { 50% { transform: translateY(-14px) rotate(-1.5deg); } }
+
+  /* edition pills */
+  .stack { display: grid; gap: var(--g); margin: 0 var(--g); }
+  .row { display: grid; grid-template-columns: 1fr minmax(180px, 34%); gap: var(--g); }
+  .row--flip { grid-template-columns: minmax(180px, 34%) 1fr; }
+  .cap { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: clamp(130px, 14vw, 200px); padding: 18px clamp(22px, 4vw, 56px); border-radius: 999px; background: var(--cream); }
+  .cap__t { margin: 0; font-size: clamp(2rem, 5vw, 4.4rem); line-height: 1.05; }
+  .cap__t small { font-size: .55em; color: var(--red); }
+  .cap__d { margin: 8px 0 0; font-weight: 700; color: #5a4a40; }
+  .row--lead .cap { background: var(--yellow); }
+  .tile { position: relative; overflow: hidden; display: grid; place-items: center; border-radius: 999px; text-decoration: none; min-height: 100%; transition: transform .3s cubic-bezier(.3,1.5,.5,1); }
+  .tile:hover { transform: rotate(-3deg) scale(1.02); }
+  .tile::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent 0 22px, rgba(255,255,255,.14) 22px 34px); }
+  .tile__ini { position: relative; font-size: clamp(4rem, 9vw, 8rem); line-height: 1; transform: translateY(.06em) rotate(-6deg); }
+  .tile__yr { position: absolute; right: 12%; bottom: 16%; padding: 6px 12px; border-radius: 999px; background: var(--ink); color: var(--cream); font: 800 .9rem/1 var(--display); }
+  .tile--blue { background: var(--blue); color: var(--yellow); }
+  .tile--saffron { background: var(--saffron); color: var(--navy); }
+  .tile--navy { background: var(--navy); color: var(--saffron); }
+  .tile--sand { background: var(--sand); color: var(--red); }
+  .tile--red { background: #b5161c; color: var(--cream); }
+  .tile--sky { background: var(--sky); color: var(--navy); }
+  .more { justify-self: center; margin: 12px 0 0; padding: 14px 24px; border-radius: 999px; background: var(--ink); color: var(--cream); text-decoration: none; font: 800 1rem/1 var(--display); text-transform: uppercase; }
+
+  /* waves */
+  section.mani, section.agenda, section.names, section.formats { position: relative; padding: clamp(110px, 12vw, 180px) clamp(16px, 4vw, 48px) clamp(80px, 9vw, 130px); }
+  .wave { position: absolute; left: 0; top: -1px; width: 100%; height: clamp(60px, 9vw, 130px); transform: scaleY(-1); }
+  .mani { margin-top: 60px; background: var(--saffron); text-align: center; }
+  .mani .wave path { fill: var(--red); }
+  .mani__blob { position: absolute; left: 50%; top: 52%; width: min(760px, 90vw); aspect-ratio: 1.5; transform: translate(-50%, -50%) rotate(-6deg); border-radius: 46% 54% 38% 62% / 55% 40% 60% 45%; background: var(--yellow); }
+  .mani__in { position: relative; max-width: 1100px; margin: 0 auto; }
+  .mega { margin: 0 0 30px; font-size: clamp(3.2rem, 10vw, 9rem); line-height: 1.05; color: var(--navy); }
+  .totals { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 34px; padding: 0; }
+  .totals li { padding: 12px 22px; border-radius: 999px; background: var(--cream); font: 700 1.05rem/1 var(--display); }
+  .totals b { font-size: 1.5em; color: var(--red); }
+
+  .agenda { background: var(--sky); }
+  .agenda .wave path { fill: var(--saffron); }
+  .agenda__list { list-style: none; margin: 0 auto; padding: 0; max-width: 1320px; display: grid; gap: 6px; }
+  .ag { display: grid; grid-template-columns: 1.1fr 1.1fr .8fr 2fr 1fr; gap: 6px; }
+  .ag__p { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-height: 64px; padding: 8px 16px; border-radius: 999px; background: #fff; font: 800 .92rem/1.15 var(--display); text-transform: uppercase; }
+  .ag__where { font-weight: 600; text-transform: none; }
+  .ag__where b { font-weight: 800; text-transform: uppercase; }
+  .ag__tag { background: var(--lilac); }
+  .ag__tag--live { background: var(--lime); }
+  .ag__name { font-size: clamp(1rem, 1.8vw, 1.5rem); }
+  .ag__go { background: var(--ink); color: var(--cream); text-decoration: none; transition: background .2s; }
+  .ag__go:hover { background: var(--red); }
+  .under { display: table; margin: 34px auto 0; font: 800 1rem/1 var(--display); text-transform: uppercase; text-underline-offset: 6px; text-decoration-thickness: 3px; }
+  .under--light { color: var(--cream); }
+
+  .names { background: var(--red); text-align: center; color: var(--ink); }
+  .names .wave path { fill: var(--sky); }
+  .names__list { list-style: none; margin: 0 0 40px; padding: 0; display: grid; gap: 0; justify-items: center; }
+  .names__list li { transform: rotate(var(--r)); }
+  .names__list a { display: inline-flex; align-items: center; gap: .3em; text-decoration: none; font-size: clamp(2.3rem, 7.4vw, 6.4rem); line-height: 1.2; }
+  .names__list i { flex: none; width: .56em; height: .56em; border-radius: 50%; background: var(--cream) linear-gradient(var(--ink), var(--ink)) center / 46% 14% no-repeat; position: relative; transition: transform .3s; }
+  .names__list i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--ink), var(--ink)) center / 14% 46% no-repeat; }
+  .names__list a:hover { color: var(--cream); }
+  .names__list a:hover i { transform: rotate(90deg); background: var(--yellow); }
+
+  .formats { background: var(--lilac); }
+  .formats .wave path { fill: var(--red); }
+  .ticker { overflow: hidden; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)) 60px; padding: 30px 0; }
+  .ticker__t { display: flex; gap: 18px; width: max-content; animation: tick 38s linear infinite; }
+  .sticker { padding: 18px 30px; border-radius: 999px; font: 800 clamp(1.3rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; white-space: nowrap; }
+  .s0 { background: var(--ink); color: var(--lime); transform: rotate(-4deg); }
+  .s1 { background: var(--yellow); transform: rotate(3deg); }
+  .s2 { background: var(--blue); color: var(--cream); transform: rotate(-2deg); }
+  .s3 { background: var(--cream); transform: rotate(5deg); }
+  .s4 { background: var(--red); color: var(--cream); transform: rotate(-5deg); }
+  @keyframes tick { to { transform: translateX(-50%); } }
+  .invite { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 22px; max-width: 1120px; margin: 0 auto; padding: clamp(28px, 4vw, 52px); border-radius: clamp(28px, 5vw, 60px); background: var(--lime); }
+  .invite__t { margin: 0 0 8px; font-size: clamp(1.9rem, 4vw, 3.4rem); line-height: 1.1; }
+  .invite p { margin: 0; max-width: 560px; font-weight: 600; }
+
+  .partners { padding: clamp(70px, 8vw, 120px) clamp(16px, 4vw, 48px); background: var(--navy); }
+  .logos { list-style: none; margin: 0 auto; padding: 0; max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .logos li { display: grid; place-items: center; height: 104px; padding: 16px 22px; border-radius: 999px; background: var(--cream); }
+  .logos img { max-height: 64px; width: auto; object-fit: contain; mix-blend-mode: multiply; }
+
+  /* footer */
+  .foot { display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--g); padding: var(--g); padding-top: clamp(40px, 6vw, 80px); }
+  .foot__nav { display: grid; align-content: start; padding: clamp(24px, 4vw, 44px); border-radius: clamp(28px, 4vw, 48px); background: var(--cream); }
+  .foot__nav a { text-decoration: none; font-size: clamp(2rem, 4.6vw, 4rem); line-height: 1.15; }
+  .foot__nav a:hover { color: var(--red); }
+  .foot__card { padding: clamp(24px, 4vw, 44px); border-radius: clamp(28px, 4vw, 48px); background: var(--ink); color: var(--cream); }
+  .foot__card h3 { margin: 0 0 10px; font: 800 clamp(1.5rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; color: var(--yellow); }
+  .foot__pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .foot__pills .pill { color: var(--ink); }
+  .foot__book { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: clamp(22px, 3vw, 34px) clamp(26px, 4vw, 56px); border-radius: 999px; background: var(--yellow); text-decoration: none; font-size: clamp(1.8rem, 5.4vw, 5rem); line-height: 1; transition: background .2s; }
+  .foot__book i { font-style: normal; transition: transform .3s; }
+  .foot__book:hover { background: var(--cream); }
+  .foot__book:hover i { transform: translateX(10px); }
+  .foot__note { grid-column: 1 / -1; margin: 6px 8px 10px; font-weight: 700; font-size: .85rem; color: var(--cream); }
+
+  @media (max-width: 900px) {
+    .pill--nav a:not(:last-child) { display: none; }
+    .ag { grid-template-columns: 1fr 1fr; }
+    .ag__name { grid-column: 1 / -1; order: -1; }
+    .ag__go { grid-column: 1 / -1; }
+    .foot { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .pill--logo span { display: none; }
+    .top__book { padding: 14px 16px; font-size: .88rem; }
+    .hero { min-height: 640px; }
+    .hero__blob { width: 150%; right: -40%; top: 8%; }
+    .btn { min-height: 56px; padding: 0 24px; font-size: .95rem; }
+    .row, .row--flip { grid-template-columns: 1fr 96px; }
+    .row--flip .tile { order: 2; }
+    .cap { flex-direction: column; align-items: flex-start; border-radius: 40px; padding: 22px 24px; }
+    .cap .btn { min-height: 46px; }
+    .tile { border-radius: 40px; }
+    .tile__yr { right: 50%; transform: translateX(50%); bottom: 12px; font-size: .75rem; }
+    .ag { grid-template-columns: 1fr 1fr; padding: 6px; border-radius: 34px; background: rgba(255,255,255,.45); }
+    .ag__where, .ag__tag { display: none; }
+    .ag__name { grid-column: 1 / -1; order: -1; }
+    .ag__go { grid-column: auto; }
+    .ag__p { min-height: 50px; }
+    .logos { grid-template-columns: repeat(2, 1fr); }
+    .logos li { height: 84px; }
+    .foot__book { border-radius: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hero__blob, .ticker__t { animation: none; } .btn, .tile, .names__list i { transition: none; } }
+</style>
