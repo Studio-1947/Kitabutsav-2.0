@@ -1,0 +1,30 @@
+---
+/** Moving logo strip of every partner, for the home page. */
+import { partners } from "../data/partners";
+import { localePath, type Lang } from "../i18n";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const hi = lang === "hi";
+---
+<section class="section" aria-labelledby="partners-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">{hi ? "साथी और प्रायोजक" : "Partners & sponsors"}</p>
+        <h2 class="h2" id="partners-h">{hi ? "शहर-शहर साथ चलने वाले" : "With us, city by city"}</h2>
+      </div>
+      <a class="link-more" href={localePath(lang, "/partners/")}>{hi ? "सभी साथी" : "All partners"}</a>
+    </div>
+  </div>
+  <div class="logo-strip">
+    <ul class="logo-strip__track">
+      {[...partners, ...partners].map((p, i) => (
+        <li aria-hidden={i >= partners.length ? "true" : undefined}>
+          <a href={localePath(lang, "/partners/")} tabindex={i >= partners.length ? -1 : undefined}>
+            <img src={p.logo} alt={i < partners.length ? p.name[lang] : ""} loading="lazy" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

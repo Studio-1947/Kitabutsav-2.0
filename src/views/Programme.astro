@@ -20,8 +20,8 @@ const site = Astro.site!;
 const e = editionBySlug(programme.editionSlug)!;
 const when = formatRange(e, lang);
 const title = hi
-  ? `कार्यक्रम: किताब उत्सव ${e.city.hi} ${e.year} | दिन-वार सत्र`
-  : `Programme: Kitab Utsav ${e.city.en} ${e.year} | Day-wise sessions`;
+  ? `आयोजन: किताब उत्सव ${e.city.hi} ${e.year} | दिन-वार सत्र`
+  : `Events: Kitab Utsav ${e.city.en} ${e.year} | Day-wise sessions`;
 const description = hi
   ? `किताब उत्सव ${e.city.hi} (${when}) का दिन-वार कार्यक्रम: उद्घाटन, बातचीत, लोकार्पण, चर्चा, पाठ और काव्य संध्या। ${e.venue?.hi ?? ""}`
   : `Day-wise programme for Kitab Utsav ${e.city.en} (${when}): opening, conversations, book launches, discussions, readings and poetry. ${e.venue?.en ?? ""}`;
@@ -57,7 +57,7 @@ if (ev) {
     <div class="wrap">
       <Crumbs lang={lang} items={crumbs} />
       <p class="eyebrow">{hi ? `${e.city.hi} · ${when}` : `${e.city.en} · ${when}`}</p>
-      <h1>{hi ? "कार्यक्रम" : "Programme"}</h1>
+      <h1>{hi ? "आयोजन" : "Events"}</h1>
       <p class="lead">
         {hi
           ? `${e.venue?.hi}। रोज़ ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")} तक। पुस्तक प्रदर्शनी पूरे दिन खुली रहेगी।`

@@ -12,6 +12,13 @@ export default defineConfig({
   trailingSlash: "always",
   build: { format: "directory", inlineStylesheets: "auto" },
   compressHTML: true,
+  // Festivals and Gallery were folded into "About Kitab Utsav".
+  redirects: {
+    "/editions/": "/about/#editions",
+    "/en/editions/": "/en/about/#editions",
+    "/gallery/": "/about/#gallery",
+    "/en/gallery/": "/en/about/#gallery",
+  },
   i18n: {
     locales: ["hi", "en"],
     defaultLocale: "hi",
@@ -19,7 +26,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes("/404"),
+      filter: (page) => !page.includes("/404") && !/\/(en\/)?(editions|gallery)\/$/.test(new URL(page).pathname),
       i18n: {
         defaultLocale: "hi",
         locales: { hi: "hi-IN", en: "en-IN" },

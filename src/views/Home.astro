@@ -5,6 +5,7 @@ import Icon from "../components/Icon.astro";
 import NextEdition from "../components/NextEdition.astro";
 import NextSoon from "../components/NextSoon.astro";
 import GalleryGrid from "../components/GalleryGrid.astro";
+import PartnerStrip from "../components/PartnerStrip.astro";
 import EditionCard from "../components/EditionCard.astro";
 import CityThumb from "../components/CityThumb.astro";
 import Clouds from "../components/Clouds.astro";
@@ -123,10 +124,8 @@ const days = Array.from({ length: 5 }, (_, i) => {
           {festivalTotals.map((x) => <li><b>{x.value}</b>{x.label[lang]}</li>)}
         </ul>
         <div class="btns">
-          {up
-            ? <a class="btn btn--primary" href={seatHref} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>{s.bookSeat}</a>
-            : <a class="btn btn--primary" href="#newsletter">{hi ? "अगले उत्सव की ख़बर पाएँ" : "Hear about the next one"}</a>}
-          <a class="btn" href={localePath(lang, "/editions/")}>{s.allEditions}</a>
+          <a class="btn btn--primary" href={seatHref} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>{s.bookSeat}</a>
+          <a class="btn" href={localePath(lang, "/programme/")}>{s.upcomingEvents}</a>
         </div>
       </div>
       <div class="hero-side">
@@ -179,7 +178,7 @@ const days = Array.from({ length: 5 }, (_, i) => {
         <a class="link-more" href={localePath(lang, `/editions/${fe.slug}/`)}>{s.exploreDetails}</a>
       </div>
       <GalleryGrid items={recentPhotos} lang={lang} />
-      <p class="gallery-more"><a class="btn" href={localePath(lang, "/gallery/")}><Icon name="camera" />{hi ? "पूरी गैलरी" : "Full gallery"}</a></p>
+      <p class="gallery-more"><a class="btn" href={localePath(lang, "/about/#gallery")}><Icon name="camera" />{hi ? "पूरी गैलरी" : "Full gallery"}</a></p>
     </div>
   </section>
   )}
@@ -254,7 +253,7 @@ const days = Array.from({ length: 5 }, (_, i) => {
               : "Kitab Utsav began in Bhopal in the 75th year of Rajkamal Prakashan. Since then it has travelled to Hindi-reading cities large and small."}
           </p>
         </div>
-        <a class="link-more" href={localePath(lang, "/editions/")}>{s.allEditions}</a>
+        <a class="link-more" href={localePath(lang, "/about/#editions")}>{s.allEditions}</a>
       </div>
       <ol class="journey journey--cards">
         {journey.map((j) => (
@@ -296,13 +295,15 @@ const days = Array.from({ length: 5 }, (_, i) => {
           <p class="eyebrow">{s.nav.editions}</p>
           <h2 class="h2" id="recent">{hi ? "हाल के संस्करण" : "Recent editions"}</h2>
         </div>
-        <a class="link-more" href={localePath(lang, "/editions/")}>{s.allEditions}</a>
+        <a class="link-more" href={localePath(lang, "/about/#editions")}>{s.allEditions}</a>
       </div>
       <div class="grid grid--3">
         {editions.slice(0, 6).map((e) => <EditionCard e={e} lang={lang} />)}
       </div>
     </div>
   </section>
+
+  <PartnerStrip lang={lang} />
 
   <section class="section" aria-labelledby="faq">
     <div class="wrap">

@@ -2,7 +2,7 @@
 import Icon from "./Icon.astro";
 import { t, localePath, routeOf, type Lang } from "../i18n";
 import { org, bookSeatUrl } from "../site.config";
-import { nextEdition } from "../data/editions";
+import { nextEdition, featuredEdition } from "../data/editions";
 
 interface Props { lang: Lang; altHref: string }
 const { lang, altHref } = Astro.props;
@@ -10,20 +10,14 @@ const s = t(lang);
 const route = routeOf(Astro.url.pathname);
 const L = (p: string) => localePath(lang, p);
 
+// Two main subpages (About Kitab Utsav, Events) plus partners; the rest live in the footer.
 const nav = [
-  { href: L("/editions/"), label: s.nav.editions, match: "/editions/" },
+  { href: L("/about/"), label: s.nav.about, match: "/about/", also: "/editions/" },
   { href: L("/programme/"), label: s.nav.programme, match: "/programme/" },
-  { href: L("/resources/"), label: lang === "hi" ? "लेखक" : "Authors", match: "/resources/" },
-  { href: L("/gallery/"), label: lang === "hi" ? "गैलरी" : "Gallery", match: "/gallery/" },
-  { href: L("/about/"), label: s.nav.about, match: "/about/" },
-  { href: L("/visit/"), label: s.nav.visit, match: "/visit/" },
-  { href: L("/faq/"), label: s.nav.faq, match: "/faq/" },
+  { href: L("/partners/"), label: s.nav.partners, match: "/partners/" },
 ];
 const icsHref = nextEdition ? `/ics/${nextEdition.slug}.ics` : null;
-// Between editions there is no seat to book: the CTA collects emails for the next one instead.
-const cta = nextEdition
-  ? { href: bookSeatUrl ?? L(`/editions/${nextEdition.slug}/`), label: s.bookSeat, ext: !!bookSeatUrl }
-  : { href: "#newsletter", label: lang === "hi" ? "ख़बर पाएँ" : "Get updates", ext: false };
+const seatHref = bookSeatUrl ?? L(`/editions/${(nextEdition ?? featuredEdition).slug}/`);
 ---
 <header class="site-header" id="siteHeader">
   <div class="header-top">
@@ -34,7 +28,7 @@ const cta = nextEdition
     <nav class="header-nav-main" aria-label={lang === "hi" ? "मुख्य नेविगेशन" : "Main navigation"}>
       <ul>
         {nav.map((n) => (
-          <li><a href={n.href} aria-current={route.startsWith(n.match) ? "page" : undefined}>{n.label}</a></li>
+          <li><a href={n.href} aria-current={route.startsWith(n.match) || (n.also && route.startsWith(n.also)) ? "page" : undefined}>{n.label}</a></li>
         ))}
         <li><a class="nav-ext" href={org.url} target="_blank" rel="noopener">{s.nav.shop}<Icon name="ext" /></a></li>
       </ul>
@@ -50,7 +44,10 @@ const cta = nextEdition
       <button type="button" class="pill-btn pill-btn--burger" aria-label={s.openMenu} aria-expanded="false" aria-controls="mobileMenu"><span class="burger-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>
     </div>
 
-    <a class="btn btn--primary header-cta" href={cta.href} {...(cta.ext ? { target: "_blank", rel: "noopener" } : {})}>{cta.label}</a>
+    <div class="header-ctas">
+      <a class="btn header-cta header-cta--events" href={L("/programme/")}>{s.upcomingEvents}</a>
+      <a class="btn btn--primary header-cta" href={seatHref} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>{s.bookSeat}</a>
+    </div>
   </div>
 
   <div class="mobile-menu" id="mobileMenu" hidden>

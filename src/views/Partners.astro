@@ -1,0 +1,95 @@
+---
+import Base from "../layouts/Base.astro";
+import Crumbs from "../components/Crumbs.astro";
+import Clouds from "../components/Clouds.astro";
+import Icon from "../components/Icon.astro";
+import PartnerLogo from "../components/PartnerLogo.astro";
+import { partners, groupLabel, groupOrder } from "../data/partners";
+import { org } from "../site.config";
+import { t, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const label = hi ? "साथी और प्रायोजक" : "Partners & sponsors";
+const title = hi ? "किताब उत्सव के साथी और प्रायोजक" : "Kitab Utsav partners and sponsors";
+const description = hi
+  ? `किताब उत्सव को शहर-शहर पहुँचाने वाले ${partners.length} साथी: सरकारी और सांस्कृतिक संस्थान, आयोजन स्थल, मीडिया, प्रकाशक, साहित्यिक समुदाय, शिक्षण संस्थाएँ और व्यवसाय।`
+  : `The ${partners.length} partners who help take Kitab Utsav from city to city: government and cultural institutions, venues, media, publishers, literary communities, educators and businesses.`;
+const crumbs = [{ name: label, path: "/partners/" }];
+const groups = groupOrder.map((g) => ({ g, items: partners.filter((p) => p.group === g) })).filter((x) => x.items.length);
+const cities = [...new Map(partners.flatMap((p) => p.city.en.split(" & ").map((en, i) => [en.toLowerCase(), p.city[lang].split(hi ? " और " : " & ")[i]] as [string, string]))).entries()];
+const mail = `mailto:${org.email}?subject=${encodeURIComponent(hi ? "किताब उत्सव: साझेदारी" : "Kitab Utsav: partnership")}`;
+const orgLd = {
+  "@type": "ItemList",
+  name: title,
+  itemListElement: partners.map((p, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Organization", name: p.name.en, ...(p.url ? { url: p.url } : {}) } })),
+};
+---
+<Base lang={lang} route="/partners/" title={title} description={description} crumbs={crumbs} jsonLd={[orgLd]}>
+  <section class="page-hero">
+    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+    <div class="wrap">
+      <Crumbs lang={lang} items={crumbs} />
+      <p class="eyebrow">{label}</p>
+      <h1>{hi ? <>साथ जुड़ें, <em>साथ पढ़ें</em></> : <>Come together, <em>read together</em></>}</h1>
+      <p class="lead">
+        {hi
+          ? `किताब उत्सव अकेले नहीं चलता। हर शहर में संस्थान, मंच, मीडिया, प्रकाशक और साहित्यिक समुदाय इसे पाठकों तक पहुँचाते हैं। अब तक ${partners.length} साथी।`
+          : `Kitab Utsav never travels alone. In every city, institutions, venues, media, publishers and literary communities help bring it to readers. ${partners.length} partners so far.`}
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:28px">
+    <div class="wrap">
+      <div class="chips" role="group" aria-label={hi ? "शहर से छाँटें" : "Filter by city"} data-pfilter>
+        <button type="button" class="chip" aria-pressed="true" data-city="">{hi ? "सभी शहर" : "All cities"}</button>
+        {cities.map(([key, name]) => <button type="button" class="chip" aria-pressed="false" data-city={key}>{name}</button>)}
+      </div>
+
+      <div class="partner-groups">
+      {groups.map(({ g, items }) => (
+        <section class="partner-group" aria-labelledby={`pg-${g}`} data-pgroup style={`--span:${Math.min(items.length, 5)}`}>
+          <h2 id={`pg-${g}`}>{groupLabel[g][lang]} <span>{items.length}</span></h2>
+          <div class="partner-grid">
+            {items.map((p) => <PartnerLogo p={p} lang={lang} />)}
+          </div>
+        </section>
+      ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band">
+      <Clouds items={[{ x: "55%", y: "-30%", w: 260 }, { x: "-6%", y: "50%", w: 200, flip: true }]} />
+      <div>
+        <h2>{hi ? "अपने शहर में किताब उत्सव के साथी बनें" : "Partner with Kitab Utsav in your city"}</h2>
+        <p>{hi ? "आयोजन स्थल, मीडिया, संस्थान या प्रायोजक के रूप में जुड़ने के लिए लिखें।" : "Write to us to join as a venue, media partner, institution or sponsor."}</p>
+      </div>
+      <div class="btns">
+        <a class="btn btn--primary" href={mail}><Icon name="mail" />{hi ? "साझेदारी के लिए लिखें" : "Write to us"}</a>
+      </div>
+    </div>
+  </div>
+  <script is:inline>
+    document.querySelectorAll("[data-pfilter]").forEach(function (bar) {
+      bar.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-city]");
+        if (!b) return;
+        var c = b.getAttribute("data-city");
+        bar.querySelectorAll("[data-city]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+        document.querySelectorAll("[data-pgroup]").forEach(function (g) {
+          var any = false;
+          g.querySelectorAll(".partner").forEach(function (p) {
+            var on = !c || p.getAttribute("data-city").split(" & ").indexOf(c) >= 0;
+            p.hidden = !on; any = any || on;
+          });
+          g.hidden = !any;
+        });
+      });
+    });
+  </script>
+</Base>

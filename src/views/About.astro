@@ -1,30 +1,68 @@
 ---
+/**
+ * About Kitab Utsav: the festival's story, every edition and the photo gallery on one page.
+ * /editions/ and /gallery/ redirect here (see astro.config.mjs); edition detail pages stay.
+ */
 import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
-import { localePath, t, type Lang } from "../i18n";
-import { org } from "../site.config";
+import EditionCard from "../components/EditionCard.astro";
+import GalleryGrid from "../components/GalleryGrid.astro";
+import { editions } from "../data/editions";
+import { galleryFor, hasRealPhotos } from "../data/gallery";
+import { festivalTotals } from "../data/speakers";
+import { festivalSocial, org } from "../site.config";
+import { formatRange, localePath, t, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const s = t(lang);
 const hi = lang === "hi";
-const title = hi ? "किताब उत्सव के बारे में: राजकमल प्रकाशन समूह की पहल" : "About Kitab Utsav: a Rajkamal Prakashan Samuh initiative";
+const site = Astro.site!;
+const title = hi ? "किताब उत्सव के बारे में: कहानी, संस्करण और तस्वीरें" : "About Kitab Utsav: the story, every edition and the gallery";
 const description = hi
-  ? "किताब उत्सव राजकमल प्रकाशन समूह का घूमता हुआ हिन्दी पुस्तक उत्सव है, जिसकी शुरुआत भोपाल में राजकमल के 75वें वर्ष में हुई। जानिए उत्सव का विचार, स्वरूप और इतिहास।"
-  : "Kitab Utsav is Rajkamal Prakashan Samuh's travelling Hindi book festival, begun in Bhopal in Rajkamal's 75th year. The idea, the format and the story so far.";
-const crumbs = [{ name: s.nav.about, path: "/about/" }];
+  ? "किताब उत्सव राजकमल प्रकाशन समूह का घूमता हुआ हिन्दी पुस्तक उत्सव है। इसकी शुरुआत, अब तक के सभी संस्करण (शहर, तारीख़ें, स्थान) और हर पड़ाव की तस्वीरें।"
+  : "Kitab Utsav is Rajkamal Prakashan Samuh's travelling Hindi book festival. How it began, every edition so far (cities, dates, venues) and photos from each stop.";
+const label = hi ? "किताब उत्सव के बारे में" : "About Kitab Utsav";
+const crumbs = [{ name: label, path: "/about/" }];
+const byYear = [...new Set(editions.map((e) => e.year))].sort((a, b) => b - a);
+const withPhotos = editions.filter((e) => galleryFor(e.slug).length);
+const itemList = {
+  "@type": "ItemList",
+  name: hi ? "किताब उत्सव के संस्करण" : "Kitab Utsav editions",
+  itemListElement: editions.map((e, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    url: new URL(localePath(lang, `/editions/${e.slug}/`), site).href,
+    name: hi ? `किताब उत्सव ${e.city.hi} ${e.year}` : `Kitab Utsav ${e.city.en} ${e.year}`,
+  })),
+};
+const sections = [
+  { id: "story", label: hi ? "परिचय" : "The story" },
+  { id: "editions", label: hi ? "संस्करण" : "Editions" },
+  { id: "gallery", label: hi ? "गैलरी" : "Gallery" },
+];
 ---
-<Base lang={lang} route="/about/" title={title} description={description} crumbs={crumbs}>
+<Base lang={lang} route="/about/" title={title} description={description} crumbs={crumbs} jsonLd={[itemList]}>
   <section class="page-hero">
     <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
     <div class="wrap">
       <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{s.nav.about}</p>
-      <h1>{hi ? "किताबें जहाँ पाठकों से मिलती हैं" : "Where books meet their readers"}</h1>
+      <p class="eyebrow">{label}</p>
+      <h1>{hi ? <>किताबें जहाँ <em>पाठकों से मिलती हैं</em></> : <>Where books <em>meet their readers</em></>}</h1>
+      <ul class="totals" aria-label={hi ? "अब तक" : "So far"}>
+        {festivalTotals.map((x) => <li><b>{x.value}</b>{x.label[lang]}</li>)}
+      </ul>
     </div>
   </section>
-  <section class="section" style="padding-top:28px">
+
+  <nav class="page-tabs" aria-label={hi ? "इस पेज पर" : "On this page"}>
+    <div class="wrap">
+      {sections.map((x) => <a href={`#${x.id}`}>{x.label}</a>)}
+    </div>
+  </nav>
+
+  <section class="section anchor" id="story" style="padding-top:40px" aria-label={sections[0].label}>
     <div class="wrap prose">
       {hi ? (
         <>
@@ -42,7 +80,7 @@ const crumbs = [{ name: s.nav.about, path: "/about/" }];
           </ul>
           <h2>राजकमल प्रकाशन समूह</h2>
           <p>1947 में स्थापित राजकमल प्रकाशन हिन्दी के प्रमुख प्रकाशन घरानों में है। समूह में राजकमल प्रकाशन, राधाकृष्ण प्रकाशन, लोकभारती प्रकाशन और राजकमल उर्दू शामिल हैं। मुख्यालय नई दिल्ली के दरियागंज में है और पटना, प्रयागराज व मुम्बई में शाखाएँ हैं।</p>
-          <p>समूह की किताबें ऑनलाइन <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a> पर उपलब्ध हैं। अपने शहर में किताब उत्सव के लिए <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a> पर लिखें, या <a href={localePath(lang, "/editions/")}>अब तक के संस्करण</a> देखें।</p>
+          <p>समूह की किताबें ऑनलाइन <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a> पर उपलब्ध हैं। अपने शहर में किताब उत्सव के लिए <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a> पर लिखें, या नीचे <a href="#editions">अब तक के संस्करण</a> देखें।</p>
         </>
       ) : (
         <>
@@ -60,9 +98,87 @@ const crumbs = [{ name: s.nav.about, path: "/about/" }];
           </ul>
           <h2>Rajkamal Prakashan Samuh</h2>
           <p>Founded in 1947, Rajkamal Prakashan is one of the leading Hindi publishing houses. The group includes Rajkamal Prakashan, Radhakrishna Prakashan, Lokbharti Prakashan and Rajkamal Urdu, with its head office in Daryaganj, New Delhi, and branches in Patna, Prayagraj and Mumbai.</p>
-          <p>The group's books are available online at <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a>. To bring Kitab Utsav to your city, write to <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a>, or browse the <a href={localePath(lang, "/editions/")}>editions so far</a>.</p>
+          <p>The group's books are available online at <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a>. To bring Kitab Utsav to your city, write to <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a>, or browse the <a href="#editions">editions so far</a> below.</p>
         </>
       )}
     </div>
   </section>
+
+  <section class="section anchor" id="editions" aria-labelledby="editions-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">{hi ? "शहर दर शहर" : "City by city"}</p>
+          <h2 class="h2" id="editions-h">{hi ? "अब तक के संस्करण" : "Editions so far"}</h2>
+          <p class="lead">
+            {hi
+              ? "नीचे वे संस्करण हैं जिनकी पूरी जानकारी उपलब्ध है। किसी शहर पर क्लिक करें: तारीख़ें, स्थान, वक्ता और तस्वीरें।"
+              : "Below are the editions with full details on record. Open a city for its dates, venue, speakers and photos."}
+          </p>
+        </div>
+      </div>
+      {byYear.map((y) => (
+        <div class="year-block">
+          <h3 class="year-block__y">{y}</h3>
+          <div class="grid grid--3">
+            {editions.filter((e) => e.year === y).map((e) => <EditionCard e={e} lang={lang} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section anchor" id="gallery" aria-labelledby="gallery-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">{hi ? "गैलरी" : "Gallery"}</p>
+          <h2 class="h2" id="gallery-h">{hi ? "शहर दर शहर, तस्वीरों में" : "City by city, in pictures"}</h2>
+        </div>
+      </div>
+      {!hasRealPhotos && (
+        <div class="notice" role="note">
+          <p>
+            {hi ? "तस्वीरें जोड़ी जा रही हैं। तब तक उत्सव की झलकियाँ " : "Photos are being added. Until then, see festival moments on "}
+            <a href={festivalSocial[0].url} target="_blank" rel="noopener" style="text-decoration:underline">{festivalSocial[0].handle}</a>
+            {hi ? " पर देखें।" : "."}
+          </p>
+        </div>
+      )}
+      <div data-gallery-tabs>
+        <div class="chips" role="tablist" aria-label={hi ? "संस्करण चुनें" : "Choose an edition"}>
+          {withPhotos.map((e, i) => (
+            <button type="button" class="chip" role="tab" id={`gt-${e.slug}`} aria-controls={`gp-${e.slug}`} aria-selected={i === 0 ? "true" : "false"} aria-pressed={i === 0 ? "true" : "false"}>
+              {e.city[lang]} {e.year}
+            </button>
+          ))}
+        </div>
+        {withPhotos.map((e, i) => (
+          <div class="gallery-panel" role="tabpanel" id={`gp-${e.slug}`} aria-labelledby={`gt-${e.slug}`} hidden={i !== 0}>
+            <p class="gallery-panel__meta">
+              {formatRange(e, lang)}{e.venue && ` · ${e.venue[lang]}`}
+              <a class="link-more" href={localePath(lang, `/editions/${e.slug}/`)}>{s.exploreDetails}</a>
+            </p>
+            <GalleryGrid items={galleryFor(e.slug)} lang={lang} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <script is:inline>
+    document.querySelectorAll("[data-gallery-tabs]").forEach(function (w) {
+      var tabs = w.querySelectorAll("[role=tab]");
+      var show = function (id) {
+        tabs.forEach(function (t) {
+          var on = t.getAttribute("aria-controls") === id;
+          t.setAttribute("aria-selected", String(on)); t.setAttribute("aria-pressed", String(on));
+          document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+        });
+      };
+      tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.getAttribute("aria-controls")); }); });
+      // /about/#gallery-indore-2026 (and old /gallery/#indore-2026 links) open that edition.
+      var m = location.hash.match(/^#(?:gallery-)?([a-z]+-\d{4})$/);
+      if (m && document.getElementById("gp-" + m[1])) { show("gp-" + m[1]); document.getElementById("gallery").scrollIntoView(); }
+    });
+  </script>
 </Base>

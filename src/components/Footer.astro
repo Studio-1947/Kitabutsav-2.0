@@ -47,10 +47,9 @@ const hi = lang === "hi";
           <h4>{s.siteName}</h4>
           <ul>
             <li><a href={L("/about/")}>{s.nav.about}</a></li>
-            <li><a href={L("/editions/")}>{s.nav.editions}</a></li>
             <li><a href={L("/programme/")}>{s.nav.programme}</a></li>
+            <li><a href={L("/partners/")}>{hi ? "साथी और प्रायोजक" : "Partners & sponsors"}</a></li>
             <li><a href={L("/resources/")}>{hi ? "लेखक" : "Authors"}</a></li>
-            <li><a href={L("/gallery/")}>{hi ? "गैलरी" : "Gallery"}</a></li>
             <li><a href={L("/press/")}>{hi ? "मीडिया" : "Press"}</a></li>
             <li><a href={L("/visit/")}>{s.nav.visit}</a></li>
             <li><a href={L("/faq/")}>{s.nav.faq}</a></li>

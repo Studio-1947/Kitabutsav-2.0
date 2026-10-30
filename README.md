@@ -23,6 +23,7 @@ Deploys as plain static files (Vercel, Netlify, Cloudflare Pages, any CDN). On V
 | Bareilly day-wise programme | `src/data/programme.ts` |
 | FAQ (the "next edition" answers are generated from editions) | `src/data/faq.ts` |
 | Gallery photos (placeholder slots) | `src/data/gallery.ts` |
+| Partners and sponsors (18 logos in `public/partners/`) | `src/data/partners.ts` |
 | Press coverage (placeholder slots) | `src/data/press.ts` |
 | Announced speakers, official totals, tagline | `src/data/speakers.ts` |
 | Festival logo slot, partners | `src/site.config.ts` |
@@ -36,7 +37,9 @@ Deploys as plain static files (Vercel, Netlify, Cloudflare Pages, any CDN). On V
 
 To add a new edition, add an object to `editions` (newest first). The site works out the next edition from the dates at build time: while one is upcoming, the home hero shows its countdown, the header shows "Book my seat" and a calendar link, and Event schema is emitted. When nothing is upcoming, the hero switches to "next city, soon", the header CTA becomes "Get updates" (footer newsletter), and Visit/Programme show a notice that the details are from the last edition. Its page, calendar file (`/ics/<slug>.ics`), sitemap entry, gallery block and previous/next links are generated automatically.
 
-Pages: home, editions (one page per city), programme, authors (`/resources/`, filterable by city), gallery, press, about, visit, FAQ, all in Hindi and English.
+Main pages: **About Kitab Utsav** (`/about/`: the story, every edition and the gallery, with in-page tabs) and **Events** (`/programme/`), plus **Partners** (`/partners/`). Secondary pages in the footer: authors (`/resources/`), press, visit, FAQ. One page per edition at `/editions/<slug>/`. `/editions/` and `/gallery/` redirect to sections of `/about/`. Everything exists in Hindi and English.
+
+Header CTAs: "मेरी सीट बुक करें" (primary, goes to `bookSeatUrl` in `site.config.ts`, else the current edition page) and "आगामी आयोजन" (Events).
 
 ## Design language
 

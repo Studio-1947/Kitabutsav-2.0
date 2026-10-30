@@ -1,0 +1,16 @@
+---
+import type { Partner } from "../data/partners";
+import type { Lang } from "../i18n";
+interface Props { p: Partner; lang: Lang; showMeta?: boolean }
+const { p, lang, showMeta = true } = Astro.props;
+const Tag = p.url ? "a" : "div";
+---
+<Tag class="partner" {...(p.url ? { href: p.url, target: "_blank", rel: "noopener" } : {})} data-city={p.city.en.toLowerCase()}>
+  <span class="partner__logo"><img src={p.logo} alt={p.name[lang]} loading="lazy" /></span>
+  {showMeta && (
+    <span class="partner__meta">
+      <b>{p.name[lang]}</b>
+      <small>{p.kind[lang]} · {p.city[lang]}</small>
+    </span>
+  )}
+</Tag>

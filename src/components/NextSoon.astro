@@ -3,7 +3,7 @@
 import Icon from "./Icon.astro";
 import type { Edition } from "../data/editions";
 import { formatRange, localePath, t, type Lang } from "../i18n";
-import { festivalSocial, org } from "../site.config";
+import { bookSeatUrl, festivalSocial, org } from "../site.config";
 
 interface Props { last: Edition; lang: Lang }
 const { last, lang } = Astro.props;
@@ -28,7 +28,8 @@ const invite = `mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमा
     <li class="is-next"><span>?</span><small>{hi ? "अगला" : "Next"}</small></li>
   </ol>
   <div class="btns" style="margin-top:22px">
-    <a class="btn btn--primary" href="#newsletter"><Icon name="mail" />{hi ? "ख़बर पाएँ" : "Get notified"}</a>
+    <a class="btn btn--primary" href={bookSeatUrl ?? localePath(lang, `/editions/${last.slug}/`)} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>{s.bookSeat}</a>
+    <a class="btn" href={localePath(lang, "/programme/")}>{s.upcomingEvents}</a>
     <a class="btn" href={localePath(lang, `/editions/${last.slug}/`)}>{hi ? `${last.city.hi} की झलकियाँ` : `${last.city.en} recap`}</a>
     <a class="btn" href={invite}>{hi ? "अपने शहर बुलाएँ" : "Invite to your city"}</a>
   </div>

@@ -29,7 +29,7 @@ const title = hi
   : `Kitab Utsav ${e.city.en} ${e.year} | ${when}`;
 const description = e.summary[lang];
 const crumbs = [
-  { name: s.nav.editions, path: "/editions/" },
+  { name: s.nav.about, path: "/about/" },
   { name: hi ? `${e.city.hi} ${e.year}` : `${e.city.en} ${e.year}`, path: route },
 ];
 const ev = eventLd(e, lang, site, og);
@@ -116,7 +116,7 @@ const label = (x: Edition) => (hi ? `${x.city.hi} ${x.year}` : `${x.city.en} ${x
       <div class="wrap">
         <div class="section-head">
           <div><p class="eyebrow">{hi ? "गैलरी" : "Gallery"}</p><h2 class="h2" id="photos">{hi ? `${e.city.hi}, तस्वीरों में` : `${e.city.en} in pictures`}</h2></div>
-          <a class="link-more" href={localePath(lang, `/gallery/#${e.slug}`)}>{hi ? "पूरी गैलरी" : "Full gallery"}</a>
+          <a class="link-more" href={localePath(lang, `/about/#gallery-${e.slug}`)}>{hi ? "पूरी गैलरी" : "Full gallery"}</a>
         </div>
         <GalleryGrid items={photos} lang={lang} />
       </div>
@@ -149,7 +149,7 @@ const label = (x: Edition) => (hi ? `${x.city.hi} ${x.year}` : `${x.city.en} ${x
     <div class="wrap">
       <div class="section-head">
         <h2 class="h2" id="others">{s.otherEditions}</h2>
-        <a class="link-more" href={localePath(lang, "/editions/")}>{s.allEditions}</a>
+        <a class="link-more" href={localePath(lang, "/about/#editions")}>{s.allEditions}</a>
       </div>
       <div class="grid grid--3">{others.map((x) => <EditionCard e={x} lang={lang} />)}</div>
     </div>
