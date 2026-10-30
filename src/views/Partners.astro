@@ -44,19 +44,30 @@ const orgLd = {
 
   <section class="section" style="padding-top:28px">
     <div class="wrap">
-      <div class="chips" role="group" aria-label={hi ? "शहर से छाँटें" : "Filter by city"} data-pfilter>
-        <button type="button" class="chip" aria-pressed="true" data-city="">{hi ? "सभी शहर" : "All cities"}</button>
-        {cities.map(([key, name]) => <button type="button" class="chip" aria-pressed="false" data-city={key}>{name}</button>)}
+      <div class="pfilters" data-pfilters>
+        <label class="pfilter">
+          <span>{hi ? "शहर" : "City"}</span>
+          <select data-pf="city">
+            <option value="">{hi ? "सभी शहर" : "All cities"}</option>
+            {cities.map(([key, name]) => <option value={key}>{name}</option>)}
+          </select>
+        </label>
+        <label class="pfilter">
+          <span>{hi ? "श्रेणी" : "Type"}</span>
+          <select data-pf="group">
+            <option value="">{hi ? "सभी श्रेणियाँ" : "All types"}</option>
+            {groups.map(({ g }) => <option value={g}>{groupLabel[g][lang]}</option>)}
+          </select>
+        </label>
+        <p class="pfilters__count" aria-live="polite"><b data-pcount>{partners.length}</b> {hi ? "साथी" : "partners"}</p>
       </div>
 
-      <div class="partner-groups">
-      {groups.map(({ g, items }) => (
-        <section class="partner-group" aria-labelledby={`pg-${g}`} data-pgroup style={`--span:${Math.min(items.length, 5)}`}>
-          <h2 id={`pg-${g}`}>{groupLabel[g][lang]} <span>{items.length}</span></h2>
-          <div class="partner-grid">
-            {items.map((p) => <PartnerLogo p={p} lang={lang} />)}
-          </div>
-        </section>
+      <div class="partner-grid partner-grid--all" data-plist>
+        {groups.flatMap(({ items }) => items).map((p) => <PartnerLogo p={p} lang={lang} />)}
+      </div>
+      <p class="pfilters__empty" data-pempty hidden>{hi ? "इस चुनाव में कोई साथी नहीं।" : "No partners match this choice."}</p>
+    </div>
+  </section>
       ))}
       </div>
     </div>
@@ -75,21 +86,20 @@ const orgLd = {
     </div>
   </div>
   <script is:inline>
-    document.querySelectorAll("[data-pfilter]").forEach(function (bar) {
-      bar.addEventListener("click", function (e) {
-        var b = e.target.closest("[data-city]");
-        if (!b) return;
-        var c = b.getAttribute("data-city");
-        bar.querySelectorAll("[data-city]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-        document.querySelectorAll("[data-pgroup]").forEach(function (g) {
-          var any = false;
-          g.querySelectorAll(".partner").forEach(function (p) {
-            var on = !c || p.getAttribute("data-city").split(" & ").indexOf(c) >= 0;
-            p.hidden = !on; any = any || on;
-          });
-          g.hidden = !any;
+    document.querySelectorAll("[data-pfilters]").forEach(function (bar) {
+      var list = document.querySelector("[data-plist]");
+      var empty = document.querySelector("[data-pempty]");
+      var count = bar.querySelector("[data-pcount]");
+      var sel = { city: bar.querySelector('[data-pf="city"]'), group: bar.querySelector('[data-pf="group"]') };
+      var apply = function () {
+        var c = sel.city.value, g = sel.group.value, n = 0;
+        list.querySelectorAll(".partner").forEach(function (p) {
+          var on = (!c || p.getAttribute("data-city").split(" & ").indexOf(c) >= 0) && (!g || p.getAttribute("data-group") === g);
+          p.hidden = !on; if (on) n++;
         });
-      });
+        count.textContent = n; empty.hidden = n > 0;
+      };
+      sel.city.addEventListener("change", apply); sel.group.addEventListener("change", apply);
     });
   </script>
 </Base>

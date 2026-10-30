@@ -646,14 +646,16 @@ nav.chips { margin-top: 26px; }
 .chip[aria-selected="true"] { background: var(--ku-blue); border-color: var(--ku-blue); color: #fff; }
 
 /* partners */
-.partner-groups { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-flow: row dense; gap: 40px 14px; }
-.partner-group { grid-column: span var(--span); min-width: 0; }
-.partner-group[hidden], .partner[hidden] { display: none; }
-.partner-group h2 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 18px; font: 800 clamp(1.3rem, 2.2vw, 1.7rem)/1.2 var(--ku-display); color: var(--ku-blue); }
-.partner-group h2 span { color: var(--ku-sand-ink); font-size: .8em; }
-.partner-grid { display: grid; grid-template-columns: repeat(var(--span), minmax(0, 1fr)); gap: 14px; }
-.partner-group h2 { min-height: 2.6em; align-items: flex-end; }
-@media (max-width: 980px) { .partner-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } .partner-group { grid-column: 1 / -1; } .partner-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } .partner-group h2 { min-height: 0; } }
+.partner[hidden] { display: none; }
+.partner-grid--all { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+.pfilters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 14px; margin: 0 0 24px; }
+.pfilter { display: grid; gap: 6px; min-width: 220px; }
+.pfilter span { color: var(--ku-red); font-size: .78rem; font-weight: 800; }
+.pfilter select { height: 46px; padding: 0 44px 0 18px; border: 1.5px solid var(--ku-blue); border-radius: 999px; background: var(--ku-paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173f86' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 16px center / 16px; color: var(--ku-blue); font: inherit; font-weight: 700; appearance: none; cursor: pointer; }
+.pfilter select:focus-visible { outline: 2px solid var(--ku-blue); outline-offset: 3px; }
+.pfilters__count { margin: 0 0 12px auto; color: var(--ku-muted); font-weight: 600; }
+.pfilters__count b { color: var(--ku-blue); font-size: 1.2em; }
+.pfilters__empty { padding: 28px; border: 2px dashed var(--ku-border); border-radius: 16px; color: var(--ku-muted); text-align: center; }
 .partner { display: grid; grid-template-rows: auto 1fr; overflow: hidden; border: 1.5px solid var(--ku-border); border-radius: 18px; background: #fff; color: var(--ku-text); text-decoration: none; transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .2s, box-shadow .25s; }
 .partner:hover { transform: translateY(-3px); border-color: rgba(23,63,134,.35); box-shadow: 0 22px 44px -32px rgba(18,49,106,.6); }
 .partner__logo { display: grid; place-items: center; height: 168px; padding: 22px; background: #fff; }
@@ -661,7 +663,7 @@ nav.chips { margin-top: 26px; }
 .partner__meta { display: grid; gap: 2px; padding: 14px 16px 16px; border-top: 1px solid var(--ku-border); background: var(--ku-paper); }
 .partner__meta b { font: 800 1rem/1.3 var(--ku-display); color: var(--ku-blue); }
 .partner__meta small { color: var(--ku-muted); font-size: .8rem; font-weight: 600; }
-@media (max-width: 600px) { .partner-groups { gap: 30px; } .partner-grid { grid-template-columns: 1fr 1fr; gap: 10px; } .partner__logo { height: 120px; padding: 14px; } .partner__logo img { max-height: 92px; } .partner__meta { padding: 10px 12px 12px; } .partner__meta b { font-size: .88rem; } }
+@media (max-width: 600px) { .pfilter { flex: 1 1 100%; min-width: 0; } .pfilters__count { margin: 0; } .partner-grid--all { grid-template-columns: 1fr 1fr; gap: 10px; } .partner__logo { height: 120px; padding: 14px; } .partner__logo img { max-height: 92px; } .partner__meta { padding: 10px 12px 12px; } .partner__meta b { font-size: .88rem; } }
 
 /* home logo strip */
 .logo-strip { overflow: hidden; padding-block: 6px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
