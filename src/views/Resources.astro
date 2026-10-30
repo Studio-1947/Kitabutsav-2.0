@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+import Crumbs from "../components/Crumbs.astro";
+import SpeakerCard from "../components/SpeakerCard.astro";
+import { allSpeakers } from "../data/speakers";
+import { t, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const title = hi ? "किताब उत्सव के लेखक: अब तक शामिल हुए सभी वक्ता" : "Kitab Utsav authors: everyone who has taken part so far";
+const description = hi
+  ? "किताब उत्सव के अब तक के सभी संस्करणों में शामिल हुए लेखक, कवि और वक्ता एक जगह।"
+  : "The writers, poets and speakers who have taken part in Kitab Utsav editions so far, in one place.";
+const crumbs = [{ name: hi ? "लेखक" : "Authors", path: "/resources/" }];
+---
+<Base lang={lang} route="/resources/" title={title} description={description} crumbs={crumbs}>
+  <section class="authors-hero">
+    <img class="authors-hero__img" src="/resources/authors-hero.jpg" alt="" width="1672" height="941" fetchpriority="high" />
+    <div class="authors-hero__scrim"></div>
+    <div class="wrap authors-hero__body">
+      <Crumbs lang={lang} items={crumbs} />
+      <p class="eyebrow">{hi ? "संसाधन" : "Resources"}</p>
+      <h1>{hi ? "अब तक के सभी लेखक" : "Every author, so far"}</h1>
+      <p class="lead">
+        {hi
+          ? "किताब उत्सव के मंच पर अब तक आए लेखक, कवि और वक्ता, एक जगह।"
+          : "The writers, poets and speakers who have shared the Kitab Utsav stage, in one place."}
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:36px">
+    <div class="wrap">
+      <div class="grid grid--3">{allSpeakers.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,46 @@
+---
+import Icon from "./Icon.astro";
+import type { Edition } from "../data/editions";
+import { formatRange, formatTime, localePath, t, type Lang } from "../i18n";
+import { mapsUrl } from "../lib/schema";
+import { partners } from "../site.config";
+
+interface Props { e: Edition; lang: Lang; heading?: "h2" | "p" }
+const { e, lang, heading = "h2" } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const H = heading;
+const startIso = `${e.start}T${e.startTime ?? "00:00"}:00+05:30`;
+const endIso = `${e.end}T${e.endTime ?? "23:59"}:00+05:30`;
+const p = partners[e.slug] ?? [];
+---
+<div class="next-card">
+  <span class="eyebrow">{s.nextEdition}</span>
+  <H class="next-title">
+    {hi ? `किताब उत्सव ${e.city.hi}` : `Kitab Utsav ${e.city.en}`}
+    <span class="city-en">{hi ? `Kitab Utsav ${e.city.en} ${e.year}` : `किताब उत्सव ${e.city.hi} ${e.year}`}</span>
+  </H>
+
+  <ul class="facts">
+    <li><Icon name="calendar" /><span><b>{s.dates}</b><span class="when">{formatRange(e, lang)}</span></span></li>
+    {e.startTime && e.endTime && (
+      <li><Icon name="clock" /><span><b>{s.time}</b>{s.daily}, {formatTime(e.startTime, lang)} {hi ? "से" : "to"} {formatTime(e.endTime, lang)}</span></li>
+    )}
+    {e.venue && <li><Icon name="pin" /><span><b>{s.venue}</b>{e.venue[lang]}</span></li>}
+  </ul>
+
+  <div class="countdown" data-countdown data-start={startIso} data-end={endIso} aria-label={hi ? "उत्सव शुरू होने में" : "Time until the festival opens"}>
+    <div><span data-unit="d">00</span><small>{s.days}</small></div>
+    <div><span data-unit="h">00</span><small>{s.hours}</small></div>
+    <div><span data-unit="m">00</span><small>{s.minutes}</small></div>
+    <div><span data-unit="s">00</span><small>{s.seconds}</small></div>
+  </div>
+  <p class="status-pill" data-live hidden>{s.happeningNow}</p>
+
+  <div class="btns" style="margin-top:22px">
+    <a class="btn btn--primary" href={localePath(lang, "/programme/")}>{s.seeProgramme}</a>
+    {e.mapQuery && <a class="btn" href={mapsUrl(e.mapQuery)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>}
+    <a class="btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>
+  </div>
+  {p.length > 0 && <p class="partners"><b>{hi ? "साथ" : "With"}</b>{p.join(" · ")}</p>}
+</div>

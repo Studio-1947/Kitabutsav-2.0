@@ -1,0 +1,68 @@
+---
+import Base from "../layouts/Base.astro";
+import Crumbs from "../components/Crumbs.astro";
+import Clouds from "../components/Clouds.astro";
+import { localePath, t, type Lang } from "../i18n";
+import { org } from "../site.config";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const title = hi ? "किताब उत्सव के बारे में: राजकमल प्रकाशन समूह की पहल" : "About Kitab Utsav: a Rajkamal Prakashan Samuh initiative";
+const description = hi
+  ? "किताब उत्सव राजकमल प्रकाशन समूह का घूमता हुआ हिन्दी पुस्तक उत्सव है, जिसकी शुरुआत भोपाल में राजकमल के 75वें वर्ष में हुई। जानिए उत्सव का विचार, स्वरूप और इतिहास।"
+  : "Kitab Utsav is Rajkamal Prakashan Samuh's travelling Hindi book festival, begun in Bhopal in Rajkamal's 75th year. The idea, the format and the story so far.";
+const crumbs = [{ name: s.nav.about, path: "/about/" }];
+---
+<Base lang={lang} route="/about/" title={title} description={description} crumbs={crumbs}>
+  <section class="page-hero">
+    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+    <div class="wrap">
+      <Crumbs lang={lang} items={crumbs} />
+      <p class="eyebrow">{s.nav.about}</p>
+      <h1>{hi ? "किताबें जहाँ पाठकों से मिलती हैं" : "Where books meet their readers"}</h1>
+    </div>
+  </section>
+  <section class="section" style="padding-top:28px">
+    <div class="wrap prose">
+      {hi ? (
+        <>
+          <p>किताब उत्सव किताबों, पाठकों और लेखकों के संवाद का उत्सव है, जिसे राजकमल प्रकाशन समूह शहर-शहर ले जाता है। इसका नारा है: साथ जुड़ें, साथ पढ़ें। पाँच वर्षों में यह सात राज्यों के ग्यारह शहरों में सोलह बार आयोजित हो चुका है। इसका विचार सीधा है: किताबें और उन्हें लिखने वाले ख़ुद पाठकों के शहर तक पहुँचें। हर पड़ाव पर, आम तौर पर पाँच दिनों तक, सुबह से रात तक पाठ, बातचीत, चर्चा और लोकार्पण के सत्र चलते हैं और साथ में किताबों की प्रदर्शनी लगती है।</p>
+          <h2>शुरुआत</h2>
+          <p>किताब उत्सव की शुरुआत भोपाल में हुई, राजकमल प्रकाशन के स्थापना के 75वें वर्ष में। भोपाल और बनारस के बाद नवम्बर 2022 में पटना में नौ दिनों का उत्सव हुआ। फिर चंडीगढ़ (फ़रवरी 2023), लखनऊ (जनवरी 2024), भोपाल (सितम्बर 2025, शहर में तीसरा आयोजन), मुम्बई (फ़रवरी 2026), पटना (अप्रैल 2026) और इन्दौर (सितम्बर 2026) में उत्सव हुए। अक्टूबर 2026 में यह बरेली लौट रहा है।</p>
+          <h2>उत्सव में क्या होता है</h2>
+          <ul>
+            <li>लेखकों से बातचीत और पाठक-लेखक संवाद</li>
+            <li>कहानी, कविता और गद्य का पाठ</li>
+            <li>किताबों और समकालीन सवालों पर चर्चा</li>
+            <li>नई किताबों के लोकार्पण</li>
+            <li>दास्तानगोई, लोक-प्रस्तुतियाँ और काव्य संध्या</li>
+            <li>राजकमल, राधाकृष्ण, लोकभारती और राजकमल उर्दू की किताबों की प्रदर्शनी</li>
+          </ul>
+          <h2>राजकमल प्रकाशन समूह</h2>
+          <p>1947 में स्थापित राजकमल प्रकाशन हिन्दी के प्रमुख प्रकाशन घरानों में है। समूह में राजकमल प्रकाशन, राधाकृष्ण प्रकाशन, लोकभारती प्रकाशन और राजकमल उर्दू शामिल हैं। मुख्यालय नई दिल्ली के दरियागंज में है और पटना, प्रयागराज व मुम्बई में शाखाएँ हैं।</p>
+          <p>समूह की किताबें ऑनलाइन <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a> पर उपलब्ध हैं। अपने शहर में किताब उत्सव के लिए <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a> पर लिखें, या <a href={localePath(lang, "/editions/")}>अब तक के संस्करण</a> देखें।</p>
+        </>
+      ) : (
+        <>
+          <p>Kitab Utsav is a festival of conversation between books, readers and writers, taken from city to city by Rajkamal Prakashan Samuh under the line "saath judein, saath padhein" (come together, read together). In five years it has held sixteen editions in eleven cities across seven states. The idea is simple: bring books, and the people who write them, to readers in their own city. At each stop, usually for five days, sessions of readings, conversations, discussions and book launches run from morning to night alongside an exhibition of books.</p>
+          <h2>How it began</h2>
+          <p>Kitab Utsav began in Bhopal in the 75th year of Rajkamal Prakashan. After Bhopal and Banaras came a nine-day edition in Patna in November 2022, followed by Chandigarh (February 2023), Lucknow (January 2024), Bhopal again (September 2025, the city's third), Mumbai (February 2026), Patna (April 2026) and Indore (September 2026). In October 2026 it returns to Bareilly.</p>
+          <h2>What happens at the festival</h2>
+          <ul>
+            <li>Conversations with writers and open reader Q&amp;A</li>
+            <li>Readings of fiction, poetry and prose</li>
+            <li>Discussions on books and the questions of our time</li>
+            <li>Launches of new books</li>
+            <li>Dastangoi, folk performances and poetry evenings</li>
+            <li>An exhibition of books from Rajkamal, Radhakrishna, Lokbharti and Rajkamal Urdu</li>
+          </ul>
+          <h2>Rajkamal Prakashan Samuh</h2>
+          <p>Founded in 1947, Rajkamal Prakashan is one of the leading Hindi publishing houses. The group includes Rajkamal Prakashan, Radhakrishna Prakashan, Lokbharti Prakashan and Rajkamal Urdu, with its head office in Daryaganj, New Delhi, and branches in Patna, Prayagraj and Mumbai.</p>
+          <p>The group's books are available online at <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a>. To bring Kitab Utsav to your city, write to <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a>, or browse the <a href={localePath(lang, "/editions/")}>editions so far</a>.</p>
+        </>
+      )}
+    </div>
+  </section>
+</Base>

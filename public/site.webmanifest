@@ -1,0 +1,14 @@
+{
+  "name": "किताब उत्सव | Kitab Utsav",
+  "short_name": "किताब उत्सव",
+  "description": "राजकमल प्रकाशन समूह का पुस्तक और साहित्य उत्सव",
+  "start_url": "/",
+  "display": "standalone",
+  "lang": "hi-IN",
+  "background_color": "#ffffff",
+  "theme_color": "#114b9c",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,74 @@
+---
+import Base from "../layouts/Base.astro";
+import Crumbs from "../components/Crumbs.astro";
+import Clouds from "../components/Clouds.astro";
+import Icon from "../components/Icon.astro";
+import { featuredEdition as e } from "../data/editions";
+import { formatRange, formatTime, t, type Lang } from "../i18n";
+import { eventLd, mapsUrl } from "../lib/schema";
+import { org, festivalSocial } from "../site.config";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const when = formatRange(e, lang);
+const title = hi ? `कैसे पहुँचें: किताब उत्सव ${e.city.hi} ${e.year} | स्थान और समय` : `Visit Kitab Utsav ${e.city.en} ${e.year} | Venue, timings, directions`;
+const description = hi
+  ? `किताब उत्सव ${e.city.hi}: ${when}, ${e.venue?.hi}। रोज़ ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")} तक। नक्शा, संपर्क और ज़रूरी जानकारी।`
+  : `Kitab Utsav ${e.city.en}: ${when} at ${e.venue?.en}. Open daily ${formatTime(e.startTime!, "en")} to ${formatTime(e.endTime!, "en")}. Map, contacts and visitor information.`;
+const crumbs = [{ name: s.nav.visit, path: "/visit/" }];
+const ev = eventLd(e, lang, Astro.site!, "/og/kitab-utsav.jpg");
+const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? e.city.en)}&output=embed`;
+---
+<Base lang={lang} route="/visit/" title={title} description={description} crumbs={crumbs} jsonLd={ev ? [ev] : []}>
+  <section class="page-hero">
+    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+    <div class="wrap">
+      <Crumbs lang={lang} items={crumbs} />
+      <p class="eyebrow">{hi ? `${e.city.hi} · ${when}` : `${e.city.en} · ${when}`}</p>
+      <h1>{hi ? "उत्सव तक कैसे पहुँचें" : "Plan your visit"}</h1>
+    </div>
+  </section>
+  <section class="section" style="padding-top:28px">
+    <div class="wrap detail-grid">
+      <div>
+        <iframe class="map-frame" src={embed} title={hi ? `${e.venue?.hi} का नक्शा` : `Map of ${e.venue?.en}`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="prose" style="margin-top:28px">
+          <h2>{hi ? "ध्यान रखें" : "Good to know"}</h2>
+          <ul>
+            {hi ? (
+              <>
+                <li>उत्सव पाँचों दिन {formatTime(e.startTime!, "hi")} से {formatTime(e.endTime!, "hi")} तक खुला रहेगा।</li>
+                <li>सत्रों का दिन-वार समय <a href="/programme/">कार्यक्रम</a> पेज पर देखें।</li>
+                <li>पुस्तक प्रदर्शनी पूरे दिन खुली रहेगी।</li>
+                <li>प्रवेश और पंजीकरण की ताज़ा जानकारी <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a> पर मिलेगी।</li>
+              </>
+            ) : (
+              <>
+                <li>The festival is open all five days from {formatTime(e.startTime!, "en")} to {formatTime(e.endTime!, "en")}.</li>
+                <li>Session timings for each day are on the <a href="/en/programme/">programme</a> page.</li>
+                <li>The book exhibition is open all day.</li>
+                <li>For the latest on entry and registration, follow <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a>.</li>
+              </>
+            )}
+          </ul>
+        </div>
+      </div>
+      <aside>
+        <div class="card">
+          <ul class="info">
+            <li><Icon name="calendar" /><span><b>{s.dates}</b>{when}</span></li>
+            <li><Icon name="clock" /><span><b>{s.time}</b>{s.daily}, {formatTime(e.startTime!, lang)} {hi ? "से" : "to"} {formatTime(e.endTime!, lang)}</span></li>
+            <li><Icon name="pin" /><span><b>{s.venue}</b>{e.venue?.[lang]}</span></li>
+            <li><Icon name="chat" /><span><b>{hi ? "संपर्क" : "Contact"}</b><a href={`tel:${org.phones[0].tel}`}>{org.phones[0].label}</a>, <a href={`tel:${org.phones[1].tel}`}>{org.phones[1].label}</a><br /><a href={`mailto:${org.email}`}>{org.email}</a></span></li>
+          </ul>
+          <div class="btns">
+            <a class="btn btn--primary" href={mapsUrl(e.mapQuery!)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>
+            <a class="btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>

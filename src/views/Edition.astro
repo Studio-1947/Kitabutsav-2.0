@@ -1,0 +1,118 @@
+---
+import Base from "../layouts/Base.astro";
+import Crumbs from "../components/Crumbs.astro";
+import Clouds from "../components/Clouds.astro";
+import Icon from "../components/Icon.astro";
+import EditionCard from "../components/EditionCard.astro";
+import NextEdition from "../components/NextEdition.astro";
+import SpeakerCard from "../components/SpeakerCard.astro";
+import { speakersFor } from "../data/speakers";
+import { editions, type Edition } from "../data/editions";
+import { formatRange, formatTime, isUpcoming, localePath, t, type Lang } from "../i18n";
+import { eventLd, mapsUrl } from "../lib/schema";
+import { org } from "../site.config";
+
+interface Props { lang: Lang; e: Edition }
+const { lang, e } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const site = Astro.site!;
+const up = isUpcoming(e);
+const route = `/editions/${e.slug}/`;
+const og = "/og/kitab-utsav.jpg";
+const when = formatRange(e, lang);
+
+const title = hi
+  ? `किताब उत्सव ${e.city.hi} ${e.year} | ${when}`
+  : `Kitab Utsav ${e.city.en} ${e.year} | ${when}`;
+const description = e.summary[lang];
+const crumbs = [
+  { name: s.nav.editions, path: "/editions/" },
+  { name: hi ? `${e.city.hi} ${e.year}` : `${e.city.en} ${e.year}`, path: route },
+];
+const ev = eventLd(e, lang, site, og);
+const announced = speakersFor(e.slug);
+const others = editions.filter((x) => x.slug !== e.slug).slice(0, 3);
+---
+<Base lang={lang} route={route} title={title} description={description} crumbs={crumbs} jsonLd={ev ? [ev] : []}>
+  <section class="page-hero">
+    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+    <div class="wrap">
+      <Crumbs lang={lang} items={crumbs} />
+      <p class="eyebrow">{up ? s.upcoming : s.past} · {e.state[lang]}</p>
+      <h1>{hi ? `किताब उत्सव ${e.city.hi} ${e.year}` : `Kitab Utsav ${e.city.en} ${e.year}`}</h1>
+      <p class="lead">{e.summary[lang]}</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:32px">
+    <div class="wrap detail-grid">
+      <div class="prose">
+        {e.body[lang].map((p) => <p>{p}</p>)}
+
+        {e.stats && (
+          <>
+            <h2>{s.inNumbers}</h2>
+            <ul class="stats">{e.stats.map((st) => <li><b>{st.value}</b><span>{st.label[lang]}</span></li>)}</ul>
+          </>
+        )}
+
+        {e.highlights && (
+          <>
+            <h2>{s.highlights}</h2>
+            <ul>{e.highlights[lang].map((h) => <li>{h}</li>)}</ul>
+          </>
+        )}
+
+        {up && (
+          <>
+            <h2>{s.nav.programme}</h2>
+            <p>
+              {hi ? "दिन-वार सत्र, वक्ता और समय " : "Day-wise sessions, speakers and timings are on the "}
+              <a href={localePath(lang, "/programme/")}>{hi ? "कार्यक्रम पेज" : "programme page"}</a>
+              {hi ? " पर हैं।" : "."}
+            </p>
+          </>
+        )}
+      </div>
+
+      <aside>
+        {up ? (
+          <NextEdition e={e} lang={lang} heading="p" />
+        ) : (
+          <div class="card">
+            <ul class="info">
+              <li><Icon name="calendar" /><span><b>{s.dates}</b>{when}</span></li>
+              {e.startTime && e.endTime && <li><Icon name="clock" /><span><b>{s.time}</b>{formatTime(e.startTime, lang)} {hi ? "से" : "to"} {formatTime(e.endTime, lang)}</span></li>}
+              {e.venue && <li><Icon name="pin" /><span><b>{s.venue}</b>{e.venue[lang]}</span></li>}
+              <li><Icon name="book" /><span><b>{s.organiser}</b>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</span></li>
+            </ul>
+            <div class="btns">
+              {e.mapQuery && <a class="btn" href={mapsUrl(e.mapQuery)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>}
+              <a class="btn" href={org.url} target="_blank" rel="noopener">{s.nav.shop}</a>
+            </div>
+          </div>
+        )}
+      </aside>
+    </div>
+  </section>
+
+  {announced.length > 0 && (
+    <section class="section" aria-labelledby="speakers">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">{hi ? "मिलिए" : "Meet"}</p><h2 class="h2" id="speakers">{hi ? "अब तक घोषित वक्ता" : "Speakers announced so far"}</h2></div></div>
+        <div class="grid grid--3">{announced.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="others">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="h2" id="others">{s.otherEditions}</h2>
+        <a class="link-more" href={localePath(lang, "/editions/")}>{s.allEditions}</a>
+      </div>
+      <div class="grid grid--3">{others.map((x) => <EditionCard e={x} lang={lang} />)}</div>
+    </div>
+  </section>
+</Base>

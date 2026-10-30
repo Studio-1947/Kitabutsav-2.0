@@ -1,0 +1,31 @@
+---
+import Icon from "./Icon.astro";
+import { t, localePath, routeOf, type Lang } from "../i18n";
+
+interface Props { lang: Lang; altHref: string }
+const { lang, altHref } = Astro.props;
+const s = t(lang);
+const route = routeOf(Astro.url.pathname);
+const on = (m: string) => (m === "/" ? route === "/" : route.startsWith(m));
+const tabs = [
+  { href: localePath(lang, "/editions/"), label: s.nav.editions, icon: "grid", m: "/editions/" },
+  { href: localePath(lang, "/programme/"), label: s.nav.programme, icon: "list", m: "/programme/" },
+  { href: localePath(lang, "/visit/"), label: s.nav.visit, icon: "pin", m: "/visit/" },
+  { href: localePath(lang, "/faq/"), label: s.nav.faq, icon: "help", m: "/faq/" },
+];
+---
+<nav class="mobile-tabbar" aria-label={lang === "hi" ? "त्वरित नेविगेशन" : "Quick navigation"}>
+  <a class:list={["mobile-tab", "mobile-tab--home", { "is-on": on("/") }]} href={localePath(lang, "/")}>
+    <img class="mobile-tab__logo mobile-tab__logo--light" src="/brand/rkp-favicon.svg" alt="" width="20" height="20" />
+    <img class="mobile-tab__logo mobile-tab__logo--dark" src="/brand/rkp-favicon-dark.svg" alt="" width="20" height="20" />
+    <span>{s.nav.home}</span>
+  </a>
+  {tabs.map((tb) => (
+    <a class:list={["mobile-tab", { "is-on": on(tb.m) }]} href={tb.href} aria-current={on(tb.m) ? "page" : undefined}>
+      <Icon name={tb.icon} size={20} /><span>{tb.label}</span>
+    </a>
+  ))}
+  <a class="mobile-tab" href={altHref} hreflang={lang === "hi" ? "en" : "hi"}>
+    <Icon name="lang" size={20} /><span>{s.langSwitch}</span>
+  </a>
+</nav>

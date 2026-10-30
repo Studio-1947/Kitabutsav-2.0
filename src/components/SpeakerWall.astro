@@ -1,0 +1,69 @@
+---
+/** A moving photo archive of writers who have appeared at Kitab Utsav. */
+import type { Speaker } from "../data/speakers";
+import type { Lang } from "../i18n";
+interface Props { speakers: Speaker[]; lang: Lang }
+const { speakers, lang } = Astro.props;
+
+// Keep one clear subject in every moving card: no group grids or multi-face collages.
+const festivalPhotos = ["/speakers/indore-festival-instagram.jpg"];
+const rows = [
+  speakers.filter((_, i) => i % 3 === 0),
+  speakers.filter((_, i) => i % 3 === 1),
+  speakers.filter((_, i) => i % 3 === 2),
+];
+const appearance = (sp: Speaker) => sp.appearances?.[0];
+const photoFor = (_sp: Speaker, index: number) => festivalPhotos[index % festivalPhotos.length];
+---
+<div class="writer-marquee" aria-label={lang === "hi" ? "किताब उत्सव के लेखक और कवि" : "Writers and poets at Kitab Utsav"}>
+  {rows.map((row, rowIndex) => (
+    <div class:list={["writer-lane", rowIndex === 1 && "writer-lane--reverse"]}>
+      <div class="writer-track">
+        {[...row, ...row].map((sp, index) => {
+          const joined = appearance(sp);
+          return (
+            <article class="writer-card">
+              <img src={photoFor(sp, index % row.length)} alt="" loading="lazy" />
+              <div class="writer-card__veil"></div>
+              <div class="writer-card__copy">
+                <p>{sp.role[lang]}</p>
+                <h3>{sp.name[lang]}</h3>
+                {joined && <span>{joined.city[lang]} · {joined.year}</span>}
+              </div>
+              <div class="writer-card__detail">
+                <b>{sp.name[lang]}</b>
+                <p>{sp.bio[lang]}</p>
+                {sp.appearances && <small>{sp.appearances.map((a) => `${a.city[lang]} · ${a.year}`).join("  /  ")}</small>}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  ))}
+</div>
+<style>
+  .writer-marquee { display: grid; gap: 14px; margin-inline: calc((100vw - min(1180px, 100vw - 48px)) / -2); overflow: hidden; padding-block: 5px; }
+  .writer-lane { overflow: hidden; }
+  .writer-track { display: flex; gap: 14px; width: max-content; animation: writer-slide 44s linear infinite; will-change: transform; }
+  .writer-lane--reverse .writer-track { animation-name: writer-slide-reverse; animation-duration: 51s; }
+  .writer-lane:hover .writer-track, .writer-lane:focus-within .writer-track { animation-play-state: paused; }
+  .writer-card { position: relative; isolation: isolate; flex: 0 0 clamp(238px, 23vw, 336px); height: 206px; overflow: hidden; border: 1px solid rgba(17,75,156,.18); border-radius: 18px; background: #114b9c; box-shadow: 0 16px 35px -28px rgba(9,29,72,.84); }
+  .writer-card > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; filter: saturate(.9) contrast(1.04); transition: transform .42s cubic-bezier(.22,1,.36,1), filter .3s; }
+  .writer-card__veil { position: absolute; inset: 0; z-index: 1; background: rgba(7,28,73,.47); transition: background .25s; }
+  .writer-card__copy { position: absolute; z-index: 2; inset: auto 18px 16px; color: #fff; }
+  .writer-card__copy p { margin: 0 0 4px; color: #ffe18a; font-size: .74rem; font-weight: 800; }
+  .writer-card__copy h3 { margin: 0; font: 800 clamp(1.25rem, 2vw, 1.7rem)/1.1 var(--ku-display); }
+  .writer-card__copy span { display: block; margin-top: 7px; font-size: .76rem; font-weight: 700; }
+  .writer-card__detail { position: absolute; z-index: 3; inset: 0; display: grid; align-content: end; gap: 8px; padding: 18px; background: #fffdf8; color: var(--ku-text); opacity: 0; transform: translateY(18px); transition: opacity .25s, transform .3s cubic-bezier(.22,1,.36,1); pointer-events: none; }
+  .writer-card__detail b { color: var(--ku-blue); font: 800 1.25rem/1.1 var(--ku-display); }
+  .writer-card__detail p { margin: 0; color: var(--ku-muted); font-size: .79rem; line-height: 1.45; }
+  .writer-card__detail small { color: var(--ku-red); font-size: .74rem; font-weight: 800; }
+  .writer-card:hover > img { transform: scale(1.06); filter: saturate(1.06); }
+  .writer-card:hover .writer-card__veil { background: rgba(7,28,73,.62); }
+  .writer-card:hover .writer-card__detail, .writer-card:focus-within .writer-card__detail { opacity: 1; transform: translateY(0); }
+  @keyframes writer-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes writer-slide-reverse { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  @media (prefers-reduced-motion: reduce) { .writer-track { animation-play-state: paused; } }
+  @media (max-width: 620px) { .writer-marquee { margin-inline: -20px; gap: 10px; } .writer-track { gap: 10px; animation-duration: 34s; } .writer-card { flex-basis: 224px; height: 172px; border-radius: 14px; } .writer-card__copy { inset: auto 14px 13px; } }
+</style>

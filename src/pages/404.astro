@@ -1,0 +1,16 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base lang="hi" route="/404/" title="पेज नहीं मिला" description="यह पेज उपलब्ध नहीं है। किताब उत्सव के मुखपृष्ठ पर लौटें।" noindex alternates={false}>
+  <section class="not-found">
+    <div class="wrap">
+      <p class="big" aria-hidden="true">404</p>
+      <h1 class="h2">यह पेज नहीं मिला · Page not found</h1>
+      <p class="lead" style="margin:14px auto 28px">शायद पता बदल गया है। The page may have moved.</p>
+      <div class="btns" style="justify-content:center">
+        <a class="btn btn--primary" href="/">किताब उत्सव</a>
+        <a class="btn" href="/en/">Kitab Utsav (English)</a>
+      </div>
+    </div>
+  </section>
+</Base>

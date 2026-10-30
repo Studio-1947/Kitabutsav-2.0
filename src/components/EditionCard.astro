@@ -1,0 +1,19 @@
+---
+import type { Edition } from "../data/editions";
+import { formatRange, isUpcoming, localePath, t, type Lang } from "../i18n";
+import CityThumb from "./CityThumb.astro";
+
+interface Props { e: Edition; lang: Lang; headingLevel?: "h2" | "h3" }
+const { e, lang, headingLevel = "h3" } = Astro.props;
+const s = t(lang);
+const up = isUpcoming(e);
+const H = headingLevel;
+---
+<article class:list={["edition-card", { "is-upcoming": up }]}>
+  <div class="edition-card__city-art" aria-hidden="true"><CityThumb city={e.city[lang]} /></div>
+  <span class="year" aria-hidden="true">{e.year}</span>
+  <span class="tag">{up ? s.upcoming : s.past}</span>
+  <H class="city"><a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city[lang]}</a></H>
+  <span class="when">{formatRange(e, lang)}</span>
+  {e.venue && <span class="where">{e.venue[lang]}</span>}
+</article>

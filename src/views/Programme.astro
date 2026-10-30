@@ -1,0 +1,120 @@
+---
+import Base from "../layouts/Base.astro";
+import Crumbs from "../components/Crumbs.astro";
+import Clouds from "../components/Clouds.astro";
+import Icon from "../components/Icon.astro";
+import SpeakerCard from "../components/SpeakerCard.astro";
+import { speakersFor } from "../data/speakers";
+import { programme, sessionKindLabel } from "../data/programme";
+import { editionBySlug } from "../data/editions";
+import { formatDate, formatRange, formatTime, t, type Lang } from "../i18n";
+import { eventLd } from "../lib/schema";
+import { festivalSocial } from "../site.config";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const site = Astro.site!;
+const e = editionBySlug(programme.editionSlug)!;
+const when = formatRange(e, lang);
+const title = hi
+  ? `कार्यक्रम: किताब उत्सव ${e.city.hi} ${e.year} | दिन-वार सत्र`
+  : `Programme: Kitab Utsav ${e.city.en} ${e.year} | Day-wise sessions`;
+const description = hi
+  ? `किताब उत्सव ${e.city.hi} (${when}) का दिन-वार कार्यक्रम: उद्घाटन, बातचीत, लोकार्पण, चर्चा, पाठ और काव्य संध्या। ${e.venue?.hi ?? ""}`
+  : `Day-wise programme for Kitab Utsav ${e.city.en} (${when}): opening, conversations, book launches, discussions, readings and poetry. ${e.venue?.en ?? ""}`;
+const crumbs = [{ name: s.nav.programme, path: "/programme/" }];
+const announced = speakersFor(e.slug);
+
+/* Sessions only become structured data once the real schedule is published. */
+const ev = eventLd(e, lang, site, "/og/kitab-utsav.jpg");
+const jsonLd: Record<string, unknown>[] = [];
+if (ev) {
+  if (programme.published) {
+    (ev as Record<string, unknown>).subEvent = programme.days.flatMap((d) =>
+      d.sessions
+        .filter((x) => x.kind !== "exhibition")
+        .map((x) => ({
+          "@type": "Event",
+          name: x.title[lang],
+          startDate: `${d.date}T${x.time}:00+05:30`,
+          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+          eventStatus: "https://schema.org/EventScheduled",
+          location: (ev as { location: unknown }).location,
+          ...(x.speakers.length ? { performer: x.speakers.map((n) => ({ "@type": "Person", name: n })) } : {}),
+        })),
+    );
+  }
+  jsonLd.push(ev);
+}
+---
+<Base lang={lang} route="/programme/" title={title} description={description} crumbs={crumbs} jsonLd={jsonLd}>
+  <section class="page-hero">
+    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+    <div class="wrap">
+      <Crumbs lang={lang} items={crumbs} />
+      <p class="eyebrow">{hi ? `${e.city.hi} · ${when}` : `${e.city.en} · ${when}`}</p>
+      <h1>{hi ? "कार्यक्रम" : "Programme"}</h1>
+      <p class="lead">
+        {hi
+          ? `${e.venue?.hi}। रोज़ ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")} तक। पुस्तक प्रदर्शनी पूरे दिन खुली रहेगी।`
+          : `${e.venue?.en}. Daily from ${formatTime(e.startTime!, "en")} to ${formatTime(e.endTime!, "en")}. The book exhibition is open all day.`}
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:28px">
+    <div class="wrap">
+      {!programme.published && (
+        <div class="notice" role="note">
+          <Icon name="help" />
+          <p>
+            {hi ? "सत्रों और वक्ताओं की घोषणा जल्द होगी। नीचे दिन-वार ढाँचा है; ताज़ा जानकारी के लिए " : "Sessions and speakers will be announced soon. Below is the day-wise outline; for the latest, follow "}
+            <a href={festivalSocial[0].url} target="_blank" rel="noopener" style="text-decoration:underline">{festivalSocial[0].handle}</a>
+            {hi ? " देखें।" : "."}
+          </p>
+        </div>
+      )}
+
+      <div data-tabs>
+        <div class="day-tabs" role="tablist" aria-label={hi ? "दिन चुनें" : "Choose a day"}>
+          {programme.days.map((d, i) => (
+            <button type="button" class="day-tab" role="tab" id={`tab-${d.date}`} aria-controls={`day-${d.date}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+              <small>{hi ? `दिन ${i + 1}` : `Day ${i + 1}`}</small>
+              <b>{formatDate(d.date, lang).replace(/ \d{4}$/, "")}</b>
+            </button>
+          ))}
+        </div>
+        {programme.days.map((d, i) => (
+          <section class="day-panel" id={`day-${d.date}`} role="tabpanel" aria-labelledby={`tab-${d.date}`}>
+            <h3>{hi ? `दिन ${i + 1}: ` : `Day ${i + 1}: `}{formatDate(d.date, lang, true)}</h3>
+            <ol class="sessions">
+              {d.sessions.map((x) => {
+                const tba = !x.speakers.length && x.kind !== "exhibition" && x.kind !== "opening" && x.kind !== "poetry";
+                return (
+                  <li class:list={["session", { "is-tba": tba }]}>
+                    <time datetime={`${d.date}T${x.time}`}>{formatTime(x.time, lang)}{x.end && ` - ${formatTime(x.end, lang)}`}</time>
+                    <div>
+                      <h4>{x.title[lang]}</h4>
+                      {x.speakers.length > 0 && <div class="who">{x.speakers.join(", ")}</div>}
+                    </div>
+                    <span class="kind">{sessionKindLabel[x.kind][lang]}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        ))}
+      </div>
+    </div>
+  </section>
+  {announced.length > 0 && (
+    <section class="section" aria-labelledby="speakers">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">{hi ? `किताब उत्सव ${e.city.hi} में मिलिए` : `Meet them in ${e.city.en}`}</p><h2 class="h2" id="speakers">{hi ? "अब तक घोषित वक्ता" : "Speakers announced so far"}</h2></div></div>
+        <div class="grid grid--3">{announced.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
+      </div>
+    </section>
+  )}
+</Base>

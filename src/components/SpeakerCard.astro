@@ -1,0 +1,14 @@
+---
+import type { Speaker } from "../data/speakers";
+import type { Lang } from "../i18n";
+interface Props { s: Speaker; lang: Lang }
+const { s, lang } = Astro.props;
+---
+<article class="speaker">
+  <span class="sticker" aria-hidden="true">{s.photo ? <img src={s.photo} alt="" loading="lazy" width="96" height="96" /> : s.name.hi}</span>
+  <div>
+    <h3>{s.name[lang]}</h3>
+    <span class="role">{s.role[lang]}</span>
+    <p>{s.bio[lang]}</p>
+  </div>
+</article>

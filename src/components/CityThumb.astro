@@ -1,0 +1,32 @@
+---
+/** A reusable line-art cityscape for city and edition cards. */
+interface Props { city: string; label?: string; class?: string }
+const { city, label, class: klass } = Astro.props;
+let seed = 0;
+for (let i = 0; i < city.length; i++) seed = (seed * 31 + city.charCodeAt(i)) >>> 0;
+const W = 400, H = 220, ground = 164;
+const offset = seed % 34;
+---
+<svg class:list={["city-thumb", klass]} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label ?? city} preserveAspectRatio="xMidYMax slice">
+  <g class="skyline" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d={`M0 ${ground}H400`} />
+    <path d={`M0 ${ground}V112H38V${82 + offset % 24}H72V${ground}`} />
+    <path d={`M82 ${ground}V88H126V${ground}`} />
+    <path d={`M137 ${ground}V65H186V${ground}M146 65V46H177V65`} />
+    <path d={`M197 ${ground}V102H238V${ground}M205 102V78H230V102`} />
+    <path d={`M250 ${ground}V76H294V${ground}M261 76V53H283V76`} />
+    <path d={`M307 ${ground}V106H344V${ground}M354 ${ground}V92H400`} />
+    <path d={`M18 126H56M92 103H116M150 83H174M210 116H228M267 93H287M320 121H337`} stroke-width="2" />
+    <path d={`M${44 + offset} ${ground}c0-24 24-24 24 0M${321 - offset / 2} ${ground}c0-29 29-29 29 0`} />
+    <path d={`M${58 + offset} ${ground - 26}v26M${336 - offset / 2} ${ground - 31}v31`} stroke-width="2" />
+  </g>
+  <circle cx={72 + offset} cy="40" r="14" class="sun" />
+  <path d="M22 191H378" class="baseline" fill="none" stroke="currentColor" stroke-width="1.5" />
+  <text x="20" y="208" class="label">{city}</text>
+</svg>
+<style>
+  .city-thumb { display: block; width: 100%; height: 100%; color: var(--ku-blue, #114b9c); }
+  .sun { fill: var(--ku-orange, #f2a33a); stroke: var(--ku-orange, #f2a33a); }
+  .baseline { color: var(--ku-red, #de2026); }
+  .label { fill: currentColor; font-family: var(--ku-display, sans-serif); font-size: 28px; font-weight: 800; }
+</style>

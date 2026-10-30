@@ -1,0 +1,17 @@
+---
+/** Decorative sky clouds from the campaign posters. Positions are % of the parent. */
+interface Props { items?: { x: string; y: string; w: number; flip?: boolean }[] }
+const { items = [
+  { x: "62%", y: "4%", w: 240 },
+  { x: "-4%", y: "44%", w: 200, flip: true },
+  { x: "84%", y: "58%", w: 220 },
+] } = Astro.props;
+---
+<div class="clouds" aria-hidden="true">
+  {items.map((c) => (
+    <svg class="cloud" viewBox="0 0 240 120" style={`left:${c.x};top:${c.y};--w:${c.w}px;${c.flip ? "scale:-1 1;" : ""}`}>
+      <path class="fill" d="M30 98c-16 0-26-10-26-24s12-24 27-23c3-17 18-29 36-28 9-14 25-21 42-17 15 3 26 13 30 26 10-6 23-6 33 0 12 7 18 20 15 33 13 3 21 13 21 25 0 5-1 8-4 8H30z" />
+      <path class="line" d="M58 70c8-10 22-10 28-2M104 52c10-12 30-12 38 2s-4 26-18 22M176 80c6-8 18-8 22 2" />
+    </svg>
+  ))}
+</div>

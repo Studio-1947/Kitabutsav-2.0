@@ -1,0 +1,153 @@
+---
+import "../styles/rk-chrome.css";
+import "../styles/site.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import MobileTabbar from "../components/MobileTabbar.astro";
+import { locales, defaultLang, localePath, htmlLang, ogLocale, t, type Lang } from "../i18n";
+import { org, festivalSocial } from "../site.config";
+
+export interface Crumb { name: string; path: string }
+interface Props {
+  lang: Lang;
+  /** Route without locale prefix, e.g. "/editions/bareilly-2026/" */
+  route: string;
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  jsonLd?: Record<string, unknown>[];
+  crumbs?: Crumb[];
+  noindex?: boolean;
+  /** Set false for routes that only exist in one language (e.g. 404). */
+  alternates?: boolean;
+}
+
+const { lang, route, title, description, image = "/og/kitab-utsav.jpg", imageAlt, jsonLd = [], crumbs = [], noindex = false, alternates = true } = Astro.props;
+const s = t(lang);
+const site = Astro.site ?? new URL("https://kitabutsav.rajkamalprakashan.com");
+const abs = (p: string) => new URL(p, site).href;
+const canonical = abs(localePath(lang, route));
+const other: Lang = lang === "hi" ? "en" : "hi";
+const altHref = localePath(other, route);
+const fullTitle = title.includes(s.siteName) ? title : `${title} | ${s.siteName}`;
+
+const graph: Record<string, unknown>[] = [
+  {
+    "@type": "Organization",
+    "@id": `${org.url}/#organization`,
+    name: org.name,
+    legalName: org.legalName,
+    alternateName: ["Rajkamal Prakashan Samuh", "राजकमल प्रकाशन समूह"],
+    url: org.url,
+    logo: org.logo,
+    email: org.email,
+    telephone: org.phones[0].tel,
+    foundingDate: "1947",
+    address: { "@type": "PostalAddress", ...org.address },
+    sameAs: [
+      "https://www.youtube.com/@RajkamalBooks",
+      "https://www.instagram.com/rajkamalbooks",
+      "https://www.facebook.com/RajkamalPrakashanSamooh",
+      "https://x.com/RajkamalBooks",
+      ...festivalSocial.map((x) => x.url),
+    ],
+  },
+  {
+    "@type": "WebSite",
+    "@id": `${abs("/")}#website`,
+    url: abs(localePath(lang, "/")),
+    name: s.siteNameFull,
+    alternateName: lang === "hi" ? ["Kitab Utsav", "किताब उत्सव"] : ["किताब उत्सव", "Kitab Utsav"],
+    inLanguage: htmlLang[lang],
+    publisher: { "@id": `${org.url}/#organization` },
+  },
+  {
+    "@type": "WebPage",
+    "@id": `${canonical}#webpage`,
+    url: canonical,
+    name: fullTitle,
+    description,
+    inLanguage: htmlLang[lang],
+    isPartOf: { "@id": `${abs("/")}#website` },
+    primaryImageOfPage: abs(image),
+  },
+];
+if (crumbs.length) {
+  graph.push({
+    "@type": "BreadcrumbList",
+    itemListElement: [{ name: s.breadcrumbHome, path: "/" }, ...crumbs].map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: abs(localePath(lang, c.path)),
+    })),
+  });
+}
+const ld = { "@context": "https://schema.org", "@graph": [...graph, ...jsonLd] };
+---
+<!doctype html>
+<html lang={htmlLang[lang]} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+    {alternates && locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(localePath(l, route))} />)}
+    {alternates && <link rel="alternate" hreflang="x-default" href={abs(localePath(defaultLang, route))} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={s.siteNameFull} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={abs(image)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt ?? fullTitle} />
+    <meta property="og:locale" content={ogLocale[lang]} />
+    <meta property="og:locale:alternate" content={ogLocale[other]} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@RajkamalBooks" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={abs(image)} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300..700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(ld)} />
+  </head>
+  <body class:list={[`lang-${lang}`]}>
+    <a class="skip-link" href="#main">{s.skip}</a>
+    <Header lang={lang} altHref={altHref} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <MobileTabbar lang={lang} altHref={altHref} />
+    <script is:inline src="/scripts/chrome.js" defer></script>
+    <script is:inline src="/scripts/letters.js" defer></script>
+    <script is:inline>
+      /* Deep links to a section (e.g. #wall) can land in the wrong place: the browser's
+         built-in scroll races against images still loading further down the page, which
+         changes the document height mid-scroll and leaves the anchor overshot. Once
+         everything has finished loading, jump straight (no animation) to the right spot. */
+      if (location.hash) {
+        window.addEventListener("load", function () {
+          var el = document.getElementById(location.hash.slice(1));
+          if (el) requestAnimationFrame(function () { el.scrollIntoView({ block: "start", behavior: "instant" }); });
+        });
+      }
+    </script>
+  </body>
+</html>

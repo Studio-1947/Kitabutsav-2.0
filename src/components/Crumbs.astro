@@ -1,0 +1,13 @@
+---
+import { localePath, t, type Lang } from "../i18n";
+interface Props { lang: Lang; items: { name: string; path: string }[] }
+const { lang, items } = Astro.props;
+const all = [{ name: t(lang).breadcrumbHome, path: "/" }, ...items];
+---
+<nav aria-label={lang === "hi" ? "ब्रेडक्रम्ब" : "Breadcrumb"}>
+  <ol class="crumbs">
+    {all.map((c, i) => (
+      <li>{i < all.length - 1 ? <a href={localePath(lang, c.path)}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>
+    ))}
+  </ol>
+</nav>
