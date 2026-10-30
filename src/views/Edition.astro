@@ -6,8 +6,10 @@ import Icon from "../components/Icon.astro";
 import EditionCard from "../components/EditionCard.astro";
 import NextEdition from "../components/NextEdition.astro";
 import SpeakerCard from "../components/SpeakerCard.astro";
+import GalleryGrid from "../components/GalleryGrid.astro";
+import { galleryFor } from "../data/gallery";
 import { speakersFor } from "../data/speakers";
-import { editions, type Edition } from "../data/editions";
+import { editions, neighbours, type Edition } from "../data/editions";
 import { formatRange, formatTime, isUpcoming, localePath, t, type Lang } from "../i18n";
 import { eventLd, mapsUrl } from "../lib/schema";
 import { org } from "../site.config";
@@ -33,6 +35,9 @@ const crumbs = [
 const ev = eventLd(e, lang, site, og);
 const announced = speakersFor(e.slug);
 const others = editions.filter((x) => x.slug !== e.slug).slice(0, 3);
+const { prev, next } = neighbours(e.slug);
+const photos = galleryFor(e.slug);
+const label = (x: Edition) => (hi ? `${x.city.hi} ${x.year}` : `${x.city.en} ${x.year}`);
 ---
 <Base lang={lang} route={route} title={title} description={description} crumbs={crumbs} jsonLd={ev ? [ev] : []}>
   <section class="page-hero">
@@ -100,10 +105,44 @@ const others = editions.filter((x) => x.slug !== e.slug).slice(0, 3);
   {announced.length > 0 && (
     <section class="section" aria-labelledby="speakers">
       <div class="wrap">
-        <div class="section-head"><div><p class="eyebrow">{hi ? "मिलिए" : "Meet"}</p><h2 class="h2" id="speakers">{hi ? "अब तक घोषित वक्ता" : "Speakers announced so far"}</h2></div></div>
+        <div class="section-head"><div><p class="eyebrow">{hi ? "मिलिए" : "Meet"}</p><h2 class="h2" id="speakers">{up ? (hi ? "अब तक घोषित वक्ता" : "Speakers announced so far") : (hi ? "मंच पर" : "On stage")}</h2></div></div>
         <div class="grid grid--3">{announced.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
       </div>
     </section>
+  )}
+
+  {photos.length > 0 && (
+    <section class="section" aria-labelledby="photos">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="eyebrow">{hi ? "गैलरी" : "Gallery"}</p><h2 class="h2" id="photos">{hi ? `${e.city.hi}, तस्वीरों में` : `${e.city.en} in pictures`}</h2></div>
+          <a class="link-more" href={localePath(lang, `/gallery/#${e.slug}`)}>{hi ? "पूरी गैलरी" : "Full gallery"}</a>
+        </div>
+        <GalleryGrid items={photos} lang={lang} />
+      </div>
+    </section>
+  )}
+
+  {(prev || next) && (
+    <nav class="wrap edition-pager" aria-label={hi ? "पिछला और अगला संस्करण" : "Previous and next edition"}>
+      {prev ? (
+        <a class="edition-pager__link" href={localePath(lang, `/editions/${prev.slug}/`)} rel="prev">
+          <small><Icon name="arrowLeft" />{hi ? "पिछला पड़ाव" : "Previous stop"}</small>
+          <b>{label(prev)}</b><span>{formatRange(prev, lang)}</span>
+        </a>
+      ) : <span />}
+      {next ? (
+        <a class="edition-pager__link edition-pager__link--next" href={localePath(lang, `/editions/${next.slug}/`)} rel="next">
+          <small>{hi ? "अगला पड़ाव" : "Next stop"}<Icon name="arrowRight" /></small>
+          <b>{label(next)}</b><span>{formatRange(next, lang)}</span>
+        </a>
+      ) : (
+        <a class="edition-pager__link edition-pager__link--next is-soon" href="#newsletter">
+          <small>{hi ? "अगला पड़ाव" : "Next stop"}<Icon name="arrowRight" /></small>
+          <b>{hi ? "घोषणा जल्द" : "Announcing soon"}</b><span>{hi ? "ख़बर पाने के लिए जुड़ें" : "Sign up to hear first"}</span>
+        </a>
+      )}
+    </nav>
   )}
 
   <section class="section" aria-labelledby="others">

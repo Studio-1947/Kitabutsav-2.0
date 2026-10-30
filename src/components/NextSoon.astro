@@ -1,0 +1,35 @@
+---
+/** Hero card for the gap between editions: no fake city or date, just where to hear first. */
+import Icon from "./Icon.astro";
+import type { Edition } from "../data/editions";
+import { formatRange, localePath, t, type Lang } from "../i18n";
+import { festivalSocial, org } from "../site.config";
+
+interface Props { last: Edition; lang: Lang }
+const { last, lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const invite = `mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`;
+---
+<div class="next-card next-card--soon">
+  <span class="eyebrow">{s.nextEdition}</span>
+  <p class="next-title">
+    {hi ? "अगला शहर, जल्द" : "Next city, soon"}
+    <span class="city-en">{hi ? "Next stop announcing soon" : "अगले पड़ाव की घोषणा जल्द"}</span>
+  </p>
+  <p class="next-soon__text">
+    {hi
+      ? `किताब उत्सव ${last.city.hi} (${formatRange(last, "hi")}) पूरा हुआ। अगले शहर और तारीख़ों की घोषणा सबसे पहले ${festivalSocial[0].handle} और ईमेल पर होगी।`
+      : `Kitab Utsav ${last.city.en} (${formatRange(last, "en")}) has wrapped. The next city and dates will be announced first on ${festivalSocial[0].handle} and by email.`}
+  </p>
+  <ol class="next-soon__track" aria-label={hi ? "सफ़र" : "Journey"}>
+    <li class="is-done"><span>{last.city[lang]}</span><small>{last.year}</small></li>
+    <li class="next-soon__arrow" aria-hidden="true">» » »</li>
+    <li class="is-next"><span>?</span><small>{hi ? "अगला" : "Next"}</small></li>
+  </ol>
+  <div class="btns" style="margin-top:22px">
+    <a class="btn btn--primary" href="#newsletter"><Icon name="mail" />{hi ? "ख़बर पाएँ" : "Get notified"}</a>
+    <a class="btn" href={localePath(lang, `/editions/${last.slug}/`)}>{hi ? `${last.city.hi} की झलकियाँ` : `${last.city.en} recap`}</a>
+    <a class="btn" href={invite}>{hi ? "अपने शहर बुलाएँ" : "Invite to your city"}</a>
+  </div>
+</div>

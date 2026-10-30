@@ -1,14 +1,22 @@
 ---
+import Portrait from "./Portrait.astro";
 import type { Speaker } from "../data/speakers";
-import type { Lang } from "../i18n";
+import { localePath, type Lang } from "../i18n";
 interface Props { s: Speaker; lang: Lang }
 const { s, lang } = Astro.props;
 ---
-<article class="speaker">
-  <span class="sticker" aria-hidden="true">{s.photo ? <img src={s.photo} alt="" loading="lazy" width="96" height="96" /> : s.name.hi}</span>
+<article class="speaker" id={s.slug}>
+  <Portrait s={s} lang={lang} />
   <div>
     <h3>{s.name[lang]}</h3>
     <span class="role">{s.role[lang]}</span>
     <p>{s.bio[lang]}</p>
+    {s.appearances && s.appearances.length > 0 && (
+      <ul class="speaker__at">
+        {s.appearances.map((a) => (
+          <li>{a.edition ? <a href={localePath(lang, `/editions/${a.edition}/`)}>{a.city[lang]} {a.year}</a> : `${a.city[lang]} ${a.year}`}</li>
+        ))}
+      </ul>
+    )}
   </div>
 </article>

@@ -3,7 +3,8 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
 import Icon from "../components/Icon.astro";
-import { featuredEdition as e } from "../data/editions";
+import { featuredEdition as e, nextEdition } from "../data/editions";
+import { localePath } from "../i18n";
 import { formatRange, formatTime, t, type Lang } from "../i18n";
 import { eventLd, mapsUrl } from "../lib/schema";
 import { org, festivalSocial } from "../site.config";
@@ -18,7 +19,8 @@ const description = hi
   ? `किताब उत्सव ${e.city.hi}: ${when}, ${e.venue?.hi}। रोज़ ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")} तक। नक्शा, संपर्क और ज़रूरी जानकारी।`
   : `Kitab Utsav ${e.city.en}: ${when} at ${e.venue?.en}. Open daily ${formatTime(e.startTime!, "en")} to ${formatTime(e.endTime!, "en")}. Map, contacts and visitor information.`;
 const crumbs = [{ name: s.nav.visit, path: "/visit/" }];
-const ev = eventLd(e, lang, Astro.site!, "/og/kitab-utsav.jpg");
+const up = !!nextEdition;
+const ev = up ? eventLd(e, lang, Astro.site!, "/og/kitab-utsav.jpg") : null;
 const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? e.city.en)}&output=embed`;
 ---
 <Base lang={lang} route="/visit/" title={title} description={description} crumbs={crumbs} jsonLd={ev ? [ev] : []}>
@@ -31,6 +33,18 @@ const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? 
     </div>
   </section>
   <section class="section" style="padding-top:28px">
+    {!up && (
+      <div class="wrap">
+        <div class="notice" role="note">
+          <Icon name="help" />
+          <p>
+            {hi
+              ? <>नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। अगले शहर और स्थान की घोषणा जल्द होगी; <a href="#newsletter">ख़बर पाने के लिए जुड़ें</a>।</>
+              : <>Below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). The next city and venue will be announced soon; <a href="#newsletter">sign up to hear first</a>.</>}
+          </p>
+        </div>
+      </div>
+    )}
     <div class="wrap detail-grid">
       <div>
         <iframe class="map-frame" src={embed} title={hi ? `${e.venue?.hi} का नक्शा` : `Map of ${e.venue?.en}`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -40,7 +54,7 @@ const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? 
             {hi ? (
               <>
                 <li>उत्सव पाँचों दिन {formatTime(e.startTime!, "hi")} से {formatTime(e.endTime!, "hi")} तक खुला रहेगा।</li>
-                <li>सत्रों का दिन-वार समय <a href="/programme/">कार्यक्रम</a> पेज पर देखें।</li>
+                <li>सत्रों का दिन-वार समय <a href={localePath("hi", "/programme/")}>कार्यक्रम</a> पेज पर देखें।</li>
                 <li>पुस्तक प्रदर्शनी पूरे दिन खुली रहेगी।</li>
                 <li>प्रवेश और पंजीकरण की ताज़ा जानकारी <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a> पर मिलेगी।</li>
               </>
@@ -65,7 +79,7 @@ const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? 
           </ul>
           <div class="btns">
             <a class="btn btn--primary" href={mapsUrl(e.mapQuery!)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>
-            <a class="btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>
+            {up && <a class="btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>}
           </div>
         </div>
       </aside>

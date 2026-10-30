@@ -1,7 +1,8 @@
 /**
  * Speakers announced on @kitab.utsav for the Bareilly edition (October 2026).
  * Bios are condensed from the festival's own announcement posts. Add new names as they are
- * announced; `photo` is optional (put files in public/speakers/ and reference "/speakers/x.jpg").
+ * announced; `photo` is optional (put a square portrait in public/speakers/ and reference
+ * "/speakers/x.jpg"). Without one the site draws a name tile, never a stand-in face.
  */
 import type { L10n } from "./editions";
 
@@ -19,7 +20,6 @@ export const speakers: Speaker[] = [
   {
     slug: "geetashree",
     edition: "bareilly-2026",
-    photo: "/speakers/geetashree-instagram.jpg",
     name: { hi: "गीताश्री", en: "Geetashree" },
     role: { hi: "पत्रकार और लेखक", en: "Journalist and writer" },
     bio: {
@@ -31,7 +31,6 @@ export const speakers: Speaker[] = [
   {
     slug: "sujata",
     edition: "bareilly-2026",
-    photo: "/speakers/sujata-instagram.jpg",
     name: { hi: "सुजाता", en: "Sujata" },
     role: { hi: "कवि, उपन्यासकार और आलोचक", en: "Poet, novelist and critic" },
     bio: {
@@ -43,7 +42,6 @@ export const speakers: Speaker[] = [
   {
     slug: "adnan-kafeel-darvesh",
     edition: "bareilly-2026",
-    photo: "/speakers/adnan-kafeel-darvesh-instagram.jpg",
     name: { hi: "अदनान कफ़ील दरवेश", en: "Adnan Kafeel Darvesh" },
     role: { hi: "कवि", en: "Poet" },
     bio: {
@@ -147,7 +145,9 @@ export const speakers: Speaker[] = [
   },
 ];
 
-export const speakersFor = (edition: string) => speakers.filter((s) => s.edition === edition);
+/** Everyone documented at an edition, whether it is their main listing or a recorded appearance. */
+export const speakersFor = (edition: string) =>
+  speakers.filter((s) => s.edition === edition || s.appearances?.some((a) => a.edition === edition));
 
 /**
  * Every speaker documented so far, across all editions. This is the festival's working

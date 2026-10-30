@@ -1,0 +1,28 @@
+---
+/** Masonry-style photo grid. Entries without `src` render as illustrated "photo coming" tiles. */
+import Icon from "./Icon.astro";
+import { momentLabel, type Photo } from "../data/gallery";
+import type { Lang } from "../i18n";
+interface Props { items: Photo[]; lang: Lang }
+const { items, lang } = Astro.props;
+const hi = lang === "hi";
+const tones = ["blue", "sand", "red", "sky", "orange", "ink"];
+---
+<ul class="gallery">
+  {items.map((p, i) => (
+    <li class:list={["gallery__item", `gallery__item--${p.shape ?? "square"}`, !p.src && `is-slot tone-${tones[i % tones.length]}`]}>
+      <figure>
+        {p.src ? (
+          <img src={p.src} alt={p.alt?.[lang] ?? p.caption[lang]} loading="lazy" />
+        ) : (
+          <div class="gallery__slot" aria-hidden="true">
+            <span class="gallery__kind">{momentLabel[p.moment][lang]}</span>
+            <Icon name="camera" />
+            <span class="gallery__soon">{hi ? "फ़ोटो जल्द" : "Photo coming"}</span>
+          </div>
+        )}
+        <figcaption>{p.caption[lang]}{p.credit && <small> · {p.credit}</small>}</figcaption>
+      </figure>
+    </li>
+  ))}
+</ul>

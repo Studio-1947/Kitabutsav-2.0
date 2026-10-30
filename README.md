@@ -21,7 +21,9 @@ Deploys as plain static files (Vercel, Netlify, Cloudflare Pages, any CDN). On V
 | --- | --- |
 | Editions (dates, venues, copy, highlights) | `src/data/editions.ts` |
 | Bareilly day-wise programme | `src/data/programme.ts` |
-| FAQ | `src/data/faq.ts` |
+| FAQ (the "next edition" answers are generated from editions) | `src/data/faq.ts` |
+| Gallery photos (placeholder slots) | `src/data/gallery.ts` |
+| Press coverage (placeholder slots) | `src/data/press.ts` |
 | Announced speakers, official totals, tagline | `src/data/speakers.ts` |
 | Festival logo slot, partners | `src/site.config.ts` |
 | UI strings, date/time formatting, locale paths | `src/i18n/index.ts` |
@@ -32,7 +34,9 @@ Deploys as plain static files (Vercel, Netlify, Cloudflare Pages, any CDN). On V
 | Footer cursor letters (ported) | `public/scripts/letters.js` |
 | Pages (thin routes) / page templates | `src/pages/**` / `src/views/*.astro` |
 
-To add a new edition, add an object to `editions` (newest first) and move `featured: true` to it. Its page, calendar file (`/ics/<slug>.ics`), sitemap entry and Event schema are generated automatically.
+To add a new edition, add an object to `editions` (newest first). The site works out the next edition from the dates at build time: while one is upcoming, the home hero shows its countdown, the header shows "Book my seat" and a calendar link, and Event schema is emitted. When nothing is upcoming, the hero switches to "next city, soon", the header CTA becomes "Get updates" (footer newsletter), and Visit/Programme show a notice that the details are from the last edition. Its page, calendar file (`/ics/<slug>.ics`), sitemap entry, gallery block and previous/next links are generated automatically.
+
+Pages: home, editions (one page per city), programme, authors (`/resources/`, filterable by city), gallery, press, about, visit, FAQ, all in Hindi and English.
 
 ## Design language
 
@@ -50,6 +54,12 @@ The lockup in `src/components/Wordmark.astro` is typographic with a generic open
 - Static HTML, no client framework, two small deferred scripts, fonts with `display=swap`.
 
 After launch: verify the domain in Google Search Console, submit `/sitemap-index.xml`, and test a page in the Rich Results Test.
+
+## Placeholders still in the site
+
+- **Speaker portraits**: no real photos are set, so every speaker gets a name tile (initial letter in campaign colours). Add a square photo to `public/speakers/` and set `photo` in `speakers.ts`. The earlier `*-instagram.jpg` crops were poster fragments, and `authors-hero.jpg` was a grid of stock-looking faces; both were moved out of the project to `../kitab-utsav-removed-assets/`.
+- **Gallery**: five captioned slots per edition, drawn as coloured "photo coming" tiles. Add real photos in `gallery.ts`.
+- **Press**: four slots with placeholder outlet names and no links, shown greyed out. Replace with real articles or delete them before launch.
 
 ## Before launch: check these
 

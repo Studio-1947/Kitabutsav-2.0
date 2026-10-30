@@ -38,7 +38,7 @@ export interface Edition {
   stats?: { value: string; label: L10n }[];
   /** Verified names / moments only. */
   highlights?: { hi: string[]; en: string[] };
-  /** Kept true only for the edition that should drive the home page hero and Event schema. */
+  /** Fallback for the home hero when no edition is upcoming. Upcoming editions take over automatically. */
   featured?: boolean;
 }
 
@@ -64,19 +64,19 @@ export const editions: Edition[] = [
     },
     mapQuery: "Windermere Theatre, Balwant Singh Marg, Civil Lines, Bareilly",
     summary: {
-      hi: "किताब उत्सव फिर लौट रहा है बरेली। 23 से 27 अक्टूबर 2026, विंडरमेयर थियेटर, सिविल लाइन्स में पाँच दिन पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।",
-      en: "Kitab Utsav returns to Bareilly. Five days of readings, conversations, book launches and a book exhibition at Windermere Theatre, Civil Lines, 23 to 27 October 2026.",
+      hi: "किताब उत्सव बरेली लौटा। 23 से 27 अक्टूबर 2026, विंडरमेयर थियेटर, सिविल लाइन्स में पाँच दिन पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।",
+      en: "Kitab Utsav returned to Bareilly for five days of readings, conversations, book launches and a book exhibition at Windermere Theatre, Civil Lines, 23 to 27 October 2026.",
     },
     body: {
       hi: [
-        "राजकमल प्रकाशन समूह 23 से 27 अक्टूबर 2026 तक बरेली में पाँच दिवसीय किताब उत्सव आयोजित कर रहा है। आयोजन स्थल है विंडरमेयर थियेटर, बलवंत सिंह मार्ग, सिविल लाइन्स। उत्सव रोज़ सुबह 11 बजे से रात 8 बजे तक चलेगा।",
-        "पाँचों दिन लेखकों और पाठकों के बीच सीधा संवाद होगा: किताबों पर बातचीत, रचना-पाठ, चर्चाएँ और नई किताबों के लोकार्पण। साथ में राजकमल, राधाकृष्ण, लोकभारती और राजकमल उर्दू की नई-पुरानी किताबों की प्रदर्शनी लगेगी।",
-        "बरेली में यह किताब उत्सव की वापसी है। पिछले संस्करण के दौरान एक सुबह वीरेन डंगवाल के स्मारक पर उनकी कविताओं का पाठ हुआ था। अब तक घोषित वक्ताओं में गीताश्री, सुजाता और कवि अदनान कफ़ील दरवेश शामिल हैं; बाक़ी नाम और दिन-वार कार्यक्रम घोषित होते ही जोड़े जाएँगे।",
+        "राजकमल प्रकाशन समूह ने 23 से 27 अक्टूबर 2026 तक बरेली में पाँच दिवसीय किताब उत्सव आयोजित किया। आयोजन स्थल था विंडरमेयर थियेटर, बलवंत सिंह मार्ग, सिविल लाइन्स। उत्सव रोज़ सुबह 11 बजे से रात 8 बजे तक चला।",
+        "पाँचों दिन लेखकों और पाठकों के बीच सीधा संवाद हुआ: किताबों पर बातचीत, रचना-पाठ, चर्चाएँ और नई किताबों के लोकार्पण। साथ में राजकमल, राधाकृष्ण, लोकभारती और राजकमल उर्दू की नई-पुरानी किताबों की प्रदर्शनी लगी।",
+        "बरेली में यह किताब उत्सव की वापसी है। पिछले संस्करण के दौरान एक सुबह वीरेन डंगवाल के स्मारक पर उनकी कविताओं का पाठ हुआ था। वक्ताओं में गीताश्री, सुजाता और कवि अदनान कफ़ील दरवेश शामिल थे; बाक़ी नाम और सत्रों का ब्योरा जल्द जोड़ा जाएगा।",
       ],
       en: [
-        "Rajkamal Prakashan Samuh is holding a five-day Kitab Utsav in Bareilly from 23 to 27 October 2026 at Windermere Theatre, Balwant Singh Marg, Civil Lines. The festival runs every day from 11 am to 8 pm.",
-        "Each day brings readers and writers face to face: conversations about books, readings, panel discussions and launches of new titles. Alongside runs an exhibition of new and classic books from Rajkamal, Radhakrishna, Lokbharti and Rajkamal Urdu.",
-        "This edition marks Kitab Utsav's return to Bareilly. During the previous edition, one morning was spent reading Viren Dangwal's poems at his memorial. Speakers announced so far include Geetashree, Sujata and poet Adnan Kafeel Darvesh; more names and the day-wise programme will be added as they are announced.",
+        "Rajkamal Prakashan Samuh held a five-day Kitab Utsav in Bareilly from 23 to 27 October 2026 at Windermere Theatre, Balwant Singh Marg, Civil Lines. The festival ran every day from 11 am to 8 pm.",
+        "Each day brought readers and writers face to face: conversations about books, readings, panel discussions and launches of new titles, alongside an exhibition of new and classic books from Rajkamal, Radhakrishna, Lokbharti and Rajkamal Urdu.",
+        "This edition marks Kitab Utsav's return to Bareilly. During the previous edition, one morning was spent reading Viren Dangwal's poems at his memorial. Speakers included Geetashree, Sujata and poet Adnan Kafeel Darvesh; more names and session details will be added soon.",
       ],
     },
   },
@@ -279,6 +279,28 @@ export const editions: Edition[] = [
   },
 ];
 
-export const featuredEdition = editions.find((e) => e.featured) ?? editions[0];
+/** Build-time "today". Rebuild after each edition ends so this stays correct. */
+const now = new Date();
+const endsAt = (e: Edition) => (e.end ? new Date(`${e.end}T23:59:59+05:30`).getTime() : 0);
+
+/** Soonest edition that has not ended yet, or null when nothing is announced. */
+export const nextEdition: Edition | null =
+  editions
+    .filter((e) => e.start && endsAt(e) >= now.getTime())
+    .sort((a, b) => a.start!.localeCompare(b.start!))[0] ?? null;
+
+/** Most recent edition that has already ended. */
+export const lastEdition: Edition =
+  editions.filter((e) => e.start && endsAt(e) < now.getTime()).sort((a, b) => b.start!.localeCompare(a.start!))[0] ?? editions[0];
+
+/** Drives the home hero, header calendar and Visit page: the next edition, else the latest one. */
+export const featuredEdition: Edition = nextEdition ?? editions.find((e) => e.featured) ?? lastEdition;
+
+/** Editions in date order, oldest first; used for previous/next links. */
+const chronological = [...editions].filter((e) => e.start).sort((a, b) => a.start!.localeCompare(b.start!));
+export const neighbours = (slug: string) => {
+  const i = chronological.findIndex((e) => e.slug === slug);
+  return { prev: i > 0 ? chronological[i - 1] : null, next: i >= 0 && i < chronological.length - 1 ? chronological[i + 1] : null };
+};
 
 export const editionBySlug = (slug: string) => editions.find((e) => e.slug === slug);

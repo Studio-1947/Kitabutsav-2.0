@@ -7,6 +7,7 @@ import SpeakerCard from "../components/SpeakerCard.astro";
 import { speakersFor } from "../data/speakers";
 import { programme, sessionKindLabel } from "../data/programme";
 import { editionBySlug } from "../data/editions";
+import { isUpcoming, localePath } from "../i18n";
 import { formatDate, formatRange, formatTime, t, type Lang } from "../i18n";
 import { eventLd } from "../lib/schema";
 import { festivalSocial } from "../site.config";
@@ -26,9 +27,10 @@ const description = hi
   : `Day-wise programme for Kitab Utsav ${e.city.en} (${when}): opening, conversations, book launches, discussions, readings and poetry. ${e.venue?.en ?? ""}`;
 const crumbs = [{ name: s.nav.programme, path: "/programme/" }];
 const announced = speakersFor(e.slug);
+const up = isUpcoming(e);
 
 /* Sessions only become structured data once the real schedule is published. */
-const ev = eventLd(e, lang, site, "/og/kitab-utsav.jpg");
+const ev = up ? eventLd(e, lang, site, "/og/kitab-utsav.jpg") : null;
 const jsonLd: Record<string, unknown>[] = [];
 if (ev) {
   if (programme.published) {
@@ -66,7 +68,17 @@ if (ev) {
 
   <section class="section" style="padding-top:28px">
     <div class="wrap">
-      {!programme.published && (
+      {!up && (
+        <div class="notice" role="note">
+          <Icon name="help" />
+          <p>
+            {hi
+              ? <>किताब उत्सव {e.city.hi} ({when}) पूरा हो चुका है। नीचे उसका दिन-वार ढाँचा है। अगले उत्सव का कार्यक्रम घोषणा के साथ यहीं आएगा; <a href="#newsletter">ख़बर पाने के लिए जुड़ें</a> या <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.hi} की झलकियाँ</a> देखें।</>
+              : <>Kitab Utsav {e.city.en} ({when}) has ended. Below is its day-wise outline. The next festival's programme will appear here once announced; <a href="#newsletter">sign up to hear first</a> or see the <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.en} recap</a>.</>}
+          </p>
+        </div>
+      )}
+      {up && !programme.published && (
         <div class="notice" role="note">
           <Icon name="help" />
           <p>

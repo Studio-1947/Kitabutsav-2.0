@@ -2,7 +2,23 @@
  * FAQ copy. Answers may contain simple <a> links; tags are stripped for FAQPage schema.
  * The entry-fee answer is intentionally non-committal: confirm the policy and update it.
  */
-import type { Lang } from "../i18n";
+import { formatRange, formatTime, type Lang } from "../i18n";
+import { nextEdition, lastEdition } from "./editions";
+
+/** "When is the next one?" stays true by itself: it reads the edition data at build time. */
+const n = nextEdition;
+const nextHi = n
+  ? `अगला किताब उत्सव ${n.city.hi} में ${formatRange(n, "hi")} तक${n.venue ? ` ${n.venue.hi} में` : ""} होगा।${n.startTime && n.endTime ? ` समय: रोज़ ${formatTime(n.startTime, "hi")} से ${formatTime(n.endTime, "hi")} तक।` : ""} <a href=\"/visit/\">पहुँचने की जानकारी</a> देखें।`
+  : `हाल का किताब उत्सव ${lastEdition.city.hi} में ${formatRange(lastEdition, "hi")} तक हुआ। अगले शहर और तारीख़ों की घोषणा जल्द होगी; सबसे पहले जानने के लिए <a href=\"#newsletter\">ईमेल से जुड़ें</a> या <a href=\"https://www.instagram.com/kitab.utsav/\" target=\"_blank\" rel=\"noopener\">@kitab.utsav</a> देखें।`;
+const nextEn = n
+  ? `The next Kitab Utsav is in ${n.city.en}, ${formatRange(n, "en")}${n.venue ? `, at ${n.venue.en}` : ""}.${n.startTime && n.endTime ? ` Open daily from ${formatTime(n.startTime, "en")} to ${formatTime(n.endTime, "en")}.` : ""} See <a href=\"/en/visit/\">how to get there</a>.`
+  : `The most recent Kitab Utsav was in ${lastEdition.city.en}, ${formatRange(lastEdition, "en")}. The next city and dates will be announced soon; <a href=\"#newsletter\">sign up by email</a> or follow <a href=\"https://www.instagram.com/kitab.utsav/\" target=\"_blank\" rel=\"noopener\">@kitab.utsav</a> to hear first.`;
+const progHi = n
+  ? `${n.city.hi} संस्करण का दिन-वार कार्यक्रम घोषित होते ही <a href=\"/programme/\">कार्यक्रम</a> पेज पर जोड़ा जाएगा। ताज़ा घोषणाएँ @kitab.utsav और @rajkamalbooks पर भी आती हैं।`
+  : `अगले उत्सव का दिन-वार कार्यक्रम घोषणा के साथ <a href=\"/programme/\">कार्यक्रम</a> पेज पर आएगा। ताज़ा घोषणाएँ @kitab.utsav और @rajkamalbooks पर भी आती हैं।`;
+const progEn = n
+  ? `The day-wise ${n.city.en} programme will be added to the <a href=\"/en/programme/\">programme</a> page as soon as it is announced. Updates also appear on @kitab.utsav and @rajkamalbooks.`
+  : `The next festival's day-wise programme will appear on the <a href=\"/en/programme/\">programme</a> page once announced. Updates also appear on @kitab.utsav and @rajkamalbooks.`;
 
 export const faq: Record<Lang, { q: string; a: string }[]> = {
   hi: [
@@ -12,7 +28,7 @@ export const faq: Record<Lang, { q: string; a: string }[]> = {
     },
     {
       q: "अगला किताब उत्सव कब और कहाँ है?",
-      a: "अगला किताब उत्सव बरेली में 23 से 27 अक्टूबर 2026 तक विंडरमेयर थियेटर, बलवंत सिंह मार्ग, सिविल लाइन्स (अक्षर विहार के सामने) में होगा। समय: रोज़ सुबह 11 बजे से रात 8 बजे तक। <a href=\"/visit/\">पहुँचने की जानकारी</a> देखें।",
+      a: nextHi,
     },
     {
       q: "किताब उत्सव किन शहरों में हो चुका है?",
@@ -28,7 +44,7 @@ export const faq: Record<Lang, { q: string; a: string }[]> = {
     },
     {
       q: "पूरा कार्यक्रम कहाँ मिलेगा?",
-      a: "बरेली संस्करण का दिन-वार कार्यक्रम घोषित होते ही <a href=\"/programme/\">कार्यक्रम</a> पेज पर जोड़ा जाएगा। ताज़ा घोषणाएँ @kitab.utsav और @rajkamalbooks पर भी आती हैं।",
+      a: progHi,
     },
     {
       q: "अपने शहर में किताब उत्सव कैसे बुलाएँ?",
@@ -42,7 +58,7 @@ export const faq: Record<Lang, { q: string; a: string }[]> = {
     },
     {
       q: "When and where is the next Kitab Utsav?",
-      a: "The next Kitab Utsav is in Bareilly from 23 to 27 October 2026 at Windermere Theatre, Balwant Singh Marg, Civil Lines (opposite Akshar Vihar), open daily from 11 am to 8 pm. See <a href=\"/en/visit/\">how to get there</a>.",
+      a: nextEn,
     },
     {
       q: "Which cities has Kitab Utsav visited?",
@@ -58,7 +74,7 @@ export const faq: Record<Lang, { q: string; a: string }[]> = {
     },
     {
       q: "Where can I find the full programme?",
-      a: "The day-wise Bareilly programme will be added to the <a href=\"/en/programme/\">programme</a> page as soon as it is announced. Updates also appear on @kitab.utsav and @rajkamalbooks.",
+      a: progEn,
     },
     {
       q: "How can I bring Kitab Utsav to my city?",

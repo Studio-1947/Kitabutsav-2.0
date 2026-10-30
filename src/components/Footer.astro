@@ -2,7 +2,7 @@
 import Icon from "./Icon.astro";
 import { t, localePath, type Lang } from "../i18n";
 import { org, festivalSocial } from "../site.config";
-import { featuredEdition } from "../data/editions";
+import { featuredEdition, nextEdition } from "../data/editions";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -14,6 +14,20 @@ const hi = lang === "hi";
   <div class="footer-ripple" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
 
   <div class="footer-main">
+    <div class="footer-news" id="newsletter">
+      <div>
+        <h4>{s.newsletterTitle}</h4>
+        <p>{s.newsletterText}</p>
+      </div>
+      <div>
+        <form class="newsletter" data-newsletter data-email={org.email} data-thanks={s.newsletterThanks}>
+          <label class="sr-only" for="nl-email">{s.newsletterPlaceholder}</label>
+          <input id="nl-email" type="email" name="email" required autocomplete="email" placeholder={s.newsletterPlaceholder} />
+          <button class="btn btn--primary" type="submit">{s.newsletterBtn}</button>
+        </form>
+        <p class="newsletter-note" aria-live="polite"></p>
+      </div>
+    </div>
     <div class="footer-inner footer-inner--short">
       <div class="footer-brand">
         <img class="footer-mark footer-mark--ku" src="/brand/kitab-utsav-logo.svg" alt={s.siteNameFull} width="84" height="84" loading="lazy" />
@@ -35,6 +49,9 @@ const hi = lang === "hi";
             <li><a href={L("/about/")}>{s.nav.about}</a></li>
             <li><a href={L("/editions/")}>{s.nav.editions}</a></li>
             <li><a href={L("/programme/")}>{s.nav.programme}</a></li>
+            <li><a href={L("/resources/")}>{hi ? "लेखक" : "Authors"}</a></li>
+            <li><a href={L("/gallery/")}>{hi ? "गैलरी" : "Gallery"}</a></li>
+            <li><a href={L("/press/")}>{hi ? "मीडिया" : "Press"}</a></li>
             <li><a href={L("/visit/")}>{s.nav.visit}</a></li>
             <li><a href={L("/faq/")}>{s.nav.faq}</a></li>
           </ul>
@@ -44,9 +61,10 @@ const hi = lang === "hi";
         <div>
           <h4>{hi ? "जुड़ें" : "Get Involved"}</h4>
           <ul>
-            <li><a href={`/ics/${featuredEdition.slug}.ics`} download>{s.addToCal}</a></li>
+            {nextEdition && <li><a href={`/ics/${nextEdition.slug}.ics`} download>{s.addToCal}</a></li>}
+            <li><a href="#newsletter">{s.newsletterTitle}</a></li>
             <li><a href={`mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`}>{hi ? "किताब उत्सव बुलाएँ" : "Invite Kitab Utsav"}</a></li>
-            <li><a href="https://1947.io" target="_blank" rel="noopener">{hi ? "राजकमल प्रकाशन समूह" : "By Rajkamal Prakashan Samuh"}</a></li>
+            <li><a href={org.url} target="_blank" rel="noopener">{hi ? "राजकमल प्रकाशन समूह" : "By Rajkamal Prakashan Samuh"}</a></li>
           </ul>
         </div>
       </div>

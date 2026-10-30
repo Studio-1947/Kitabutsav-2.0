@@ -1,0 +1,56 @@
+---
+/**
+ * Speaker portrait. Uses `photo` when a real portrait exists; until then draws a name tile in
+ * the campaign colours (initial letter, chevrons, paper grain) so no face is ever faked.
+ */
+import type { Speaker } from "../data/speakers";
+import type { Lang } from "../i18n";
+interface Props { s: Speaker; lang: Lang; size?: "sm" | "md" | "lg"; class?: string }
+const { s, lang, size = "md", class: klass } = Astro.props;
+
+const palettes = [
+  { bg: "#114B9C", fg: "#FFFDF8", accent: "#F2A33A" },
+  { bg: "#DE2026", fg: "#FFFDF8", accent: "#FFE18A" },
+  { bg: "#F2A33A", fg: "#0B2E63", accent: "#DE2026" },
+  { bg: "#E6CF94", fg: "#114B9C", accent: "#DE2026" },
+  { bg: "#0B2E63", fg: "#E6CF94", accent: "#F2A33A" },
+];
+let seed = 0;
+for (const ch of s.slug) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+const p = palettes[seed % palettes.length];
+// First grapheme of the Hindi name, keeping any matra or nukta attached to it.
+const initial = [...new Intl.Segmenter("hi", { granularity: "grapheme" }).segment(s.name.hi)][0]?.segment ?? s.name.hi[0];
+const tilt = (seed % 7) - 3;
+---
+<span
+  class:list={["portrait", `portrait--${size}`, klass, { "portrait--photo": !!s.photo }]}
+  style={`--p-bg:${p.bg};--p-fg:${p.fg};--p-ac:${p.accent};--p-tilt:${tilt}deg`}
+  aria-hidden="true"
+>
+  {s.photo ? (
+    <img src={s.photo} alt="" loading="lazy" width="400" height="400" />
+  ) : (
+    <>
+      <svg class="portrait__chev" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M-10 78 L18 64 L-10 50 M8 92 L36 78 L8 64" />
+      </svg>
+      <span class="portrait__ini" lang="hi">{initial}</span>
+      <span class="portrait__name">{s.name[lang]}</span>
+    </>
+  )}
+</span>
+<style>
+  .portrait { position: relative; display: grid; place-items: center; overflow: hidden; isolation: isolate; aspect-ratio: 1; border-radius: 50%; background: var(--p-bg); color: var(--p-fg); }
+  .portrait::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 30% 22%, rgba(255,255,255,.22), transparent 55%); }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; }
+  .portrait__chev { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+  .portrait__chev path { fill: none; stroke: var(--p-ac); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
+  .portrait__ini { font: 800 2.6rem/1 var(--ku-display, sans-serif); transform: rotate(var(--p-tilt)) translateY(.08em); }
+  .portrait__name { display: none; }
+  .portrait--sm { width: 64px; }
+  .portrait--sm .portrait__ini { font-size: 1.7rem; }
+  .portrait--md { width: 96px; }
+  .portrait--lg { width: 100%; border-radius: 18px; }
+  .portrait--lg .portrait__ini { font-size: clamp(4.5rem, 9vw, 7rem); opacity: .95; }
+  .portrait--lg .portrait__chev path { stroke-width: 4; }
+</style>

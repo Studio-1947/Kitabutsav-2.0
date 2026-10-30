@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import SpeakerCard from "../components/SpeakerCard.astro";
 import { allSpeakers } from "../data/speakers";
+import { editions } from "../data/editions";
 import { t, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
@@ -14,26 +15,62 @@ const description = hi
   ? "किताब उत्सव के अब तक के सभी संस्करणों में शामिल हुए लेखक, कवि और वक्ता एक जगह।"
   : "The writers, poets and speakers who have taken part in Kitab Utsav editions so far, in one place.";
 const crumbs = [{ name: hi ? "लेखक" : "Authors", path: "/resources/" }];
+
+// Filter chips: one per city that has at least one documented speaker.
+const cityOf = (slug: string) => editions.find((e) => e.slug === slug)?.city;
+const tagsFor = (sp: (typeof allSpeakers)[number]) => {
+  const set = new Set<string>([sp.edition.split("-")[0]]);
+  sp.appearances?.forEach((a) => set.add(a.city.en.toLowerCase()));
+  return [...set];
+};
+const cities = [...new Map(allSpeakers.flatMap((sp) => {
+  const out: [string, string][] = [];
+  const c = cityOf(sp.edition); if (c) out.push([sp.edition.split("-")[0], c[lang]]);
+  sp.appearances?.forEach((a) => out.push([a.city.en.toLowerCase(), a.city[lang]]));
+  return out;
+})).entries()];
+const names = [...allSpeakers, ...allSpeakers].map((sp) => sp.name.hi);
 ---
 <Base lang={lang} route="/resources/" title={title} description={description} crumbs={crumbs}>
-  <section class="authors-hero">
-    <img class="authors-hero__img" src="/resources/authors-hero.jpg" alt="" width="1672" height="941" fetchpriority="high" />
-    <div class="authors-hero__scrim"></div>
-    <div class="wrap authors-hero__body">
+  <section class="page-hero names-hero">
+    <div class="names-hero__cloud" aria-hidden="true" lang="hi">
+      {names.map((n, i) => <span class={`n${i % 5}`}>{n}</span>)}
+    </div>
+    <div class="wrap">
       <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{hi ? "संसाधन" : "Resources"}</p>
-      <h1>{hi ? "अब तक के सभी लेखक" : "Every author, so far"}</h1>
+      <p class="eyebrow">{hi ? "लेखक" : "Authors"}</p>
+      <h1>{hi ? <>मंच पर अब तक <em>कौन आया</em></> : <>Who has taken <em>the stage</em></>}</h1>
       <p class="lead">
         {hi
-          ? "किताब उत्सव के मंच पर अब तक आए लेखक, कवि और वक्ता, एक जगह।"
-          : "The writers, poets and speakers who have shared the Kitab Utsav stage, in one place."}
+          ? `किताब उत्सव के मंच पर आए लेखक, कवि और वक्ता, एक जगह। अभी ${allSpeakers.length} नाम दर्ज हैं; सूची हर संस्करण के साथ बढ़ रही है।`
+          : `The writers, poets and speakers who have shared the Kitab Utsav stage, in one place. ${allSpeakers.length} names are on record so far, with more added after every edition.`}
       </p>
     </div>
   </section>
 
-  <section class="section" style="padding-top:36px">
+  <section class="section" style="padding-top:28px">
     <div class="wrap">
-      <div class="grid grid--3">{allSpeakers.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
+      <div class="chips" role="group" aria-label={hi ? "शहर से छाँटें" : "Filter by city"} data-filter>
+        <button type="button" class="chip" aria-pressed="true" data-city="">{hi ? "सभी" : "All"}</button>
+        {cities.map(([key, label]) => <button type="button" class="chip" aria-pressed="false" data-city={key}>{label}</button>)}
+      </div>
+      <div class="grid grid--3" data-filter-list>
+        {allSpeakers.map((sp) => <div data-cities={tagsFor(sp).join(" ")}><SpeakerCard s={sp} lang={lang} /></div>)}
+      </div>
     </div>
   </section>
+  <script is:inline>
+    document.querySelectorAll("[data-filter]").forEach(function (bar) {
+      var list = bar.parentNode.querySelector("[data-filter-list]");
+      bar.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-city]");
+        if (!b) return;
+        var c = b.getAttribute("data-city");
+        bar.querySelectorAll("[data-city]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+        list.querySelectorAll("[data-cities]").forEach(function (card) {
+          card.hidden = !!c && card.getAttribute("data-cities").split(" ").indexOf(c) < 0;
+        });
+      });
+    });
+  </script>
 </Base>

@@ -3,13 +3,16 @@ import { bookSeatUrl } from "../site.config";
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import NextEdition from "../components/NextEdition.astro";
+import NextSoon from "../components/NextSoon.astro";
+import GalleryGrid from "../components/GalleryGrid.astro";
 import EditionCard from "../components/EditionCard.astro";
 import CityThumb from "../components/CityThumb.astro";
 import Clouds from "../components/Clouds.astro";
 import SpeakerCard from "../components/SpeakerCard.astro";
 import SpeakerWall from "../components/SpeakerWall.astro";
 import { speakersFor, allSpeakers, festivalTotals, hashtag } from "../data/speakers";
-import { editions, featuredEdition as fe, editionBySlug } from "../data/editions";
+import { editions, featuredEdition as fe, nextEdition, editionBySlug } from "../data/editions";
+import { galleryFor } from "../data/gallery";
 import { faq } from "../data/faq";
 import { formatRange, localePath, t, type Lang } from "../i18n";
 import { eventLd, faqLd } from "../lib/schema";
@@ -21,13 +24,15 @@ const s = t(lang);
 const hi = lang === "hi";
 const site = Astro.site!;
 const og = "/og/kitab-utsav.jpg";
+/** true while an edition is announced and not over; false in the gap between editions. */
+const up = !!nextEdition;
 
 const title = hi
   ? `किताब उत्सव ${fe.year} | राजकमल प्रकाशन समूह का पुस्तक उत्सव`
   : `Kitab Utsav ${fe.year} | Rajkamal Prakashan's Hindi Book Festival`;
 const description = hi
-  ? `किताब उत्सव: किताबों, पाठकों और लेखकों के संवाद का उत्सव। राजकमल प्रकाशन समूह के इस उत्सव का अगला पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}। पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।`
-  : `Kitab Utsav is Rajkamal Prakashan's five-day Hindi book and literature festival. Next stop: ${fe.city.en}, ${formatRange(fe, "en")}. Readings, conversations, book launches and a book exhibition.`;
+  ? `किताब उत्सव: किताबों, पाठकों और लेखकों के संवाद का उत्सव। ${up ? `राजकमल प्रकाशन समूह के इस उत्सव का अगला पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}।` : `हाल का पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}; अगले शहर की घोषणा जल्द।`} पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।`
+  : `Kitab Utsav is Rajkamal Prakashan's five-day Hindi book and literature festival. ${up ? `Next stop: ${fe.city.en}, ${formatRange(fe, "en")}.` : `Most recently in ${fe.city.en}, ${formatRange(fe, "en")}; next city announcing soon.`} Readings, conversations, book launches and a book exhibition.`;
 
 const formats = hi
   ? [
@@ -65,13 +70,15 @@ const journey = [
   { city: hi ? "इन्दौर" : "Indore", note: "2026", slug: "indore-2026" },
   { city: hi ? "बरेली" : "Bareilly", note: hi ? "अक्टूबर 2026" : "Oct 2026", slug: "bareilly-2026" },
 ];
+if (!nextEdition) journey.push({ city: hi ? "अगला शहर?" : "Next city?", note: hi ? "घोषणा जल्द" : "Announcing soon" });
 const bhopal = editionBySlug("bhopal-2025")!;
 const faqTop = faq[lang].slice(0, 4);
 const announced = speakersFor(fe.slug);
 const ribbonItems = hi
   ? ["लेखक से मुलाक़ात", "काव्य-पाठ", "पुस्तक प्रदर्शनी", "लोकार्पण", "परिचर्चाएँ", "कार्यशालाएँ", "बाल-साहित्य", "दास्तानगोई"]
   : ["Author meets", "Poetry readings", "Book exhibition", "Book launches", "Conversations", "Workshops", "Children's literature", "Dastangoi"];
-const ev = eventLd(fe, lang, site, og);
+const ev = up ? eventLd(fe, lang, site, og) : null;
+const recentPhotos = galleryFor(fe.slug).slice(0, 5);
 const jsonLd = [ev, faqLd(faqTop)].filter(Boolean) as Record<string, unknown>[];
 const seatHref = bookSeatUrl ?? localePath(lang, `/editions/${fe.slug}/`);
 const days = Array.from({ length: 5 }, (_, i) => {
@@ -94,11 +101,19 @@ const days = Array.from({ length: 5 }, (_, i) => {
           <span>{hi ? "किताबों का" : "A festival"}</span>
           <strong>{hi ? "सबसे जीवंत उत्सव" : "alive with books"}</strong>
         </h1>
-        <p class="hero-edition-line">
-          <span>{hi ? fe.city.hi : fe.city.en}</span>
-          <i aria-hidden="true"></i>
-          <b>{formatRange(fe, lang)}</b>
-        </p>
+        {up ? (
+          <p class="hero-edition-line">
+            <span>{fe.city[lang]}</span>
+            <i aria-hidden="true"></i>
+            <b>{formatRange(fe, lang)}</b>
+          </p>
+        ) : (
+          <p class="hero-edition-line">
+            <span>{hi ? "अगला शहर" : "Next city"}</span>
+            <i aria-hidden="true"></i>
+            <b>{hi ? "घोषणा जल्द" : "announcing soon"}</b>
+          </p>
+        )}
         <p class="lead">
           {hi
             ? "लेखक से मुलाक़ात, लोकार्पण, काव्य-पाठ, परिचर्चाएँ, कार्यशालाएँ और पुस्तक प्रदर्शनी: साहित्य की हर गतिविधि, एक शहर में पाँच दिन।"
@@ -108,14 +123,16 @@ const days = Array.from({ length: 5 }, (_, i) => {
           {festivalTotals.map((x) => <li><b>{x.value}</b>{x.label[lang]}</li>)}
         </ul>
         <div class="btns">
-          <a class="btn btn--primary" href={seatHref} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>{s.bookSeat}</a>
+          {up
+            ? <a class="btn btn--primary" href={seatHref} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>{s.bookSeat}</a>
+            : <a class="btn btn--primary" href="#newsletter">{hi ? "अगले उत्सव की ख़बर पाएँ" : "Hear about the next one"}</a>}
           <a class="btn" href={localePath(lang, "/editions/")}>{s.allEditions}</a>
         </div>
       </div>
       <div class="hero-side">
         <img class="hero-art" src="/brand/hero-element.svg" alt="" width="872" height="538" fetchpriority="high" />
         <span class="city-word" aria-hidden="true">{fe.city[lang]}</span>
-        <NextEdition e={fe} lang={lang} />
+        {up ? <NextEdition e={fe} lang={lang} /> : <NextSoon last={fe} lang={lang} />}
       </div>
     </div>
   </section>
@@ -126,6 +143,7 @@ const days = Array.from({ length: 5 }, (_, i) => {
     </div>
   </div>
 
+  {up ? (
   <section class="section" aria-labelledby="days">
     <div class="wrap">
       <div class="section-head">
@@ -149,16 +167,32 @@ const days = Array.from({ length: 5 }, (_, i) => {
       </ol>
     </div>
   </section>
+  ) : (
+  <section class="section" aria-labelledby="recap">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">{hi ? "हाल ही में" : "Just wrapped"}</p>
+          <h2 class="h2" id="recap">{hi ? `${fe.city.hi} में पाँच दिन` : `Five days in ${fe.city.en}`}</h2>
+          <p class="lead">{fe.summary[lang]}</p>
+        </div>
+        <a class="link-more" href={localePath(lang, `/editions/${fe.slug}/`)}>{s.exploreDetails}</a>
+      </div>
+      <GalleryGrid items={recentPhotos} lang={lang} />
+      <p class="gallery-more"><a class="btn" href={localePath(lang, "/gallery/")}><Icon name="camera" />{hi ? "पूरी गैलरी" : "Full gallery"}</a></p>
+    </div>
+  </section>
+  )}
 
   {announced.length > 0 && (
     <section class="section" aria-labelledby="speakers">
       <div class="wrap">
         <div class="section-head">
           <div>
-            <p class="eyebrow">{hi ? `किताब उत्सव ${fe.city.hi} में मिलिए` : `Meet them in ${fe.city.en}`}</p>
-            <h2 class="h2" id="speakers">{hi ? "अब तक घोषित वक्ता" : "Speakers announced so far"}</h2>
+            <p class="eyebrow">{up ? (hi ? `किताब उत्सव ${fe.city.hi} में मिलिए` : `Meet them in ${fe.city.en}`) : (hi ? `किताब उत्सव ${fe.city.hi}` : `Kitab Utsav ${fe.city.en}`)}</p>
+            <h2 class="h2" id="speakers">{up ? (hi ? "अब तक घोषित वक्ता" : "Speakers announced so far") : (hi ? `${fe.city.hi} के मंच पर` : `On stage in ${fe.city.en}`)}</h2>
           </div>
-          <a class="link-more" href={localePath(lang, "/programme/")}>{s.nav.programme}</a>
+          <a class="link-more" href={localePath(lang, "/resources/")}>{hi ? "सभी लेखक" : "All authors"}</a>
         </div>
         <div class="grid grid--3">{announced.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
       </div>
@@ -213,7 +247,7 @@ const days = Array.from({ length: 5 }, (_, i) => {
       <div class="section-head">
         <div>
           <p class="eyebrow">{hi ? "शहर दर शहर" : "City by city"}</p>
-          <h2 class="h2" id="journey">{hi ? "भोपाल से बरेली तक का सफ़र" : "The journey from Bhopal to Bareilly"}</h2>
+          <h2 class="h2" id="journey">{hi ? `भोपाल से ${fe.city.hi} तक का सफ़र` : `The journey from Bhopal to ${fe.city.en}`}</h2>
           <p class="lead">
             {hi
               ? "किताब उत्सव की शुरुआत भोपाल में राजकमल प्रकाशन के स्थापना के 75वें वर्ष में हुई। तब से यह उत्सव हिन्दी के बड़े-छोटे शहरों में पाठकों तक पहुँच रहा है।"
@@ -295,7 +329,7 @@ const days = Array.from({ length: 5 }, (_, i) => {
       <Clouds items={[{ x: "55%", y: "-30%", w: 260 }, { x: "-6%", y: "50%", w: 200, flip: true }]} />
       <div>
         <h2>{s.followUs}</h2>
-        <p>{hi ? "घोषणाएँ, वक्ताओं के नाम और उत्सव की झलकियाँ सबसे पहले यहीं।" : "Announcements, speaker lists and festival moments, first."} <span class="hashtag">{hashtag}</span></p>
+        <p>{hi ? "अगला शहर, वक्ताओं के नाम और उत्सव की झलकियाँ सबसे पहले आपके पास।" : "The next city, speaker lists and festival moments, first."} <span class="hashtag">{hashtag}</span></p>
       </div>
       <div class="btns">
         {festivalSocial.map((x, i) => (

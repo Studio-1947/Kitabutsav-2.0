@@ -2,7 +2,7 @@
 import Icon from "./Icon.astro";
 import { t, localePath, routeOf, type Lang } from "../i18n";
 import { org, bookSeatUrl } from "../site.config";
-import { featuredEdition } from "../data/editions";
+import { nextEdition } from "../data/editions";
 
 interface Props { lang: Lang; altHref: string }
 const { lang, altHref } = Astro.props;
@@ -14,12 +14,16 @@ const nav = [
   { href: L("/editions/"), label: s.nav.editions, match: "/editions/" },
   { href: L("/programme/"), label: s.nav.programme, match: "/programme/" },
   { href: L("/resources/"), label: lang === "hi" ? "लेखक" : "Authors", match: "/resources/" },
+  { href: L("/gallery/"), label: lang === "hi" ? "गैलरी" : "Gallery", match: "/gallery/" },
   { href: L("/about/"), label: s.nav.about, match: "/about/" },
   { href: L("/visit/"), label: s.nav.visit, match: "/visit/" },
   { href: L("/faq/"), label: s.nav.faq, match: "/faq/" },
 ];
-const icsHref = `/ics/${featuredEdition.slug}.ics`;
-const seatHref = bookSeatUrl ?? L(`/editions/${featuredEdition.slug}/`);
+const icsHref = nextEdition ? `/ics/${nextEdition.slug}.ics` : null;
+// Between editions there is no seat to book: the CTA collects emails for the next one instead.
+const cta = nextEdition
+  ? { href: bookSeatUrl ?? L(`/editions/${nextEdition.slug}/`), label: s.bookSeat, ext: !!bookSeatUrl }
+  : { href: "#newsletter", label: lang === "hi" ? "ख़बर पाएँ" : "Get updates", ext: false };
 ---
 <header class="site-header" id="siteHeader">
   <div class="header-top">
@@ -38,13 +42,15 @@ const seatHref = bookSeatUrl ?? L(`/editions/${featuredEdition.slug}/`);
 
     <div class="header-icons">
       <a class="pill-btn pill-btn--lang" href={altHref} hreflang={lang === "hi" ? "en" : "hi"} lang={lang === "hi" ? "en" : "hi"} aria-label={s.langSwitch} title={s.langSwitch}>{s.langShort}</a>
-      <a class="pill-btn pill-btn--cal" href={icsHref} download aria-label={s.addToCal} title={s.addToCal}>
-        <Icon name="calendar" size={17} class="pill-ic" />
-      </a>
+      {icsHref && (
+        <a class="pill-btn pill-btn--cal" href={icsHref} download aria-label={s.addToCal} title={s.addToCal}>
+          <Icon name="calendar" size={17} class="pill-ic" />
+        </a>
+      )}
       <button type="button" class="pill-btn pill-btn--burger" aria-label={s.openMenu} aria-expanded="false" aria-controls="mobileMenu"><span class="burger-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>
     </div>
 
-    <a class="btn btn--primary header-cta" href={seatHref} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>{s.bookSeat}</a>
+    <a class="btn btn--primary header-cta" href={cta.href} {...(cta.ext ? { target: "_blank", rel: "noopener" } : {})}>{cta.label}</a>
   </div>
 
   <div class="mobile-menu" id="mobileMenu" hidden>
@@ -54,7 +60,7 @@ const seatHref = bookSeatUrl ?? L(`/editions/${featuredEdition.slug}/`);
     </ul>
     <div class="mobile-menu__actions">
       <a href={altHref} class="mobile-menu__action"><Icon name="lang" /><span>{s.langSwitch}</span></a>
-      <a href={icsHref} download class="mobile-menu__action"><Icon name="calendar" /><span>{s.addToCal}</span></a>
+      {icsHref && <a href={icsHref} download class="mobile-menu__action"><Icon name="calendar" /><span>{s.addToCal}</span></a>}
     </div>
   </div>
 </header>

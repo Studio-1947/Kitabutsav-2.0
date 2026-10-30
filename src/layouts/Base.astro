@@ -21,15 +21,17 @@ interface Props {
   noindex?: boolean;
   /** Set false for routes that only exist in one language (e.g. 404). */
   alternates?: boolean;
+  /** Language-switch target when the route has no twin in the other language. */
+  altPath?: string;
 }
 
-const { lang, route, title, description, image = "/og/kitab-utsav.jpg", imageAlt, jsonLd = [], crumbs = [], noindex = false, alternates = true } = Astro.props;
+const { lang, route, title, description, image = "/og/kitab-utsav.jpg", imageAlt, jsonLd = [], crumbs = [], noindex = false, alternates = true, altPath } = Astro.props;
 const s = t(lang);
 const site = Astro.site ?? new URL("https://kitabutsav.rajkamalprakashan.com");
 const abs = (p: string) => new URL(p, site).href;
 const canonical = abs(localePath(lang, route));
 const other: Lang = lang === "hi" ? "en" : "hi";
-const altHref = localePath(other, route);
+const altHref = altPath ?? localePath(other, route);
 const fullTitle = title.includes(s.siteName) ? title : `${title} | ${s.siteName}`;
 
 const graph: Record<string, unknown>[] = [

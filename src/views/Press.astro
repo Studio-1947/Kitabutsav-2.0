@@ -1,0 +1,116 @@
+---
+import Base from "../layouts/Base.astro";
+import Crumbs from "../components/Crumbs.astro";
+import Clouds from "../components/Clouds.astro";
+import Icon from "../components/Icon.astro";
+import { coverage, pressContact } from "../data/press";
+import { editions, editionBySlug } from "../data/editions";
+import { festivalTotals, tagline, hashtag } from "../data/speakers";
+import { formatDate, formatRange, localePath, t, type Lang } from "../i18n";
+import { org } from "../site.config";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const title = hi ? "मीडिया और प्रेस: किताब उत्सव की ख़बरें और प्रेस किट" : "Press and media: Kitab Utsav coverage and press kit";
+const description = hi
+  ? "किताब उत्सव पर प्रेस कवरेज, तथ्य-पत्र, लोगो और मीडिया संपर्क।"
+  : "Press coverage of Kitab Utsav, a fact sheet, logos and media contacts.";
+const crumbs = [{ name: hi ? "मीडिया" : "Press", path: "/press/" }];
+const dated = editions.filter((e) => e.start);
+const first = dated[dated.length - 1];
+const facts = hi
+  ? [
+      ["नाम", "किताब उत्सव (Kitab Utsav)"],
+      ["आयोजक", "राजकमल प्रकाशन समूह: राजकमल, राधाकृष्ण, लोकभारती, राजकमल उर्दू"],
+      ["स्वरूप", "घूमता हुआ हिन्दी पुस्तक उत्सव; हर पड़ाव आम तौर पर पाँच दिन"],
+      ["शुरुआत", "भोपाल, राजकमल प्रकाशन के 75वें वर्ष में"],
+      ["अब तक", festivalTotals.map((x) => `${x.value} ${x.label.hi}`).join(" · ")],
+      ["नारा", `${tagline.hi} ${hashtag}`],
+    ]
+  : [
+      ["Name", "Kitab Utsav (किताब उत्सव)"],
+      ["Organiser", "Rajkamal Prakashan Samuh: Rajkamal, Radhakrishna, Lokbharti, Rajkamal Urdu"],
+      ["Format", "Travelling Hindi book festival; each stop usually runs five days"],
+      ["Began", "Bhopal, in Rajkamal Prakashan's 75th year"],
+      ["So far", festivalTotals.map((x) => `${x.value} ${x.label.en}`).join(" · ")],
+      ["Line", `${tagline.en} ${hashtag}`],
+    ];
+const assets = [
+  { href: "/brand/kitab-utsav-logo.svg", label: hi ? "किताब उत्सव लोगो (SVG)" : "Kitab Utsav logo (SVG)" },
+  { href: "/brand/rkp-logo.svg", label: hi ? "राजकमल लोगो (SVG)" : "Rajkamal logo (SVG)" },
+  { href: "/og/kitab-utsav.jpg", label: hi ? "शेयर इमेज (1200×630)" : "Share image (1200×630)" },
+];
+---
+<Base lang={lang} route="/press/" title={title} description={description} crumbs={crumbs}>
+  <section class="page-hero">
+    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+    <div class="wrap">
+      <Crumbs lang={lang} items={crumbs} />
+      <p class="eyebrow">{hi ? "मीडिया" : "Press"}</p>
+      <h1>{hi ? <>ख़बरों में <em>किताब उत्सव</em></> : <>Kitab Utsav <em>in the news</em></>}</h1>
+      <p class="lead">
+        {hi
+          ? "पत्रकारों और आयोजकों के लिए: कवरेज, तथ्य, लोगो और संपर्क एक जगह।"
+          : "For journalists and partners: coverage, facts, logos and contacts in one place."}
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:32px">
+    <div class="wrap detail-grid">
+      <div>
+        <h2 class="h2 h2--sm">{hi ? "कवरेज" : "Coverage"}</h2>
+        {coverage.length === 0 ? (
+          <div class="notice" role="note"><Icon name="news" /><p>{hi ? "प्रेस कवरेज के लिंक जल्द जोड़े जाएँगे।" : "Links to press coverage will be added soon."}</p></div>
+        ) : (
+          <ul class="press-list">
+            {coverage.map((c) => {
+              const e = c.edition ? editionBySlug(c.edition) : null;
+              return (
+                <li class:list={["press-item", { "is-slot": !c.url }]}>
+                  <span class="press-item__src">{c.outlet[lang]}</span>
+                  <h3>{c.url ? <a href={c.url} target="_blank" rel="noopener">{c.headline[lang]}<Icon name="ext" /></a> : c.headline[lang]}</h3>
+                  <span class="press-item__meta">
+                    {[
+                      c.date && formatDate(c.date, lang),
+                      e && <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city[lang]} {e.year}</a>,
+                      !c.url && <em>{hi ? "लिंक जल्द" : "link coming"}</em>,
+                    ].filter(Boolean).map((x, i) => <>{i > 0 && " · "}{x}</>)}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        <h2 class="h2 h2--sm" style="margin-top:56px">{hi ? "तथ्य-पत्र" : "Fact sheet"}</h2>
+        <dl class="facts-sheet">
+          {facts.map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}
+          <dt>{hi ? "संस्करण" : "Editions"}</dt>
+          <dd>
+            {dated.map((e, i) => <>{i > 0 && " · "}<a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city[lang]} {e.year}</a></>)}
+          </dd>
+        </dl>
+        <p class="muted" style="font-size:.85rem">{hi ? `सबसे पुराना दर्ज संस्करण: ${first.city.hi}, ${formatRange(first, "hi")}।` : `Earliest edition on record here: ${first.city.en}, ${formatRange(first, "en")}.`}</p>
+      </div>
+
+      <aside>
+        <div class="card">
+          <h3 class="card-title">{hi ? "मीडिया संपर्क" : "Media contact"}</h3>
+          <ul class="info">
+            <li><Icon name="mail" /><span><b>{hi ? "ईमेल" : "Email"}</b><a href={`mailto:${pressContact.email}?subject=${encodeURIComponent("Kitab Utsav: press")}`}>{pressContact.email}</a></span></li>
+            <li><Icon name="chat" /><span><b>{hi ? "फ़ोन" : "Phone"}</b>{org.phones.map((p, i) => <>{i > 0 && ", "}<a href={`tel:${p.tel}`}>{p.label}</a></>)}</span></li>
+          </ul>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h3 class="card-title">{hi ? "प्रेस किट" : "Press kit"}</h3>
+          <ul class="asset-list">
+            {assets.map((a) => <li><a href={a.href} download><Icon name="download" />{a.label}</a></li>)}
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>
