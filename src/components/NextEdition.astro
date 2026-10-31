@@ -26,21 +26,21 @@ const p = partners[e.slug] ?? [];
     {e.startTime && e.endTime && (
       <li><Icon name="clock" /><span><b>{s.time}</b>{s.daily}, {formatTime(e.startTime, lang)} {hi ? "से" : "to"} {formatTime(e.endTime, lang)}</span></li>
     )}
-    {e.venue && <li><Icon name="pin" /><span><b>{s.venue}</b>{e.venue[lang]}</span></li>}
+    {e.venue ? <li><Icon name="pin" /><span><b>{s.venue}</b>{e.venue[lang]}</span></li> : <li><Icon name="pin" /><span><b>{s.venue}</b>{hi ? "घोषणा जल्द" : "To be announced"}</span></li>}
   </ul>
 
-  <div class="countdown" data-countdown data-start={startIso} data-end={endIso} aria-label={hi ? "उत्सव शुरू होने में" : "Time until the festival opens"}>
+  {e.start && e.end && <div class="countdown" data-countdown data-start={startIso} data-end={endIso} aria-label={hi ? "उत्सव शुरू होने में" : "Time until the festival opens"}>
     <div><span data-unit="d">00</span><small>{s.days}</small></div>
     <div><span data-unit="h">00</span><small>{s.hours}</small></div>
     <div><span data-unit="m">00</span><small>{s.minutes}</small></div>
     <div><span data-unit="s">00</span><small>{s.seconds}</small></div>
-  </div>
+  </div>}
   <p class="status-pill" data-live hidden>{s.happeningNow}</p>
 
   <div class="btns" style="margin-top:22px">
     <a class="btn btn--primary" href={localePath(lang, "/programme/")}>{s.seeProgramme}</a>
     {e.mapQuery && <a class="btn" href={mapsUrl(e.mapQuery)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>}
-    <a class="btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>
+    {e.start && e.end && <a class="btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>}
   </div>
   {p.length > 0 && <p class="partners"><b>{hi ? "साथ" : "With"}</b>{p.join(" · ")}</p>}
 </div>

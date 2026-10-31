@@ -39,7 +39,7 @@ export default defineConfig({
       serialize(item) {
         const path = new URL(item.url).pathname;
         if (path === "/" || path === "/en/") item.priority = 1.0;
-        else if (/\/(programme|visit)\/$/.test(path) || path.includes("bareilly-2026")) item.priority = 0.9;
+        else if (/\/(programme|visit)\/$/.test(path) || path.includes("mumbai-2027")) item.priority = 0.9;
         item.lastmod = new Date().toISOString();
         return item;
       },

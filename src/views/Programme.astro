@@ -6,7 +6,7 @@ import Icon from "../components/Icon.astro";
 import SpeakerCard from "../components/SpeakerCard.astro";
 import { speakersFor } from "../data/speakers";
 import { programme, sessionKindLabel } from "../data/programme";
-import { editionBySlug } from "../data/editions";
+import { editionBySlug, nextEdition } from "../data/editions";
 import { isUpcoming, localePath } from "../i18n";
 import { formatDate, formatRange, formatTime, t, type Lang } from "../i18n";
 import { eventLd } from "../lib/schema";
@@ -73,8 +73,8 @@ if (ev) {
           <Icon name="help" />
           <p>
             {hi
-              ? <>किताब उत्सव {e.city.hi} ({when}) पूरा हो चुका है। नीचे उसका दिन-वार ढाँचा है। अगले उत्सव का कार्यक्रम घोषणा के साथ यहीं आएगा; <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a> या <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.hi} की झलकियाँ</a> देखें।</>
-              : <>Kitab Utsav {e.city.en} ({when}) has ended. Below is its day-wise outline. The next festival's programme will appear here once announced; <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a> or see the <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.en} recap</a>.</>}
+              ? <>किताब उत्सव {e.city.hi} ({when}) पूरा हो चुका है। नीचे उसका दिन-वार ढाँचा है। {nextEdition ? <>अगला किताब उत्सव <a href={localePath(lang, `/editions/${nextEdition.slug}/`)}>{nextEdition.city.hi}, {formatRange(nextEdition, "hi")}</a> में होगा; उसका कार्यक्रम घोषणा के साथ यहीं आएगा;</> : "अगले उत्सव का कार्यक्रम घोषणा के साथ यहीं आएगा;"} <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a> या <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.hi} की झलकियाँ</a> देखें।</>
+              : <>Kitab Utsav {e.city.en} ({when}) has ended. Below is its day-wise outline. {nextEdition ? <>The next Kitab Utsav is in <a href={localePath(lang, `/editions/${nextEdition.slug}/`)}>{nextEdition.city.en}, {formatRange(nextEdition, "en")}</a>; its programme will appear here once announced;</> : "The next festival's programme will appear here once announced;"} <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a> or see the <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.en} recap</a>.</>}
           </p>
         </div>
       )}

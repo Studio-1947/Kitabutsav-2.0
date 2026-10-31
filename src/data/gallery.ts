@@ -43,7 +43,7 @@ const slots: { moment: Moment; shape: Photo["shape"]; caption: (c: L10n) => L10n
   { moment: "launch", shape: "square", caption: () => ({ hi: "नई किताब का लोकार्पण", en: "A new book is launched" }) },
 ];
 
-export const gallery: Photo[] = editions.flatMap((e) =>
+export const gallery: Photo[] = editions.filter((e) => !e.announced).flatMap((e) =>
   slots.map((sl) => ({ edition: e.slug, moment: sl.moment, shape: sl.shape, caption: sl.caption(e.city) })),
 );
 

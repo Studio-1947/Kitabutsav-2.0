@@ -11,7 +11,7 @@ import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
 import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
 import { partners } from "../data/partners";
-import { formatRange, localePath, t, type Lang } from "../i18n";
+import { formatRange, isUpcoming, localePath, t, type Lang } from "../i18n";
 import { eventLd } from "../lib/schema";
 
 interface Props { lang: Lang }
@@ -43,9 +43,13 @@ const description = hi
   ? `किताब उत्सव: किताबों, पाठकों और लेखकों के संवाद का उत्सव। ${up ? `राजकमल प्रकाशन समूह के इस उत्सव का अगला पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}।` : `हाल का पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}; अगले शहर की घोषणा जल्द।`} पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।`
   : `Kitab Utsav is Rajkamal Prakashan's five-day Hindi book and literature festival. ${up ? `Next stop: ${fe.city.en}, ${formatRange(fe, "en")}.` : `Most recently in ${fe.city.en}, ${formatRange(fe, "en")}; next city announcing soon.`} Readings, conversations, book launches and a book exhibition.`;
 // Cities for the hero's "Upcoming in:" scroller: every other festival city once, latest first.
-const heroCities = byDate.filter((e) => e.city.en !== fe.city.en)
-  .filter((e, i, all) => all.findIndex((x) => x.city.en === e.city.en) === i);
-const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : [];
+const upcomingOthers = byDate.filter((e) => e.slug !== fe.slug && isUpcoming(e)).reverse();
+const heroItems = up
+  ? [formatRange(fe, lang), ...upcomingOthers.map((e) => `${e.city[lang]} · ${formatRange(e, lang)}`)]
+  : byDate.filter((e) => e.city.en !== fe.city.en).filter((e, i, all) => all.findIndex((x) => x.city.en === e.city.en) === i).map((e) => e.city[lang]);
+const heroLabel = up ? (hi ? "आगामी:" : "Upcoming:") : (hi ? "पिछले पड़ाव:" : "Past stops:");
+const heroEv = up ? eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg") : null;
+const jsonLd = heroEv ? [heroEv] : [];
 ---
 
 <Base lang={lang} route="/" title={title} description={description} jsonLd={jsonLd} home>
@@ -59,9 +63,9 @@ const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : []
           <span>{fe.city[lang]}</span>
         </h1>
         <p class="hero__upnext">
-          <span>{hi ? "आगामी:" : "Upcoming in:"}</span>
-          <span class="hero__city" data-rotate aria-label={heroCities.map((e) => e.city[lang]).join(", ")}>
-            {heroCities.map((e, i) => <span class:list={["hero__word", i === 0 && "is-on"]} aria-hidden="true">{e.city[lang]}</span>)}
+          <span>{heroLabel}</span>
+          <span class="hero__city" data-rotate aria-label={heroItems.join(", ")}>
+            {heroItems.map((x, i) => <span class:list={["hero__word", i === 0 && "is-on"]} aria-hidden="true">{x}</span>)}
           </span>
         </p>
         <div class="hero__ctas">

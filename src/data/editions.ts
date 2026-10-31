@@ -20,6 +20,10 @@ export interface Edition {
   end: string | null;
   /** Human label used when exact dates are not known. */
   monthLabel?: L10n;
+  /** YYYY-MM when only the month is known; used for ordering. */
+  month?: string;
+  /** Announced but without final dates: counts as upcoming until `end` is set. */
+  announced?: boolean;
   startTime?: string;
   endTime?: string;
   venue?: L10n;
@@ -43,6 +47,31 @@ export interface Edition {
 }
 
 export const editions: Edition[] = [
+  {
+    slug: "mumbai-2027",
+    announced: true,
+    city: { hi: "मुम्बई", en: "Mumbai" },
+    state: { hi: "महाराष्ट्र", en: "Maharashtra" },
+    year: 2027,
+    start: null,
+    end: null,
+    month: "2027-02",
+    monthLabel: { hi: "फ़रवरी 2027", en: "February 2027" },
+    summary: {
+      hi: "किताब उत्सव फ़रवरी 2027 में मुम्बई लौट रहा है। तारीख़ों, स्थान और वक्ताओं की घोषणा जल्द होगी।",
+      en: "Kitab Utsav returns to Mumbai in February 2027. Dates, venue and speakers will be announced soon.",
+    },
+    body: {
+      hi: [
+        "अगला किताब उत्सव मुम्बई में होगा, फ़रवरी 2027 में। फ़रवरी 2026 के संस्करण के बाद यह मुम्बई में उत्सव की वापसी है।",
+        "तारीख़ों, स्थान, वक्ताओं और दिन-वार कार्यक्रम की घोषणा जल्द होगी। सबसे पहले जानने के लिए Instagram पर @kitab.utsav से जुड़ें।",
+      ],
+      en: [
+        "The next Kitab Utsav is in Mumbai, in February 2027. It marks the festival's return to the city after the February 2026 edition.",
+        "Dates, venue, speakers and the day-wise programme will be announced soon. Follow @kitab.utsav on Instagram to hear first.",
+      ],
+    },
+  },
   {
     slug: "bareilly-2026",
     featured: true,
@@ -282,12 +311,16 @@ export const editions: Edition[] = [
 /** Build-time "today". Rebuild after each edition ends so this stays correct. */
 const now = new Date();
 const endsAt = (e: Edition) => (e.end ? new Date(`${e.end}T23:59:59+05:30`).getTime() : 0);
+/** Sort key: exact start date, else the announced month, else the year. */
+export const startKey = (e: Edition) => e.start ?? (e.month ? `${e.month}-01` : `${e.year}-01-01`);
+/** True once exact dates are published (calendar file, countdown, Event schema). */
+export const hasDates = (e: Edition) => !!(e.start && e.end);
+/** Not over yet: dated and not ended, or announced without final dates. */
+export const isAhead = (e: Edition) => (e.end ? endsAt(e) >= now.getTime() : !!e.announced);
 
 /** Soonest edition that has not ended yet, or null when nothing is announced. */
 export const nextEdition: Edition | null =
-  editions
-    .filter((e) => e.start && endsAt(e) >= now.getTime())
-    .sort((a, b) => a.start!.localeCompare(b.start!))[0] ?? null;
+  editions.filter(isAhead).sort((a, b) => startKey(a).localeCompare(startKey(b)))[0] ?? null;
 
 /** Most recent edition that has already ended. */
 export const lastEdition: Edition =
@@ -297,7 +330,7 @@ export const lastEdition: Edition =
 export const featuredEdition: Edition = nextEdition ?? editions.find((e) => e.featured) ?? lastEdition;
 
 /** Editions in date order, oldest first; used for previous/next links. */
-const chronological = [...editions].filter((e) => e.start).sort((a, b) => a.start!.localeCompare(b.start!));
+const chronological = [...editions].filter((e) => e.start || e.month).sort((a, b) => startKey(a).localeCompare(startKey(b)));
 export const neighbours = (slug: string) => {
   const i = chronological.findIndex((e) => e.slug === slug);
   return { prev: i > 0 ? chronological[i - 1] : null, next: i >= 0 && i < chronological.length - 1 ? chronological[i + 1] : null };

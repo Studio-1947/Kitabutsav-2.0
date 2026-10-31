@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
 import Icon from "../components/Icon.astro";
-import { featuredEdition as e, nextEdition } from "../data/editions";
+import { nextEdition, lastEdition } from "../data/editions";
 import { localePath } from "../i18n";
 import { formatRange, formatTime, t, type Lang } from "../i18n";
 import { eventLd, mapsUrl } from "../lib/schema";
@@ -13,13 +13,18 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const s = t(lang);
 const hi = lang === "hi";
+/* Visitor details come from the next edition once its venue and timings are published,
+   otherwise from the most recent edition (with a notice saying so). */
+const n = nextEdition;
+const ready = !!(n && n.start && n.venue && n.startTime && n.endTime && n.mapQuery);
+const e = ready ? n! : lastEdition;
 const when = formatRange(e, lang);
 const title = hi ? `कैसे पहुँचें: किताब उत्सव ${e.city.hi} ${e.year} | स्थान और समय` : `Visit Kitab Utsav ${e.city.en} ${e.year} | Venue, timings, directions`;
 const description = hi
   ? `किताब उत्सव ${e.city.hi}: ${when}, ${e.venue?.hi}। रोज़ ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")} तक। नक्शा, संपर्क और ज़रूरी जानकारी।`
   : `Kitab Utsav ${e.city.en}: ${when} at ${e.venue?.en}. Open daily ${formatTime(e.startTime!, "en")} to ${formatTime(e.endTime!, "en")}. Map, contacts and visitor information.`;
 const crumbs = [{ name: s.nav.visit, path: "/visit/" }];
-const up = !!nextEdition;
+const up = ready;
 const ev = up ? eventLd(e, lang, Astro.site!, "/og/kitab-utsav.jpg") : null;
 const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? e.city.en)}&output=embed`;
 ---
@@ -38,9 +43,13 @@ const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? 
         <div class="notice" role="note">
           <Icon name="help" />
           <p>
-            {hi
-              ? <>नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। अगले शहर और स्थान की घोषणा जल्द होगी; <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a>।</>
-              : <>Below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). The next city and venue will be announced soon; <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a>.</>}
+            {n
+              ? (hi
+                ? <>अगला किताब उत्सव <a href={localePath(lang, `/editions/${n.slug}/`)}>{n.city.hi} में, {formatRange(n, "hi")}</a> होगा। स्थान और समय की घोषणा जल्द होगी; तब तक नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a>।</>
+                : <>The next Kitab Utsav is <a href={localePath(lang, `/editions/${n.slug}/`)}>in {n.city.en}, {formatRange(n, "en")}</a>. Venue and timings will be announced soon; until then, below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). <a href={festivalSocial[0].url} target="_blank" rel="noopener">Follow us on Instagram to hear first</a>.</>)
+              : (hi
+                ? <>नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। अगले शहर और स्थान की घोषणा जल्द होगी; <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a>।</>
+                : <>Below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). The next city and venue will be announced soon; <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a>.</>)}
           </p>
         </div>
       </div>

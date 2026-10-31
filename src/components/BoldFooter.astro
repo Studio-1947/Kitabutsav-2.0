@@ -34,7 +34,7 @@ const invite = `mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमा
     <div class="foot__pills">
       <a class="pill pill--line" href={invite}>{hi ? "किताब उत्सव बुलाएँ" : "Invite Kitab Utsav"}</a>
       <a class="pill pill--line" href={org.url} target="_blank" rel="noopener">{s.nav.shop} ↗</a>
-      {nextEdition && <a class="pill pill--line" href={`/ics/${nextEdition.slug}.ics`} download>{s.addToCal}</a>}
+      {nextEdition?.start && nextEdition.end && <a class="pill pill--line" href={`/ics/${nextEdition.slug}.ics`} download>{s.addToCal}</a>}
     </div>
   </div>
   <a class="foot__book" href={seat}><span>{s.bookSeat}</span><Icon name="arrowUpRight" class="foot__arrow" /></a>

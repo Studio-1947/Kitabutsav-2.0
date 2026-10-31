@@ -59,7 +59,7 @@ export function formatTime(t: string, lang: Lang): string {
 }
 
 export const isUpcoming = (e: Edition, today = new Date()) => {
-  if (!e.end) return false;
+  if (!e.end) return !!e.announced;
   const end = new Date(e.end + "T23:59:59+05:30");
   return end.getTime() >= today.getTime();
 };
