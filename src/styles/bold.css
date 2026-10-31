@@ -467,3 +467,10 @@
   .cloud--b { left: calc(50% + 120px); top: 200px; bottom: auto; width: 200px; --dx: 20px; }
   .cloud--e { display: none; }
 }
+
+/* one cloud above "किताब उत्सव"; all clouds a shade lighter */
+.hero__titlecloud { position: absolute; z-index: -1; left: .55em; bottom: calc(100% + .02em); width: .85em; height: auto; pointer-events: none; animation: cloud-drift 22s ease-in-out -5s infinite alternate; --dx: 40px; }
+.hero__clouds .cloud, .hero__titlecloud { opacity: .6; }
+@media (prefers-reduced-motion: reduce) { .hero__titlecloud { animation: none; } }
+/* English buttons are wider; the small cloud by them steps out */
+:lang(en) .cloud--d { display: none; }
