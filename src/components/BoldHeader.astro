@@ -24,8 +24,8 @@ const seat = bookSeatUrl ?? L(`/editions/${(nextEdition ?? featuredEdition).slug
   </a>
   <nav class="pill pill--nav" aria-label={hi ? "मुख्य नेविगेशन" : "Main navigation"}>
     {nav.map((n) => <a href={n.href} aria-current={n.on ? "page" : undefined}>{n.label}</a>)}
-    <a href={altHref} hreflang={hi ? "en" : "hi"} lang={hi ? "en" : "hi"} aria-label={s.langSwitch}>{hi ? "EN" : "हिं"}</a>
   </nav>
+  <a class="pill pill--lang" href={altHref} hreflang={hi ? "en" : "hi"} lang={hi ? "en" : "hi"} aria-label={s.langSwitch} title={s.langSwitch}>{hi ? "EN" : "हिं"}</a>
   <a class="pill pill--ink top__book" href={seat} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>
     {s.bookSeat}<Icon name="arrowUpRight" size={18} />
   </a>
