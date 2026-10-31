@@ -1,0 +1,45 @@
+---
+/** Site footer: big stacked nav, contact card, full-width Book my seat bar. Hover shows the Hindi letters (letters.js). */
+import Icon from "./Icon.astro";
+import { t, localePath, type Lang } from "../i18n";
+import { org, festivalSocial, bookSeatUrl } from "../site.config";
+import { nextEdition, featuredEdition } from "../data/editions";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const L = (p: string) => localePath(lang, p);
+const seat = bookSeatUrl ?? L(`/editions/${(nextEdition ?? featuredEdition).slug}/`);
+const invite = `mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`;
+---
+<footer class="foot">
+  <nav class="foot__nav" aria-label={hi ? "फ़ुटर" : "Footer"}>
+    <a href={L("/about/")}>{hi ? "परिचय" : "About"}</a>
+    <a href={L("/programme/")}>{s.nav.programme}</a>
+    <a href={L("/resources/")}>{hi ? "लेखक" : "Authors"}</a>
+    <a href={L("/partners/")}>{s.nav.partners}</a>
+    <a href={L("/press/")}>{hi ? "मीडिया" : "Press"}</a>
+    <a href={L("/visit/")}>{s.nav.visit}</a>
+    <a href={L("/faq/")}>{s.nav.faq}</a>
+  </nav>
+  <div class="foot__card">
+    <h3>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h3>
+    <p>{org.address.streetAddress}<br />{org.address.addressLocality} {org.address.postalCode}</p>
+    <div class="foot__pills">
+      <a class="pill pill--cream" href={`mailto:${org.email}?subject=${encodeURIComponent("Kitab Utsav")}`}>{org.email} ↗</a>
+      <a class="pill pill--cream" href={`tel:${org.phones[0].tel}`}>{org.phones[0].label} ↗</a>
+      {festivalSocial.map((x) => <a class="pill pill--cream" href={x.url} target="_blank" rel="noopener">{x.name} ↗</a>)}
+    </div>
+    <div class="foot__pills">
+      <a class="pill pill--line" href={invite}>{hi ? "किताब उत्सव बुलाएँ" : "Invite Kitab Utsav"}</a>
+      <a class="pill pill--line" href={org.url} target="_blank" rel="noopener">{s.nav.shop} ↗</a>
+      {nextEdition && <a class="pill pill--line" href={`/ics/${nextEdition.slug}.ics`} download>{s.addToCal}</a>}
+    </div>
+  </div>
+  <a class="foot__book" href={seat}><span>{s.bookSeat}</span><Icon name="arrowUpRight" class="foot__arrow" /></a>
+  <div class="foot__bottom">
+    <p>{s.copyright}</p>
+    <p>{s.designedBy} <a href="https://1947.io" target="_blank" rel="noopener">Studio 1947</a></p>
+  </div>
+</footer>

@@ -29,17 +29,21 @@ Deploys as plain static files (Vercel, Netlify, Cloudflare Pages, any CDN). On V
 | Festival logo slot, partners | `src/site.config.ts` |
 | UI strings, date/time formatting, locale paths | `src/i18n/index.ts` |
 | Contacts, social links, store URL | `src/site.config.ts` |
-| Store header/footer CSS (ported) | `src/styles/rk-chrome.css` |
-| Festival page CSS | `src/styles/site.css` |
+| Bold theme (tokens, header, footer, home, inner-page overrides) | `src/styles/bold.css` |
+| Header / footer | `src/components/BoldHeader.astro` / `BoldFooter.astro` |
+| Component CSS restyled by the theme | `src/styles/site.css` |
+| Mobile tab bar CSS (ported) | `src/styles/rk-chrome.css` |
 | Header/footer/tab bar behaviour, countdown, tabs | `public/scripts/chrome.js` |
 | Footer cursor letters (ported) | `public/scripts/letters.js` |
 | Pages (thin routes) / page templates | `src/pages/**` / `src/views/*.astro` |
 
-To add a new edition, add an object to `editions` (newest first). The site works out the next edition from the dates at build time: while one is upcoming, the home hero shows its countdown, the header shows "Book my seat" and a calendar link, and Event schema is emitted. When nothing is upcoming, the hero switches to "next city, soon", the header CTA becomes "Get updates" (footer newsletter), and Visit/Programme show a notice that the details are from the last edition. Its page, calendar file (`/ics/<slug>.ics`), sitemap entry, gallery block and previous/next links are generated automatically.
+To add a new edition, add an object to `editions` (newest first). The site works out the next edition from the dates at build time: while one is upcoming, the home hero shows its countdown, the header shows "Book my seat" and a calendar link, and Event schema is emitted. When nothing is upcoming, the hero switches to "next city, soon", "Book my seat" falls back to the last edition page, and Visit/Programme show a notice that the details are from the last edition. Its page, calendar file (`/ics/<slug>.ics`), sitemap entry, gallery block and previous/next links are generated automatically.
 
 Main pages: **About Kitab Utsav** (`/about/`: the story, every edition and the gallery, with in-page tabs) and **Events** (`/programme/`), plus **Partners** (`/partners/`). Secondary pages in the footer: authors (`/resources/`), press, visit, FAQ. One page per edition at `/editions/<slug>/`. `/editions/` and `/gallery/` redirect to sections of `/about/`. Everything exists in Hindi and English.
 
 Header CTAs: "मेरी सीट बुक करें" (primary, goes to `bookSeatUrl` in `site.config.ts`, else the current edition page) and "आगामी आयोजन" (Events).
+
+Theme: the bold design (first built as a preview at `/2/`, which now redirects to `/`). Red page, white and cream rounded boxes, dark blue instead of black, Baloo 2 for display type and Mukta for text. On inner pages the header box and the page hero merge into one white box; each `.section` is its own rounded box.
 
 ## Design language
 
@@ -70,7 +74,7 @@ After launch: verify the domain in Google Search Console, submit `/sitemap-index
 2. **Programme**: `src/data/programme.ts` is placeholder structure ("घोषणा शीघ्र"). Fill sessions and set `published: true`.
 3. **Entry policy**: the FAQ says to check @kitab.utsav for entry details. If entry is free, say so in `faq.ts`.
 4. **Facts**: every date and venue came from Rajkamal's event pages, social posts and press coverage (October 2026). Lucknow 2024 has month only; Bhopal's first edition and Banaras are mentioned in the history but have no pages because their dates were not found. The earlier Bareilly edition is implied ("फिर लौट रहा है") but undated.
-5. **Newsletter**: the form opens a pre-filled email unless you add `data-endpoint="https://..."` to the form in `Footer.astro`.
+5. **Announcements**: "hear first" links go to @kitab.utsav on Instagram (there is no newsletter form).
 6. **Upcoming vs past** is decided at build time. Rebuild after each edition ends (or on a schedule) so badges, countdown and schema stay correct.
 7. **Share image** mentions Bareilly; regenerate it for the next edition.
 8. **Logos** in `public/brand/` were rebuilt from the store SVG; swap in official files if you have them.

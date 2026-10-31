@@ -1,0 +1,32 @@
+---
+/** Site header: logo, pill nav (About, Events, Partners, language) and the Book my seat button. */
+import Icon from "./Icon.astro";
+import { t, localePath, routeOf, type Lang } from "../i18n";
+import { bookSeatUrl } from "../site.config";
+import { nextEdition, featuredEdition } from "../data/editions";
+
+interface Props { lang: Lang; altHref: string }
+const { lang, altHref } = Astro.props;
+const s = t(lang);
+const hi = lang === "hi";
+const L = (p: string) => localePath(lang, p);
+const route = routeOf(Astro.url.pathname);
+const nav = [
+  { href: L("/about/"), label: hi ? "परिचय" : "About", on: route.startsWith("/about/") || route.startsWith("/editions/") },
+  { href: L("/programme/"), label: s.nav.programme, on: route.startsWith("/programme/") },
+  { href: L("/partners/"), label: s.nav.partners, on: route.startsWith("/partners/") },
+];
+const seat = bookSeatUrl ?? L(`/editions/${(nextEdition ?? featuredEdition).slug}/`);
+---
+<header class="top" id="siteHeader">
+  <a class="pill pill--logo" href={L("/")} aria-label={`${s.siteName}, ${s.by}`}>
+    <img src="/brand/kitab-utsav-logo.svg" alt="" width="74" height="68" />
+  </a>
+  <nav class="pill pill--nav" aria-label={hi ? "मुख्य नेविगेशन" : "Main navigation"}>
+    {nav.map((n) => <a href={n.href} aria-current={n.on ? "page" : undefined}>{n.label}</a>)}
+    <a href={altHref} hreflang={hi ? "en" : "hi"} lang={hi ? "en" : "hi"} aria-label={s.langSwitch}>{hi ? "EN" : "हिं"}</a>
+  </nav>
+  <a class="pill pill--ink top__book" href={seat} {...(bookSeatUrl ? { target: "_blank", rel: "noopener" } : {})}>
+    {s.bookSeat}<Icon name="arrowUpRight" size={18} />
+  </a>
+</header>

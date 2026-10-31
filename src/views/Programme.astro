@@ -73,8 +73,8 @@ if (ev) {
           <Icon name="help" />
           <p>
             {hi
-              ? <>किताब उत्सव {e.city.hi} ({when}) पूरा हो चुका है। नीचे उसका दिन-वार ढाँचा है। अगले उत्सव का कार्यक्रम घोषणा के साथ यहीं आएगा; <a href="#newsletter">ख़बर पाने के लिए जुड़ें</a> या <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.hi} की झलकियाँ</a> देखें।</>
-              : <>Kitab Utsav {e.city.en} ({when}) has ended. Below is its day-wise outline. The next festival's programme will appear here once announced; <a href="#newsletter">sign up to hear first</a> or see the <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.en} recap</a>.</>}
+              ? <>किताब उत्सव {e.city.hi} ({when}) पूरा हो चुका है। नीचे उसका दिन-वार ढाँचा है। अगले उत्सव का कार्यक्रम घोषणा के साथ यहीं आएगा; <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a> या <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.hi} की झलकियाँ</a> देखें।</>
+              : <>Kitab Utsav {e.city.en} ({when}) has ended. Below is its day-wise outline. The next festival's programme will appear here once announced; <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a> or see the <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.en} recap</a>.</>}
           </p>
         </div>
       )}

@@ -1,15 +1,17 @@
 ---
 /**
- * "Bold" design option for the home page: loud colour fields, chunky display type, pill rows and
- * wavy section edges. A self-contained preview at /2/ and /en/2/ (noindex, not in nav)
- * so it can be compared with the current home page; it reads the same data files.
+ * Home page (bold theme): loud colour fields, chunky display type, pill rows and wavy section
+ * edges. The header sits inside the hero box; everything is driven by the data files.
  */
-import "../styles/bold.css";
-import { bookSeatUrl, festivalSocial, org } from "../site.config";
+import Base from "../layouts/Base.astro";
+import BoldHeader from "../components/BoldHeader.astro";
+import Icon from "../components/Icon.astro";
+import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
 import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
 import { partners } from "../data/partners";
-import { formatRange, localePath, htmlLang, t, type Lang } from "../i18n";
+import { formatRange, localePath, t, type Lang } from "../i18n";
+import { eventLd } from "../lib/schema";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -18,7 +20,7 @@ const hi = lang === "hi";
 const L = (p: string) => localePath(lang, p);
 const up = !!nextEdition;
 const seat = bookSeatUrl ?? L(`/editions/${fe.slug}/`);
-const other = hi ? "/en/2/" : "/2/";
+const altHref = localePath(hi ? "en" : "hi", "/");
 
 const byDate = [...editions].sort((a, b) => (b.start ?? `${b.year}`).localeCompare(a.start ?? `${a.year}`));
 const rows = byDate.slice(0, 6);
@@ -33,36 +35,19 @@ const formats = hi
   ? ["लेखक से मुलाक़ात", "काव्य-पाठ", "लोकार्पण", "परिचर्चा", "पुस्तक प्रदर्शनी", "दास्तानगोई", "कार्यशाला", "बाल-साहित्य", "हस्ताक्षर"]
   : ["Author meets", "Poetry", "Book launches", "Conversations", "Book exhibition", "Dastangoi", "Workshops", "Children's books", "Signings"];
 
-const title = hi ? "किताब उत्सव · बोल्ड डिज़ाइन (प्रीव्यू)" : "Kitab Utsav · Bold design (preview)";
+const title = hi
+  ? `किताब उत्सव ${fe.year} | राजकमल प्रकाशन समूह का पुस्तक उत्सव`
+  : `Kitab Utsav ${fe.year} | Rajkamal Prakashan's Hindi Book Festival`;
+const description = hi
+  ? `किताब उत्सव: किताबों, पाठकों और लेखकों के संवाद का उत्सव। ${up ? `राजकमल प्रकाशन समूह के इस उत्सव का अगला पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}।` : `हाल का पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}; अगले शहर की घोषणा जल्द।`} पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।`
+  : `Kitab Utsav is Rajkamal Prakashan's five-day Hindi book and literature festival. ${up ? `Next stop: ${fe.city.en}, ${formatRange(fe, "en")}.` : `Most recently in ${fe.city.en}, ${formatRange(fe, "en")}; next city announcing soon.`} Readings, conversations, book launches and a book exhibition.`;
+const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : [];
 ---
-<!doctype html>
-<html lang={htmlLang[lang]}>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="noindex, nofollow" />
-  <title>{title}</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet" />
-</head>
-<body>
-  <main>
+
+<Base lang={lang} route="/" title={title} description={description} jsonLd={jsonLd} home>
     <!-- HERO -->
-    <section class="hero">
-      <header class="top">
-        <a class="pill pill--logo" href={L("/2/")} aria-label={s.siteName}>
-          <img src="/brand/kitab-utsav-logo.svg" alt="" width="74" height="68" />
-        </a>
-        <nav class="pill pill--nav" aria-label={hi ? "मुख्य" : "Main"}>
-          <a href={L("/about/")}>{hi ? "परिचय" : "About"}</a>
-          <a href={L("/programme/")}>{s.nav.programme}</a>
-          <a href={L("/partners/")}>{s.nav.partners}</a>
-          <a href={other} lang={hi ? "en" : "hi"}>{hi ? "EN" : "हिं"}</a>
-        </nav>
-        <a class="pill pill--ink top__book" href={seat}>{s.bookSeat}</a>
-      </header>
+    <section class="bhero">
+      <BoldHeader lang={lang} altHref={altHref} />
       <div class="hero__foot">
         <h1 class="hero__title">
           <span class="hero__brand">{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
@@ -70,7 +55,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
         </h1>
         <p class="hero__meta">{formatRange(fe, lang)}{fe.venue ? ` · ${fe.venue[lang].split(",")[0]}, ${fe.city[lang]}` : ""}</p>
         <div class="hero__ctas">
-          <a class="btn btn--red" href={seat}>{s.bookSeat}</a>
+          <a class="btn btn--red" href={seat}>{s.bookSeat}<Icon name="arrowUpRight" size={20} /></a>
           <a class="btn btn--line btn--line-dark" href={L("/programme/")}>{s.upcomingEvents}</a>
         </div>
       </div>
@@ -107,7 +92,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
       <div class="mani__in">
         <p class="kick">{hi ? "राजकमल प्रकाशन समूह का घूमता पुस्तक उत्सव" : "Rajkamal Prakashan's travelling book festival"}</p>
         <h2 class="mega">{tagline[lang]}</h2>
-        <ul class="totals">
+        <ul class="btotals">
           {festivalTotals.map((x) => <li><b>{x.value}</b> {x.label[lang]}</li>)}
         </ul>
         <a class="btn btn--ink" href={L("/about/")}>{hi ? "हमारी कहानी" : "Our story"}</a>
@@ -127,7 +112,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
               <span class="ag__p ag__where"><b>{e.city[lang]}</b>{e.state[lang]}</span>
               <span class:list={["ag__p", "ag__tag", live && "ag__tag--live"]}>{live ? (hi ? "आगामी" : "Upcoming") : (hi ? "सम्पन्न" : "Past")}</span>
               <span class="ag__p ag__name">{hi ? `किताब उत्सव ${e.city.hi}` : `Kitab Utsav ${e.city.en}`}</span>
-              <a class="ag__p ag__go" href={live ? seat : L(`/editions/${e.slug}/`)}>{live ? s.bookSeat : (hi ? "झलकियाँ" : "Highlights")}</a>
+              <a class="ag__p ag__go" href={live ? seat : L(`/editions/${e.slug}/`)}>{live ? <>{s.bookSeat}<Icon name="arrowUpRight" size={18} /></> : (hi ? "झलकियाँ" : "Highlights")}</a>
             </li>
           );
         })}
@@ -154,7 +139,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
       <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 80 C260 20 520 20 760 70 C1000 120 1240 60 1440 20 L1440 120 Z" /></svg>
       <h2 class="big">{hi ? "उत्सव में क्या-क्या" : "What happens"}</h2>
       <div class="ticker" aria-hidden="true">
-        <div class="ticker__t">{[...formats, ...formats].map((f, i) => <span class={`sticker s${i % 5}`}>{f}</span>)}</div>
+        <div class="ticker__t">{[...formats, ...formats].map((f, i) => <span class={`bsticker s${i % 5}`}>{f}</span>)}</div>
       </div>
       <ul class="sr">{formats.map((f) => <li>{f}</li>)}</ul>
       <div class="invite">
@@ -167,37 +152,12 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
     </section>
 
     <!-- PARTNERS -->
-    <section class="partners">
+    <section class="bpartners">
       <h2 class="big big--light">{hi ? "साथ चलने वाले" : "Our partners"}</h2>
       <ul class="logos">
         {partners.slice(0, 12).map((p) => <li><img src={p.logo} alt={p.name[lang]} /></li>)}
       </ul>
       <a class="under under--light" href={L("/partners/")}>{hi ? `सभी ${partners.length} साथी` : `All ${partners.length} partners`}</a>
     </section>
-  </main>
-
-  <footer class="foot">
-    <div class="foot__nav">
-      <a href={L("/about/")}>{hi ? "परिचय" : "About"}</a>
-      <a href={L("/programme/")}>{s.nav.programme}</a>
-      <a href={L("/resources/")}>{hi ? "लेखक" : "Authors"}</a>
-      <a href={L("/partners/")}>{s.nav.partners}</a>
-      <a href={L("/visit/")}>{s.nav.visit}</a>
-      <a href={L("/faq/")}>{s.nav.faq}</a>
-    </div>
-    <div class="foot__card">
-      <h3>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h3>
-      <p>{org.address.streetAddress}<br />{org.address.addressLocality} {org.address.postalCode}</p>
-      <div class="foot__pills">
-        <a class="pill pill--cream" href={`mailto:${org.email}`}>{org.email} ↗</a>
-        <a class="pill pill--cream" href={`tel:${org.phones[0].tel}`}>{org.phones[0].label} ↗</a>
-        {festivalSocial.map((x) => <a class="pill pill--cream" href={x.url} rel="noopener">{x.name} ↗</a>)}
-      </div>
-    </div>
-    <a class="foot__book" href={seat}><span>{s.bookSeat}</span><i aria-hidden="true">→</i></a>
-    <p class="foot__note">{hi ? "डिज़ाइन प्रीव्यू · मौजूदा मुखपृष्ठ" : "Design preview · current home page"}: <a href={L("/")}>{L("/")}</a></p>
-  </footer>
-  <script is:inline src="/scripts/letters.js" data-target=".foot" defer></script>
-</body>
-</html>
+</Base>
 

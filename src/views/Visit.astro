@@ -39,8 +39,8 @@ const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? 
           <Icon name="help" />
           <p>
             {hi
-              ? <>नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। अगले शहर और स्थान की घोषणा जल्द होगी; <a href="#newsletter">ख़बर पाने के लिए जुड़ें</a>।</>
-              : <>Below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). The next city and venue will be announced soon; <a href="#newsletter">sign up to hear first</a>.</>}
+              ? <>नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। अगले शहर और स्थान की घोषणा जल्द होगी; <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a>।</>
+              : <>Below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). The next city and venue will be announced soon; <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a>.</>}
           </p>
         </div>
       </div>

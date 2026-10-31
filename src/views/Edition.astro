@@ -12,7 +12,7 @@ import { speakersFor } from "../data/speakers";
 import { editions, neighbours, type Edition } from "../data/editions";
 import { formatRange, formatTime, isUpcoming, localePath, t, type Lang } from "../i18n";
 import { eventLd, mapsUrl } from "../lib/schema";
-import { org } from "../site.config";
+import { org, festivalSocial } from "../site.config";
 
 interface Props { lang: Lang; e: Edition }
 const { lang, e } = Astro.props;
@@ -137,7 +137,7 @@ const label = (x: Edition) => (hi ? `${x.city.hi} ${x.year}` : `${x.city.en} ${x
           <b>{label(next)}</b><span>{formatRange(next, lang)}</span>
         </a>
       ) : (
-        <a class="edition-pager__link edition-pager__link--next is-soon" href="#newsletter">
+        <a class="edition-pager__link edition-pager__link--next is-soon" href={festivalSocial[0].url} target="_blank" rel="noopener">
           <small>{hi ? "अगला पड़ाव" : "Next stop"}<Icon name="arrowRight" /></small>
           <b>{hi ? "घोषणा जल्द" : "Announcing soon"}</b><span>{hi ? "ख़बर पाने के लिए जुड़ें" : "Sign up to hear first"}</span>
         </a>

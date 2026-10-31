@@ -1,8 +1,9 @@
 ---
 import "../styles/rk-chrome.css";
 import "../styles/site.css";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import "../styles/bold.css";
+import BoldHeader from "../components/BoldHeader.astro";
+import BoldFooter from "../components/BoldFooter.astro";
 import MobileTabbar from "../components/MobileTabbar.astro";
 import { locales, defaultLang, localePath, htmlLang, ogLocale, t, type Lang } from "../i18n";
 import { org, festivalSocial } from "../site.config";
@@ -23,9 +24,11 @@ interface Props {
   alternates?: boolean;
   /** Language-switch target when the route has no twin in the other language. */
   altPath?: string;
+  /** Home page: the header is drawn inside the hero box by the view itself. */
+  home?: boolean;
 }
 
-const { lang, route, title, description, image = "/og/kitab-utsav.jpg", imageAlt, jsonLd = [], crumbs = [], noindex = false, alternates = true, altPath } = Astro.props;
+const { lang, route, title, description, image = "/og/kitab-utsav.jpg", imageAlt, jsonLd = [], crumbs = [], noindex = false, alternates = true, altPath, home = false } = Astro.props;
 const s = t(lang);
 const site = Astro.site ?? new URL("https://kitabutsav.rajkamalprakashan.com");
 const abs = (p: string) => new URL(p, site).href;
@@ -120,25 +123,25 @@ const ld = { "@context": "https://schema.org", "@graph": [...graph, ...jsonLd] }
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#de2026" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300..700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700&display=swap" />
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(ld)} />
   </head>
-  <body class:list={[`lang-${lang}`]}>
+  <body class:list={[`lang-${lang}`, home ? "is-home" : "is-inner"]}>
     <a class="skip-link" href="#main">{s.skip}</a>
-    <Header lang={lang} altHref={altHref} />
+    {!home && <div class="topbox"><BoldHeader lang={lang} altHref={altHref} /></div>}
     <main id="main">
       <slot />
     </main>
-    <Footer lang={lang} />
+    <BoldFooter lang={lang} />
     <MobileTabbar lang={lang} altHref={altHref} />
     <script is:inline src="/scripts/chrome.js" defer></script>
-    <script is:inline src="/scripts/letters.js" defer></script>
+    <script is:inline src="/scripts/letters.js" data-target=".foot" defer></script>
     <script is:inline>
       /* Deep links to a section (e.g. #wall) can land in the wrong place: the browser's
          built-in scroll races against images still loading further down the page, which

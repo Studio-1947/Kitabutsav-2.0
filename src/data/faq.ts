@@ -9,10 +9,10 @@ import { nextEdition, lastEdition } from "./editions";
 const n = nextEdition;
 const nextHi = n
   ? `अगला किताब उत्सव ${n.city.hi} में ${formatRange(n, "hi")} तक${n.venue ? ` ${n.venue.hi} में` : ""} होगा।${n.startTime && n.endTime ? ` समय: रोज़ ${formatTime(n.startTime, "hi")} से ${formatTime(n.endTime, "hi")} तक।` : ""} <a href=\"/visit/\">पहुँचने की जानकारी</a> देखें।`
-  : `हाल का किताब उत्सव ${lastEdition.city.hi} में ${formatRange(lastEdition, "hi")} तक हुआ। अगले शहर और तारीख़ों की घोषणा जल्द होगी; सबसे पहले जानने के लिए <a href=\"#newsletter\">ईमेल से जुड़ें</a> या <a href=\"https://www.instagram.com/kitab.utsav/\" target=\"_blank\" rel=\"noopener\">@kitab.utsav</a> देखें।`;
+  : `हाल का किताब उत्सव ${lastEdition.city.hi} में ${formatRange(lastEdition, "hi")} तक हुआ। अगले शहर और तारीख़ों की घोषणा जल्द होगी; सबसे पहले जानने के लिए Instagram पर <a href=\"https://www.instagram.com/kitab.utsav/\" target=\"_blank\" rel=\"noopener\">@kitab.utsav</a> से जुड़ें।`;
 const nextEn = n
   ? `The next Kitab Utsav is in ${n.city.en}, ${formatRange(n, "en")}${n.venue ? `, at ${n.venue.en}` : ""}.${n.startTime && n.endTime ? ` Open daily from ${formatTime(n.startTime, "en")} to ${formatTime(n.endTime, "en")}.` : ""} See <a href=\"/en/visit/\">how to get there</a>.`
-  : `The most recent Kitab Utsav was in ${lastEdition.city.en}, ${formatRange(lastEdition, "en")}. The next city and dates will be announced soon; <a href=\"#newsletter\">sign up by email</a> or follow <a href=\"https://www.instagram.com/kitab.utsav/\" target=\"_blank\" rel=\"noopener\">@kitab.utsav</a> to hear first.`;
+  : `The most recent Kitab Utsav was in ${lastEdition.city.en}, ${formatRange(lastEdition, "en")}. The next city and dates will be announced soon; follow <a href=\"https://www.instagram.com/kitab.utsav/\" target=\"_blank\" rel=\"noopener\">@kitab.utsav</a> to hear first.`;
 const progHi = n
   ? `${n.city.hi} संस्करण का दिन-वार कार्यक्रम घोषित होते ही <a href=\"/programme/\">कार्यक्रम</a> पेज पर जोड़ा जाएगा। ताज़ा घोषणाएँ @kitab.utsav और @rajkamalbooks पर भी आती हैं।`
   : `अगले उत्सव का दिन-वार कार्यक्रम घोषणा के साथ <a href=\"/programme/\">कार्यक्रम</a> पेज पर आएगा। ताज़ा घोषणाएँ @kitab.utsav और @rajkamalbooks पर भी आती हैं।`;

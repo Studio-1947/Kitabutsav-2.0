@@ -18,6 +18,9 @@ export default defineConfig({
     "/en/editions/": "/en/about/#editions",
     "/gallery/": "/about/#gallery",
     "/en/gallery/": "/en/about/#gallery",
+    // The bold design preview became the main site.
+    "/2/": "/",
+    "/en/2/": "/en/",
   },
   i18n: {
     locales: ["hi", "en"],
