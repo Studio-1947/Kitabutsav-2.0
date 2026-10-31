@@ -49,8 +49,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
 <body>
   <header class="top">
     <a class="pill pill--logo" href={L("/2/")} aria-label={s.siteName}>
-      <img src="/brand/kitab-utsav-logo.svg" alt="" width="44" height="40" />
-      <span>{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
+      <img src="/brand/kitab-utsav-logo.svg" alt="" width="74" height="68" />
     </a>
     <nav class="pill pill--nav" aria-label={hi ? "मुख्य" : "Main"}>
       <a href={L("/about/")}>{hi ? "परिचय" : "About"}</a>
@@ -243,8 +242,8 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   /* header */
   .top { position: fixed; z-index: 20; inset: 14px 14px auto; display: flex; align-items: center; gap: 10px; pointer-events: none; }
   .top > * { pointer-events: auto; }
-  .pill--logo { background: var(--cream); padding: 6px 18px 6px 8px; font-size: 1.15rem; }
-  .pill--logo img { width: 40px; height: auto; }
+  .pill--logo { background: var(--cream); padding: 8px 16px; border-radius: 28px; }
+  .pill--logo img { width: 74px; height: auto; }
   .pill--nav { margin-left: auto; background: var(--cream); gap: 4px; padding: 6px; }
   .pill--nav a { padding: 10px 14px; border-radius: 999px; text-decoration: none; }
   .pill--nav a:hover { background: var(--red); color: var(--cream); }
@@ -369,7 +368,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   }
   @media (max-width: 640px) {
     body { font-size: 16px; }
-    .pill--logo span { display: none; }
+    .pill--logo img { width: 58px; }
     .top__book { padding: 14px 16px; font-size: .88rem; }
     .hero { min-height: 640px; }
     .hero__blob { width: 150%; right: -40%; top: 8%; }
