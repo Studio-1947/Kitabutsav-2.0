@@ -78,24 +78,21 @@ const jsonLd = heroEv ? [heroEv] : [];
 
     <!-- EDITION PILLS -->
     <section class="stack" aria-label={hi ? "संस्करण" : "Editions"}>
-      {rows.map((e, i) => {
-        const tile = (
-          <a class:list={["tile", `tile--${tones[i % tones.length]}`]} href={L(`/editions/${e.slug}/`)} aria-hidden="true" tabindex="-1">
-            <span class="tile__ini" lang="hi">{initial(e.city.hi)}</span>
-            <span class="tile__yr">{e.year}</span>
-          </a>
-        );
-        const cap = (
-          <div class="cap">
-            <div>
+      <div class="ecards">
+        {rows.map((e, i) => (
+          <a class:list={["ecard", i === 0 && "ecard--lead"]} href={L(`/editions/${e.slug}/`)}>
+            <span class:list={["tile", `tile--${tones[i % tones.length]}`]} aria-hidden="true">
+              <span class="tile__ini" lang="hi">{initial(e.city.hi)}</span>
+              <span class="tile__yr">{e.year}</span>
+            </span>
+            <span class="ecard__body">
               <h2 class="cap__t">{e.city[lang]} <small>{e.year}</small></h2>
-              <p class="cap__d">{formatRange(e, lang)}{e.venue ? ` · ${e.venue[lang].split(",")[0]}` : ""}</p>
-            </div>
-            <a class="btn btn--ink" href={L(`/editions/${e.slug}/`)}>{hi ? "देखें" : "Explore"}</a>
-          </div>
-        );
-        return <div class:list={["row", i % 2 && "row--flip", i === 0 && "row--lead"]}>{i % 2 ? <>{tile}{cap}</> : <>{cap}{tile}</>}</div>;
-      })}
+              <span class="cap__d">{formatRange(e, lang)}{e.venue ? ` · ${e.venue[lang].split(",")[0]}` : ""}</span>
+              <span class="btn btn--ink btn--sm">{hi ? "देखें" : "Explore"}</span>
+            </span>
+          </a>
+        ))}
+      </div>
       <a class="more" href={L("/about/#editions")}>{hi ? "सभी 16 संस्करण" : "All 16 editions"} →</a>
     </section>
 

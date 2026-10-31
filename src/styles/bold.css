@@ -405,3 +405,22 @@
   .bhero .top .pill--nav { justify-self: start; }
 }
 @media (max-width: 1199px) { .bhero .bunting { --fs: .76; } }
+
+/* home: the six latest editions as cards, 2 columns x 3 rows */
+.ecards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--g); }
+.ecard { display: grid; grid-template-columns: minmax(130px, 36%) 1fr; min-height: clamp(180px, 15vw, 230px); overflow: hidden; border-radius: var(--r-lg); background: var(--cream); color: var(--ink); text-decoration: none; transition: transform .3s cubic-bezier(.3,1.5,.5,1); }
+.ecard:hover { transform: translateY(-4px) rotate(-.4deg); }
+.ecard--lead { background: var(--yellow); }
+.ecard .tile { border-radius: 0; min-height: 100%; }
+.ecard .tile:hover { transform: none; }
+.ecard .tile__ini { font-size: clamp(3.6rem, 6vw, 6rem); }
+.ecard__body { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 10px; padding: clamp(18px, 2.4vw, 34px); }
+.ecard .cap__t { font-size: clamp(1.8rem, 3.2vw, 3rem); }
+.ecard .cap__d { margin: 0; display: block; }
+.ecard .btn { margin-top: 6px; min-height: 44px; padding: 0 20px; font-size: .9rem; }
+.ecard:hover .btn--ink { background: var(--blue); border-color: var(--blue); color: #fff; }
+@media (max-width: 760px) {
+  .ecards { grid-template-columns: 1fr; }
+  .ecard { grid-template-columns: 110px 1fr; min-height: 150px; }
+  .ecard .tile__yr { right: 50%; transform: translateX(50%); bottom: 12px; font-size: .75rem; }
+}
