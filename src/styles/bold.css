@@ -377,7 +377,7 @@
 .flag--round b { line-height: 1; transform: translateY(.08em); }
 .flag--red { background: var(--red); color: #fff; }
 .flag--saffron { background: var(--saffron); color: var(--ink); }
-.flag--blue { background: var(--blue); color: var(--cream); }
+.flag--blue { background: var(--blue); color: #fff; }
 .flag--yellow { background: var(--yellow); color: var(--ink); }
 .flag--sky { background: var(--sky); color: var(--ink); }
 .flag--sand { background: var(--sand); color: var(--red); }
@@ -399,3 +399,4 @@
   .bhero .top .pill--logo { display: none; }
   .bhero .top .pill--nav { justify-self: start; }
 }
+@media (max-width: 1199px) { .bhero .bunting { --fs: .76; } }
