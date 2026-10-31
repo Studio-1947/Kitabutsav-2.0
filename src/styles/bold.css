@@ -68,7 +68,7 @@
 
   /* hero */
   .bhero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(350px + 0.445 * min(1000px, 62vw)); border-radius: var(--r-lg); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
-  .hero__blob { position: absolute; z-index: -1; right: 1%; bottom: -5px; width: min(1000px, 62vw); height: auto; transform-origin: 50% 100%; }
+  .hero__blob { position: absolute; z-index: -1; right: 6%; bottom: -5px; width: min(1000px, 62vw); height: auto; transform-origin: 50% 100%; }
   .hero__foot { display: grid; justify-items: start; gap: 26px; position: relative; padding-left: clamp(8px, 3.2vw, 40px); }
   .hero__title { margin: 0; font-size: clamp(2.8rem, 6.2vw, 6.2rem); line-height: 1; }
   .hero__title span { display: block; }
