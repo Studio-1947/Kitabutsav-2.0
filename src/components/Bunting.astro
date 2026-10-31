@@ -30,8 +30,11 @@ const rows = strands.map((s, r) => {
   const ctrl: Pt = [(knot[0] + s.end[0]) / 2, Math.max(knot[1], s.end[1]) + s.sag];
   const glyphs = aksharas(s.text);
   const n = glyphs.length;
+  // read left to right: on strings that run left from the knot, the first letter sits at the far end
+  const leftward = s.end[0] < knot[0];
   const flags = glyphs.map((g, i) => {
-    const t = s.from + ((0.98 - s.from) * (i + 0.5)) / n;
+    const k = leftward ? n - 1 - i : i;
+    const t = s.from + ((0.98 - s.from) * (k + 0.5)) / n;
     const [x, y] = q(t, knot, ctrl, s.end);
     return { g, x, y, round: true, tone: tones[(i + r * 2) % tones.length], d: ((i * 37 + r * 11) % 23) / 10, dur: 3.2 + ((i * 13 + r) % 9) / 5 };
   });
