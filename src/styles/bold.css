@@ -413,6 +413,10 @@
 .ecard .tile { border-radius: 0; min-height: 100%; }
 .ecard .tile:hover { transform: none; }
 .ecard .tile__ini { font-size: clamp(3.6rem, 6vw, 6rem); }
+.ecard .tile__art { position: absolute; inset: 6% 4% 14%; width: auto; height: auto; transition: transform .4s cubic-bezier(.3,1.5,.5,1); }
+.ecard:hover .tile__art { transform: scale(1.06) rotate(-2deg); }
+.ecard .tile::before { opacity: .45; }
+.ecard .tile__yr { top: 10px; left: 10px; right: auto; bottom: auto; transform: none; }
 .ecard__body { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 10px; padding: clamp(18px, 2.4vw, 34px); }
 .ecard .cap__t { font-size: clamp(1.8rem, 3.2vw, 3rem); }
 .ecard .cap__d { margin: 0; display: block; }
@@ -421,7 +425,7 @@
 @media (max-width: 760px) {
   .ecards { grid-template-columns: 1fr; }
   .ecard { grid-template-columns: 110px 1fr; min-height: 150px; }
-  .ecard .tile__yr { right: 50%; transform: translateX(50%); bottom: 12px; font-size: .75rem; }
+  .ecard .tile__yr { top: 8px; left: 8px; font-size: .7rem; padding: 4px 8px; }
 }
 
 /* hero lockup: Kitab Utsav sits on the city's headline, the date tucks under it, to the right of the ु curl */

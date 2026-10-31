@@ -1,0 +1,80 @@
+---
+/**
+ * Brush-stroke line art of a city's best-known building, for the edition cards.
+ * Drawn inline in currentColor so it takes the tile's colour; a displacement filter roughens
+ * the strokes so they read as ink brush rather than clean vector lines.
+ */
+interface Props { slug: string; class?: string }
+const { slug, class: cls } = Astro.props;
+
+// Each drawing: [thick outline, thin detail, soft fills]. viewBox 0 0 200 200, ground at y=170.
+const art: Record<string, { main: string; thin: string; fill?: string; dots?: [number, number, number][] }> = {
+  // Gateway of India
+  gateway: {
+    fill: "M78 170V112Q78 84 100 78Q122 84 122 112V170Z",
+    main: "M16 170H184M40 170V78H160V170M78 170V112Q78 84 100 78Q122 84 122 112V170M50 170V140Q50 127 58 125Q66 127 66 140V170M134 170V140Q134 127 142 125Q150 127 150 140V170M34 78H166M38 70H162M42 70V52H54V70M146 70V52H158V70M68 70V44H82V70M118 70V44H132V70M42 52Q48 38 54 52M146 52Q152 38 158 52M68 44Q75 26 82 44M118 44Q125 26 132 44",
+    thin: "M75 26V20M125 26V20M86 70V58H114V70M90 58Q100 48 110 58M46 104H70M130 104H154M46 112H70M130 112H154M12 184Q20 178 28 184T44 184T60 184M140 184Q148 178 156 184T172 184T188 184M88 96L100 88L112 96",
+  },
+  // Chhatrapati Shivaji Terminus
+  cst: {
+    fill: "M80 92Q80 52 100 46Q120 52 120 92Z",
+    main: "M14 170H186M78 170V92H122V170M80 92Q80 52 100 46Q120 52 120 92M24 170V112H78M122 112H176V170M22 112L36 94L50 112M150 112L164 94L178 112M90 170V144Q100 128 110 144V170M100 46V32",
+    thin: "M84 92H116M86 84H114M36 94V84M164 94V84M32 152V138Q36 130 40 138V152M50 152V138Q54 130 58 138V152M142 152V138Q146 130 150 138V152M160 152V138Q164 130 168 138V152M24 126H78M122 126H176M90 66Q100 60 110 66",
+    dots: [[100, 26, 4.5], [100, 114, 8]],
+  },
+  // Jhumka monument, Bareilly
+  jhumka: {
+    fill: "M70 112Q70 64 100 58Q130 64 130 112Z",
+    main: "M28 170H172M74 170V156H126V170M84 156V148H116V156M140 148V34Q140 24 130 24H100V36M70 112Q70 64 100 58Q130 64 130 112M64 112H136M100 44V58",
+    thin: "M80 96Q100 86 120 96M86 78Q100 72 114 78M72 120V128M84 120V132M100 120V136M116 120V132M128 120V128M128 148H152",
+    dots: [[100, 41, 6], [72, 131, 3.2], [84, 135, 3.2], [100, 139, 3.6], [116, 135, 3.2], [128, 131, 3.2], [100, 104, 3]],
+  },
+  // Rajwada, Indore
+  rajwada: {
+    fill: "M86 170V128Q86 112 100 108Q114 112 114 128V170Z",
+    main: "M14 170H186M34 170V58H166V170M86 170V128Q86 112 100 108Q114 112 114 128V170M34 146H166M34 104H166M28 58Q40 38 52 58M148 58Q160 38 172 58M86 58Q100 36 114 58",
+    thin: "M34 124H86M114 124H166M34 86H166M34 70H166M44 88V100M56 88V100M68 88V100M80 88V100M92 88V100M108 88V100M120 88V100M132 88V100M144 88V100M156 88V100M44 74V82M60 74V82M76 74V82M92 74V82M108 74V82M124 74V82M140 74V82M156 74V82M46 130V140M60 130V140M74 130V140M126 130V140M140 130V140M154 130V140M40 38V30M160 38V30M100 36V26",
+  },
+  // Golghar, Patna
+  golghar: {
+    fill: "M40 166C40 90 64 56 100 54C136 56 160 90 160 166Z",
+    main: "M18 170H182M30 170V162H170V170M40 162C40 90 64 56 100 54C136 56 160 90 160 162M92 54V46H108V54M92 162V146Q100 136 108 146V162",
+    thin: "M48 162C62 120 76 86 94 58M60 162C74 122 86 88 100 58M52 150L62 154M56 138L66 142M61 126L71 130M66 114L76 118M72 102L81 106M78 90L87 94M85 78L93 82M90 68L97 71M152 162C138 120 124 86 106 58M140 162C126 122 114 88 100 58",
+  },
+  // Taj-ul-Masajid, Bhopal
+  tajulmasajid: {
+    fill: "M78 108Q78 70 100 64Q122 70 122 108ZM54 108Q54 88 66 84Q78 88 78 108ZM122 108Q122 88 134 84Q146 88 146 108Z",
+    main: "M10 170H190M50 170V108H150V170M78 108Q78 70 100 64Q122 70 122 108M54 108Q54 88 66 84Q78 88 78 108M122 108Q122 88 134 84Q146 88 146 108M20 170V44H32V170M168 170V44H180V170M20 44Q26 28 32 44M168 44Q174 28 180 44M90 170V140Q100 126 110 140V170",
+    thin: "M100 64V52M66 84V76M134 84V76M26 30V22M174 30V22M16 120H36M16 84H36M17 58H35M164 120H184M164 84H184M165 58H183M32 132H50M150 132H168M60 170V148Q66 138 72 148V170M128 170V148Q134 138 140 148V170M50 116H150",
+  },
+};
+const bySlug: Record<string, keyof typeof art> = {
+  "mumbai-2027": "gateway", "mumbai-2026": "cst", "bareilly-2026": "jhumka",
+  "indore-2026": "rajwada", "patna-2026": "golghar", "patna-2022": "golghar", "bhopal-2025": "tajulmasajid",
+};
+const key = bySlug[slug] ?? (slug.startsWith("mumbai") ? "gateway" : undefined);
+const a = key ? art[key] : undefined;
+const fid = `brush-${slug}`;
+let seed = 0;
+for (const ch of slug) seed = (seed * 31 + ch.charCodeAt(0)) % 97;
+---
+{a && (
+  <svg class:list={["lm", cls]} viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id={fid} x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="2" seed={seed} result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+    <g filter={`url(#${fid})`} fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      {a.fill && <path class="lm__fill" d={a.fill} stroke="none" fill="currentColor" />}
+      <path d={a.main} stroke-width="5.5" />
+      <path d={a.thin} stroke-width="2.6" />
+      {a.dots?.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} stroke-width="2.6" />)}
+    </g>
+  </svg>
+)}
+<style>
+  .lm { position: relative; display: block; width: 100%; height: 100%; }
+  .lm__fill { opacity: .16; }
+</style>

@@ -7,6 +7,7 @@ import Base from "../layouts/Base.astro";
 import BoldHeader from "../components/BoldHeader.astro";
 import Icon from "../components/Icon.astro";
 import Bunting from "../components/Bunting.astro";
+import Landmark from "../components/Landmark.astro";
 import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
 import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
@@ -26,7 +27,6 @@ const altHref = localePath(hi ? "en" : "hi", "/");
 const byDate = [...editions].sort((a, b) => (b.start ?? `${b.year}`).localeCompare(a.start ?? `${a.year}`));
 const rows = byDate.slice(0, 6);
 const tones = ["blue", "saffron", "navy", "sand", "red", "sky"] as const;
-const initial = (x: string) => [...new Intl.Segmenter("hi", { granularity: "grapheme" }).segment(x)][0]?.segment ?? x[0];
 
 const headline = ["gulzar", "javed-akhtar", "geetanjali-shree", "piyush-mishra", "raghubir-yadav", "alok-dhanwa", "mridula-garg"]
   .map((slug) => allSpeakers.find((p) => p.slug === slug))
@@ -81,7 +81,7 @@ const jsonLd = heroEv ? [heroEv] : [];
         {rows.map((e, i) => (
           <a class:list={["ecard", i === 0 && "ecard--lead"]} href={L(`/editions/${e.slug}/`)}>
             <span class:list={["tile", `tile--${tones[i % tones.length]}`]} aria-hidden="true">
-              <span class="tile__ini" lang="hi">{initial(e.city.hi)}</span>
+              <Landmark slug={e.slug} class="tile__art" />
               <span class="tile__yr">{e.year}</span>
             </span>
             <span class="ecard__body">
