@@ -393,5 +393,9 @@
 /* the bunting needs width; phones and small tablets get a clean hero */
 @media (max-width: 900px) { .bhero .bunting { display: none; } }
 @media (prefers-reduced-motion: reduce) { .flag, .bunting__row, .bunting__knot { animation: none; } }
-/* home: the centre medallion is the logo, so the header mark steps aside (it stays on phones and inner pages) */
-@media (min-width: 901px) { .bhero .top .pill--logo { visibility: hidden; } }
+/* home: the centre medallion is the logo, so the header mark steps aside and the menu moves left (logo stays on phones and inner pages) */
+@media (min-width: 901px) {
+  .bhero .top { grid-template-columns: auto 1fr; align-items: start; min-height: 100px; }
+  .bhero .top .pill--logo { display: none; }
+  .bhero .top .pill--nav { justify-self: start; }
+}
