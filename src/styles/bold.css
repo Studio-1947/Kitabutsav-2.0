@@ -68,7 +68,7 @@
 
   /* hero */
   .bhero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(350px + 0.445 * min(1000px, 62vw)); border-radius: var(--r-lg); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
-  .hero__blob { position: absolute; z-index: -1; right: -1%; bottom: -5px; width: min(1080px, 66vw); height: auto; transform-origin: 50% 100%; }
+  .hero__blob { position: absolute; z-index: -1; right: -4%; bottom: -5px; width: min(1080px, 66vw); height: auto; transform-origin: 50% 100%; }
   .hero__foot { display: grid; justify-items: start; gap: 26px; position: relative; padding-left: clamp(8px, 3.2vw, 40px); }
   .hero__title { margin: 0; font-size: clamp(2.8rem, 6.2vw, 6.2rem); line-height: 1; }
   .hero__title span { display: block; }
@@ -445,10 +445,10 @@
 .hero__clouds { --bw: min(1080px, 66vw); }
 /* five clouds of three kinds float over the character's head; positions follow the illustration (right: -1%, width --bw) */
 /* each cloud sits in empty white space: between the title and the tree, above the head, and in the top-right corner */
-.cloud--a { left: calc(101% - .964 * var(--bw)); bottom: calc(.49 * var(--bw)); width: calc(.17 * var(--bw)); --t: 26s; --dx: 60px; }
-.cloud--b { left: calc(101% - .67 * var(--bw)); bottom: calc(.48 * var(--bw)); width: calc(.21 * var(--bw)); --t: 22s; --dl: -7s; --dx: -50px; }
-.cloud--d { left: calc(101% - .964 * var(--bw)); bottom: calc(.35 * var(--bw)); width: calc(.16 * var(--bw)); --t: 18s; --dl: -4s; --dx: 16px; }
-.cloud--e { left: calc(101% - .343 * var(--bw)); bottom: calc(.63 * var(--bw)); width: calc(.12 * var(--bw)); --t: 24s; --dl: -15s; --dx: 50px; }
+.cloud--a { left: calc(104% - .964 * var(--bw)); bottom: calc(.49 * var(--bw)); width: calc(.17 * var(--bw)); --t: 26s; --dx: 60px; }
+.cloud--b { left: calc(104% - .67 * var(--bw)); bottom: calc(.48 * var(--bw)); width: calc(.21 * var(--bw)); --t: 22s; --dl: -7s; --dx: -50px; }
+.cloud--d { left: calc(104% - .964 * var(--bw)); bottom: calc(.35 * var(--bw)); width: calc(.16 * var(--bw)); --t: 18s; --dl: -4s; --dx: 16px; }
+.cloud--e { left: calc(104% - .343 * var(--bw)); bottom: calc(.63 * var(--bw)); width: calc(.12 * var(--bw)); --t: 24s; --dl: -15s; --dx: 50px; }
 @keyframes cloud-drift { 0% { translate: 0 0; } 50% { translate: calc(var(--dx, 80px) / 2) -6px; } 100% { translate: var(--dx, 80px) 0; } }
 @media (max-width: 900px) { .hero__clouds { display: none; } }
 @media (prefers-reduced-motion: reduce) { .hero__clouds .cloud { animation: none; } }
@@ -459,7 +459,7 @@
 @media (max-width: 900px) { .hero__skyline { display: none; } }
 /* wide screens: the illustration stops growing, so the clouds take spots measured from the centre medallion */
 @media (min-width: 1500px) { .cloud--e { display: none; } }
-@media (max-width: 1060px) { .cloud--d { left: calc(101% - .95 * var(--bw)); width: calc(.14 * var(--bw)); } }
+@media (max-width: 1060px) { .cloud--d { left: calc(104% - .95 * var(--bw)); width: calc(.14 * var(--bw)); } }
 @media (min-width: 1600px) {
   .cloud--a { left: max(520px, calc(50% - 340px)); top: 190px; bottom: auto; width: 180px; --dx: 20px; }
   .cloud--d { left: calc(50% - 210px); top: 318px; bottom: auto; width: 150px; --dx: 30px; }
@@ -474,4 +474,4 @@
 /* English buttons are wider; the small cloud by them steps out */
 :lang(en) .cloud--d { display: none; }
 /* zoomed 1.8x on its right end (Sea Link, Gateway): the right edge stays at the character, the left runs off the box */
-.hero__skyline { --zw: calc(1.8 * (105% - min(1080px, 66vw))); width: var(--zw); left: calc(103% - min(1080px, 66vw) - var(--zw)); }
+.hero__skyline { --zw: calc(1.8 * (108% - min(1080px, 66vw))); width: var(--zw); left: calc(106% - min(1080px, 66vw) - var(--zw)); }
