@@ -439,3 +439,14 @@
 @media (max-width: 900px) { .hero__lockup { margin-left: 0; } .bhero .hero__ctas { margin-left: 0; } }
 /* header: menus sit closer to the box edges (home and inner pages) */
 @media (min-width: 901px) { .bhero .top, .topbox .top { margin-inline: calc(-1 * clamp(0px, 2.5vw, 40px)); } }
+
+/* hero clouds (public/brand/cloud.svg) drifting in the empty parts of the white box */
+.hero__clouds { position: absolute; inset: 0; z-index: -3; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.hero__clouds .cloud { position: absolute; height: auto; animation: cloud-drift var(--t, 40s) ease-in-out var(--dl, 0s) infinite alternate; }
+.cloud--1 { left: 2%; top: 74%; width: clamp(180px, 22vw, 340px); --t: 38s; }
+.cloud--2 { left: 36%; top: 22%; width: clamp(140px, 15vw, 240px); --t: 46s; --dl: -12s; --dx: -70px; }
+.cloud--3 { left: 82%; top: 13%; width: clamp(120px, 12vw, 200px); --t: 52s; --dl: -20s; }
+.cloud--4 { left: 58%; top: 31%; width: clamp(100px, 9vw, 150px); --t: 34s; --dl: -6s; --dx: -50px; opacity: .8; }
+@keyframes cloud-drift { from { transform: translateX(0); } to { transform: translateX(var(--dx, 80px)); } }
+@media (max-width: 900px) { .cloud--2, .cloud--4 { display: none; } .cloud--1 { top: 40%; left: 60%; } .cloud--3 { top: 18%; left: 70%; } }
+@media (prefers-reduced-motion: reduce) { .hero__clouds .cloud { animation: none; } }
