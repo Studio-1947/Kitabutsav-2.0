@@ -386,7 +386,9 @@
 .flag--sand { background: var(--sand); color: var(--red); }
 .bunting__knot { width: calc(150px * var(--fs)); height: calc(150px * var(--fs)); margin: calc(-75px * var(--fs)) 0 0 calc(-75px * var(--fs)); background: #fff; box-shadow: 0 0 0 3px var(--red); transform-origin: 50% 50%; animation: knot-sway 6s ease-in-out infinite alternate; }
 .bunting__knot::before { display: none; }
-.bunting__knot img { width: 78%; height: auto; }
+.bunting__knot { place-items: center; place-content: center; padding: 0; }
+/* the logo's arc is concentric with the ring at this size; the 1% nudge corrects the artwork's slight right offset */
+.bunting__knot img { width: 66%; height: auto; transform: translateX(-1%); }
 @keyframes flag-sway { 0%, 100% { transform: rotate(-7deg) skewX(2deg); } 50% { transform: rotate(7deg) skewX(-2deg); } }
 @keyframes bunting-bob { from { transform: translateY(0); } to { transform: translateY(6px); } }
 @keyframes knot-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
