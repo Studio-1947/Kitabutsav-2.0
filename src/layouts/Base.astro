@@ -141,7 +141,7 @@ const ld = { "@context": "https://schema.org", "@graph": [...graph, ...jsonLd] }
     <BoldFooter lang={lang} />
     <MobileTabbar lang={lang} altHref={altHref} />
     <script is:inline src="/scripts/chrome.js" defer></script>
-    <script is:inline src="/scripts/letters.js" data-target=".foot" defer></script>
+    <script is:inline src="/scripts/letters.js" data-target=".foot, .bhero, .topbox, .is-inner main > .page-hero:first-child" defer></script>
     <script is:inline>
       /* Deep links to a section (e.g. #wall) can land in the wrong place: the browser's
          built-in scroll races against images still loading further down the page, which
