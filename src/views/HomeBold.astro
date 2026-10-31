@@ -1,7 +1,7 @@
 ---
 /**
  * "Bold" design option for the home page: loud colour fields, chunky display type, pill rows and
- * wavy section edges. A self-contained preview at /bold/ and /en/bold/ (noindex, not in nav)
+ * wavy section edges. A self-contained preview at /2/ and /en/2/ (noindex, not in nav)
  * so it can be compared with the current home page; it reads the same data files.
  */
 import { bookSeatUrl, festivalSocial, org } from "../site.config";
@@ -17,7 +17,7 @@ const hi = lang === "hi";
 const L = (p: string) => localePath(lang, p);
 const up = !!nextEdition;
 const seat = bookSeatUrl ?? L(`/editions/${fe.slug}/`);
-const other = hi ? "/en/bold/" : "/bold/";
+const other = hi ? "/en/2/" : "/2/";
 
 const byDate = [...editions].sort((a, b) => (b.start ?? `${b.year}`).localeCompare(a.start ?? `${a.year}`));
 const rows = byDate.slice(0, 6);
@@ -48,7 +48,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
 </head>
 <body>
   <header class="top">
-    <a class="pill pill--logo" href={L("/bold/")} aria-label={s.siteName}>
+    <a class="pill pill--logo" href={L("/2/")} aria-label={s.siteName}>
       <img src="/brand/kitab-utsav-logo.svg" alt="" width="44" height="40" />
       <span>{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
     </a>
