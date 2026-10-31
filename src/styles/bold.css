@@ -68,7 +68,7 @@
 
   /* hero */
   .bhero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(350px + 0.445 * min(1000px, 62vw)); border-radius: var(--r-lg); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
-  .hero__blob { position: absolute; z-index: -1; right: 6%; bottom: -5px; width: min(880px, 54vw); height: auto; transform-origin: 50% 100%; }
+  .hero__blob { position: absolute; z-index: -1; right: -1%; bottom: -5px; width: min(1080px, 66vw); height: auto; transform-origin: 50% 100%; }
   .hero__foot { display: grid; justify-items: start; gap: 26px; position: relative; padding-left: clamp(8px, 3.2vw, 40px); }
   .hero__title { margin: 0; font-size: clamp(2.8rem, 6.2vw, 6.2rem); line-height: 1; }
   .hero__title span { display: block; }
@@ -426,11 +426,12 @@
 }
 
 /* hero lockup: Kitab Utsav sits on the city's headline, the date tucks under it, to the right of the ु curl */
-.hero__lockup { position: relative; width: max-content; max-width: 100%; margin: clamp(10px, 3vw, 48px) 0 .1em clamp(0px, 4vw, 64px); font-size: clamp(5.6rem, 16vw, 14.8rem); }
+.hero__lockup { position: relative; width: max-content; max-width: 100%; margin: clamp(10px, 3vw, 48px) 0 .1em calc(-1 * clamp(0px, 2.5vw, 40px)); font-size: clamp(4.5rem, 12.8vw, 11.8rem); }
 .hero__lockup .hero__title { font-size: 1em; line-height: 1; }
 .hero__lockup .hero__brand { display: block; font-size: .3em; font-weight: 500; line-height: 1; margin: 0 0 -.22em .06em; color: var(--red); position: relative; z-index: 1; }
 .hero__lockup .hero__cityname { display: block; font-weight: 800; }
 .hero__when { position: absolute; left: 35%; bottom: .06em; margin: 0; font: 500 max(.19em, 13px)/1 var(--display); color: var(--red); white-space: nowrap; }
-:lang(en) .hero__lockup { font-size: clamp(3rem, 9vw, 9rem); }
+:lang(en) .hero__lockup { font-size: clamp(2.4rem, 7.2vw, 7.2rem); }
 :lang(en) .hero__lockup .hero__brand { margin-bottom: .05em; }
 :lang(en) .hero__when { position: static; margin-top: .25em; font-size: .3em; }
+@media (max-width: 900px) { .hero__lockup { margin-left: 0; } }
