@@ -442,11 +442,19 @@
 
 /* hero clouds (public/brand/cloud.svg) drifting in the empty parts of the white box */
 .hero__clouds { position: absolute; inset: 0; z-index: -3; pointer-events: none; overflow: hidden; border-radius: inherit; }
-.hero__clouds .cloud { position: absolute; height: auto; animation: cloud-drift var(--t, 40s) ease-in-out var(--dl, 0s) infinite alternate; }
-.cloud--1 { left: 2%; top: 74%; width: clamp(180px, 22vw, 340px); --t: 38s; }
-.cloud--2 { left: 36%; top: 22%; width: clamp(140px, 15vw, 240px); --t: 46s; --dl: -12s; --dx: -70px; }
-.cloud--3 { left: 82%; top: 13%; width: clamp(120px, 12vw, 200px); --t: 52s; --dl: -20s; }
-.cloud--4 { left: 58%; top: 31%; width: clamp(100px, 9vw, 150px); --t: 34s; --dl: -6s; --dx: -50px; opacity: .8; }
-@keyframes cloud-drift { from { transform: translateX(0); } to { transform: translateX(var(--dx, 80px)); } }
-@media (max-width: 900px) { .cloud--2, .cloud--4 { display: none; } .cloud--1 { top: 40%; left: 60%; } .cloud--3 { top: 18%; left: 70%; } }
+.hero__clouds .cloud { position: absolute; height: auto; animation: cloud-drift var(--t, 24s) ease-in-out var(--dl, 0s) infinite alternate; }
+.hero__clouds { --bw: min(1080px, 66vw); }
+/* five clouds of three kinds float over the character's head; positions follow the illustration (right: -1%, width --bw) */
+.cloud--a { left: calc(101% - .8 * var(--bw)); bottom: calc(.43 * var(--bw)); width: calc(.24 * var(--bw)); --t: 26s; --dx: 110px; }
+.cloud--b { left: calc(101% - .55 * var(--bw)); bottom: calc(.47 * var(--bw)); width: calc(.2 * var(--bw)); --t: 21s; --dl: -7s; --dx: -90px; transform: scaleX(-1); }
+.cloud--c { left: calc(101% - .7 * var(--bw)); bottom: calc(.58 * var(--bw)); width: calc(.22 * var(--bw)); --t: 30s; --dl: -12s; --dx: 140px; opacity: .9; }
+.cloud--d { left: calc(101% - .9 * var(--bw)); bottom: calc(.6 * var(--bw)); width: calc(.12 * var(--bw)); --t: 18s; --dl: -4s; --dx: 70px; opacity: .85; }
+.cloud--e { left: calc(101% - .42 * var(--bw)); bottom: calc(.62 * var(--bw)); width: calc(.16 * var(--bw)); --t: 24s; --dl: -15s; --dx: -100px; opacity: .8; }
+@keyframes cloud-drift { 0% { translate: 0 0; } 50% { translate: calc(var(--dx, 80px) / 2) -6px; } 100% { translate: var(--dx, 80px) 0; } }
+@media (max-width: 900px) { .hero__clouds { display: none; } }
 @media (prefers-reduced-motion: reduce) { .hero__clouds .cloud { animation: none; } }
+
+/* Mumbai skyline in 50% grey behind the character */
+.hero__skyline { position: absolute; z-index: -2; left: 0; bottom: -2px; width: 100%; height: auto; opacity: .5; pointer-events: none; }
+.bhero .hero__blob { z-index: -1; }
+@media (max-width: 900px) { .hero__skyline { display: none; } }
