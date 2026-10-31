@@ -5,7 +5,8 @@
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  var TARGET = ".site-footer";
+  // Hover area; a page can override it with data-target on the script tag (the /2/ design uses ".foot").
+  var TARGET = (document.currentScript && document.currentScript.dataset.target) || ".site-footer";
   var GLYPHS = ["अ", "आ", "इ", "उ", "क", "ख", "ग", "च", "ज", "त", "द", "न", "प", "ब", "म", "य", "र", "ल", "व", "स", "ह"];
   var COUNT = 120;
   var SIZES = [6, 7, 8, 10, 12, 14, 17];

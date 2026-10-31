@@ -195,6 +195,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
     <a class="foot__book" href={seat}><span>{s.bookSeat}</span><i aria-hidden="true">→</i></a>
     <p class="foot__note">{hi ? "डिज़ाइन प्रीव्यू · मौजूदा मुखपृष्ठ" : "Design preview · current home page"}: <a href={L("/")}>{L("/")}</a></p>
   </footer>
+  <script is:inline src="/scripts/letters.js" data-target=".foot" defer></script>
 </body>
 </html>
 
@@ -354,6 +355,13 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .foot__book:hover { background: var(--cream); }
   .foot__book:hover i { transform: translateX(10px); }
   .foot__note { grid-column: 1 / -1; margin: 6px 8px 10px; font-weight: 700; font-size: .85rem; color: var(--cream); }
+
+  /* Hindi letters orbiting the cursor over the footer (public/scripts/letters.js) */
+  .cursor-letters { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
+  .cursor-letters span { position: absolute; left: 0; top: 0; opacity: 0; color: var(--blue); font-family: var(--display); font-weight: 800; line-height: 1; transition: opacity .35s; will-change: transform, opacity; }
+  .cursor-letters span:nth-child(3n) { color: var(--ink); }
+  .cursor-letters span:nth-child(5n) { color: var(--saffron); }
+  .cursor-letters.on span { opacity: .6; }
 
   @media (max-width: 900px) {
     .hero { min-height: 0; padding-bottom: 0; }
