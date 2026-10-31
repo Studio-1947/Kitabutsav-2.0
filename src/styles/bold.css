@@ -434,4 +434,6 @@
 :lang(en) .hero__lockup { font-size: clamp(2.4rem, 7.2vw, 7.2rem); }
 :lang(en) .hero__lockup .hero__brand { margin-bottom: .05em; }
 :lang(en) .hero__when { position: static; margin-top: .25em; font-size: .3em; }
-@media (max-width: 900px) { .hero__lockup { margin-left: 0; } }
+/* buttons start where "किताब उत्सव" starts */
+.bhero .hero__ctas { margin-left: calc(-1 * clamp(0px, 2.5vw, 40px) + 3px); }
+@media (max-width: 900px) { .hero__lockup { margin-left: 0; } .bhero .hero__ctas { margin-left: 0; } }
