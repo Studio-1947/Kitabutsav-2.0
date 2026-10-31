@@ -62,8 +62,6 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
         </nav>
         <a class="pill pill--ink top__book" href={seat}>{s.bookSeat}</a>
       </header>
-      <div class="hero__chev" aria-hidden="true"></div>
-      <p class="hero__kicker">{up ? (hi ? "अगला पड़ाव" : "Next stop") : (hi ? "हाल का पड़ाव" : "Latest stop")} · {formatRange(fe, lang)}</p>
       <div class="hero__foot">
         <h1 class="hero__title">
           <span class="hero__brand">{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
@@ -243,7 +241,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .btn--line-dark:hover { background: var(--ink); color: #fff; }
 
   /* header */
-  .top { display: flex; align-items: center; gap: 10px; margin-bottom: clamp(20px, 5vw, 64px); }
+  .top { display: flex; align-items: center; gap: 10px; margin-bottom: clamp(8px, 2vw, 24px); }
   .pill--logo { background: transparent; padding: 0; border-radius: 24px; }
   .pill--logo img { width: 74px; height: auto; }
   .pill--nav { margin-left: auto; background: #f6eedd; gap: 4px; padding: 6px; }
@@ -253,14 +251,12 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .top__book:hover { background: var(--navy); }
 
   /* hero */
-  .hero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(560px + 0.445 * min(1240px, 72vw)); border-radius: clamp(28px, 5vw, 64px); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 28px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
-  .hero__blob { position: absolute; z-index: -1; right: 1%; bottom: 0; width: min(1240px, 72vw); height: auto; transform-origin: 50% 100%; }
-  .hero__chev { position: absolute; z-index: -2; inset: auto -10% -30% auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: repeating-linear-gradient(-45deg, transparent 0 34px, rgba(17,75,156,.07) 34px 50px); }
-  .hero__kicker { align-self: flex-start; margin: 0 0 0 clamp(8px, 3.2vw, 40px); padding: 10px 18px; border-radius: 999px; background: var(--yellow); color: var(--ink); font: 800 .95rem/1 var(--display); }
+  .hero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(350px + 0.445 * min(1000px, 62vw)); border-radius: clamp(28px, 5vw, 64px); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
+  .hero__blob { position: absolute; z-index: -1; right: 1%; bottom: 0; width: min(1000px, 62vw); height: auto; transform-origin: 50% 100%; }
   .hero__foot { display: grid; justify-items: start; gap: 26px; position: relative; padding-left: clamp(8px, 3.2vw, 40px); }
-  .hero__title { margin: 0; font-size: clamp(3.4rem, 12.5vw, 12rem); line-height: 1; }
+  .hero__title { margin: 0; font-size: clamp(3.4rem, 9.5vw, 9.5rem); line-height: 1; }
   .hero__title span { display: block; }
-  :lang(en) .hero__title { font-size: clamp(3rem, 8.4vw, 8.4rem); }
+  :lang(en) .hero__title { font-size: clamp(3rem, 6.6vw, 6.8rem); }
   .hero__title em { font-style: normal; color: var(--saffron); }
   .hero__brand { font-size: .34em; line-height: 1.2; margin-bottom: .06em; color: var(--red); }
   .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
