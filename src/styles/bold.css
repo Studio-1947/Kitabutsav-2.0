@@ -455,7 +455,7 @@
 @media (prefers-reduced-motion: reduce) { .hero__clouds .cloud { animation: none; } }
 
 /* Mumbai skyline in light brown behind the character */
-.hero__skyline { position: absolute; z-index: -2; left: 0; bottom: -2px; width: 100%; height: auto; opacity: .75; pointer-events: none; }
+.hero__skyline { position: absolute; z-index: -2; left: 0; bottom: calc(-1 * clamp(8px, 1.1vw, 18px)); width: 100%; height: auto; opacity: .75; pointer-events: none; }
 .bhero .hero__blob { z-index: -1; }
 @media (max-width: 900px) { .hero__skyline { display: none; } }
 /* wide screens: the illustration stops growing, so the clouds take spots measured from the centre medallion */
