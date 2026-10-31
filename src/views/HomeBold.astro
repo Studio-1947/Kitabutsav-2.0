@@ -11,7 +11,7 @@ import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
 import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
 import { partners } from "../data/partners";
-import { formatRange, isUpcoming, localePath, t, type Lang } from "../i18n";
+import { formatRange, localePath, t, type Lang } from "../i18n";
 import { eventLd } from "../lib/schema";
 
 interface Props { lang: Lang }
@@ -42,12 +42,6 @@ const title = hi
 const description = hi
   ? `किताब उत्सव: किताबों, पाठकों और लेखकों के संवाद का उत्सव। ${up ? `राजकमल प्रकाशन समूह के इस उत्सव का अगला पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}।` : `हाल का पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}; अगले शहर की घोषणा जल्द।`} पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।`
   : `Kitab Utsav is Rajkamal Prakashan's five-day Hindi book and literature festival. ${up ? `Next stop: ${fe.city.en}, ${formatRange(fe, "en")}.` : `Most recently in ${fe.city.en}, ${formatRange(fe, "en")}; next city announcing soon.`} Readings, conversations, book launches and a book exhibition.`;
-// Cities for the hero's "Upcoming in:" scroller: every other festival city once, latest first.
-const upcomingOthers = byDate.filter((e) => e.slug !== fe.slug && isUpcoming(e)).reverse();
-const heroItems = up
-  ? [formatRange(fe, lang), ...upcomingOthers.map((e) => `${e.city[lang]} · ${formatRange(e, lang)}`)]
-  : byDate.filter((e) => e.city.en !== fe.city.en).filter((e, i, all) => all.findIndex((x) => x.city.en === e.city.en) === i).map((e) => e.city[lang]);
-const heroLabel = up ? (hi ? "आगामी:" : "Upcoming:") : (hi ? "पिछले पड़ाव:" : "Past stops:");
 const heroEv = up ? eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg") : null;
 const jsonLd = heroEv ? [heroEv] : [];
 ---
@@ -58,16 +52,13 @@ const jsonLd = heroEv ? [heroEv] : [];
       <BoldHeader lang={lang} altHref={altHref} />
       <Bunting />
       <div class="hero__foot">
-        <h1 class="hero__title">
-          <span class="hero__brand">{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
-          <span>{fe.city[lang]}</span>
-        </h1>
-        <p class="hero__upnext">
-          <span>{heroLabel}</span>
-          <span class="hero__city" data-rotate aria-label={heroItems.join(", ")}>
-            {heroItems.map((x, i) => <span class:list={["hero__word", i === 0 && "is-on"]} aria-hidden="true">{x}</span>)}
-          </span>
-        </p>
+        <div class="hero__lockup">
+          <h1 class="hero__title">
+            <span class="hero__brand">{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
+            <span class="hero__cityname">{fe.city[lang]}</span>
+          </h1>
+          <p class="hero__when">{formatRange(fe, lang)}</p>
+        </div>
         <div class="hero__ctas">
           <a class="btn btn--red" href={seat}>{s.bookSeat}<Icon name="arrowUpRight" size={20} /></a>
           <a class="btn btn--line btn--line-dark" href={L("/programme/")}>{s.upcomingEvents}</a>
@@ -170,23 +161,5 @@ const jsonLd = heroEv ? [heroEv] : [];
       </ul>
       <a class="under under--light" href={L("/partners/")}>{hi ? `सभी ${partners.length} साथी` : `All ${partners.length} partners`}</a>
     </section>
-  <script is:inline>
-    /* Hero: "Upcoming in:" line scrolls through every festival city. */
-    (function () {
-      var box = document.querySelector("[data-rotate]");
-      if (!box || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      var words = box.querySelectorAll(".hero__word"), i = 0;
-      if (words.length < 2) return;
-      function fit(w) { box.style.width = w.offsetWidth + "px"; }
-      fit(words[0]);
-      document.fonts && document.fonts.ready.then(function () { fit(words[i]); });
-      setInterval(function () {
-        var cur = words[i], next = words[(i = (i + 1) % words.length)];
-        cur.classList.remove("is-on"); cur.classList.add("is-out");
-        setTimeout(function () { cur.classList.remove("is-out"); }, 600);
-        next.classList.add("is-on"); fit(next);
-      }, 2000);
-    })();
-  </script>
 </Base>
 
