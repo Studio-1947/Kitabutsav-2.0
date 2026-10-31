@@ -10,13 +10,13 @@ const seg = new Intl.Segmenter("hi", { granularity: "grapheme" });
 const aksharas = (s: string) => [...seg.segment(s.replace(/\s/g, ""))].map((x) => x.segment);
 
 type Pt = [number, number];
-const knot: Pt = [50, 66];
+const knot: Pt = [50, 60];
 // end point on the top edge and how far the string sags below the straight line
 const strands: { end: Pt; sag: number; text: string; from: number }[] = [
-  { end: [24, -4], sag: 34, text: "किताब उत्सव", from: 0.34 },
-  { end: [37, -4], sag: 10, text: "किताब", from: 0.36 },
-  { end: [63, -4], sag: 10, text: "उत्सव", from: 0.36 },
-  { end: [76, -4], sag: 34, text: "राजकमल", from: 0.34 },
+  { end: [24, -4], sag: 34, text: "किताब उत्सव", from: 0.4 },
+  { end: [37, -4], sag: 10, text: "किताब", from: 0.46 },
+  { end: [63, -4], sag: 10, text: "उत्सव", from: 0.46 },
+  { end: [76, -4], sag: 34, text: "राजकमल", from: 0.4 },
 ];
 const tones = ["red", "saffron", "blue", "yellow", "sky", "sand"];
 
