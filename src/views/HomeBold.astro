@@ -70,8 +70,8 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
           <span>{fe.city[lang]} <em>{fe.year}</em></span>
         </h1>
         <div class="hero__ctas">
-          <a class="btn btn--cream" href={seat}>{s.bookSeat}</a>
-          <a class="btn btn--line" href={L("/programme/")}>{s.upcomingEvents}</a>
+          <a class="btn btn--red" href={seat}>{s.bookSeat}</a>
+          <a class="btn btn--line btn--line-dark" href={L("/programme/")}>{s.upcomingEvents}</a>
         </div>
       </div>
       <img class="hero__blob" src="/brand/hero-element.svg" alt="" aria-hidden="true" width="872" height="538" />
@@ -237,29 +237,32 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .btn--cream { background: var(--cream); color: var(--ink); }
   .btn--line { border: 3px solid var(--cream); color: var(--cream); }
   .btn--line:hover { background: var(--cream); color: var(--ink); }
+  .btn--red { background: var(--red); color: #fff; }
+  .btn--red:hover { background: var(--ink); }
+  .btn--line-dark { border-color: var(--ink); color: var(--ink); }
+  .btn--line-dark:hover { background: var(--ink); color: #fff; }
 
   /* header */
   .top { display: flex; align-items: center; gap: 10px; margin-bottom: clamp(20px, 5vw, 64px); }
-  .pill--logo { background: var(--cream); padding: 8px 16px; border-radius: 24px; }
+  .pill--logo { background: transparent; padding: 0; border-radius: 24px; }
   .pill--logo img { width: 74px; height: auto; }
-  .pill--nav { margin-left: auto; background: var(--cream); gap: 4px; padding: 6px; }
+  .pill--nav { margin-left: auto; background: #f6eedd; gap: 4px; padding: 6px; }
   .pill--nav a { padding: 10px 14px; border-radius: 999px; text-decoration: none; color: var(--ink); }
   .pill--nav a:hover { background: var(--red); color: var(--cream); }
   .top__book { padding: 16px 22px; }
   .top__book:hover { background: var(--navy); }
 
   /* hero */
-  .hero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(560px + 0.445 * min(1240px, 72vw)); border-radius: clamp(28px, 5vw, 64px); background: var(--navy); color: var(--cream); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 28px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
+  .hero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(560px + 0.445 * min(1240px, 72vw)); border-radius: clamp(28px, 5vw, 64px); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 28px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
   .hero__blob { position: absolute; z-index: -1; right: 1%; bottom: 0; width: min(1240px, 72vw); height: auto; transform-origin: 50% 100%; }
-  .hero__chev { position: absolute; z-index: -2; inset: auto -10% -30% auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: repeating-linear-gradient(-45deg, transparent 0 34px, rgba(242,163,58,.16) 34px 50px); }
+  .hero__chev { position: absolute; z-index: -2; inset: auto -10% -30% auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: repeating-linear-gradient(-45deg, transparent 0 34px, rgba(17,75,156,.07) 34px 50px); }
   .hero__kicker { align-self: flex-start; margin: 0 0 0 clamp(8px, 3.2vw, 40px); padding: 10px 18px; border-radius: 999px; background: var(--yellow); color: var(--ink); font: 800 .95rem/1 var(--display); }
   .hero__foot { display: grid; justify-items: start; gap: 26px; position: relative; padding-left: clamp(8px, 3.2vw, 40px); }
   .hero__title { margin: 0; font-size: clamp(3.4rem, 12.5vw, 12rem); line-height: 1; }
   .hero__title span { display: block; }
   :lang(en) .hero__title { font-size: clamp(3rem, 8.4vw, 8.4rem); }
-  .hero__title > span:last-child { text-shadow: 0 6px 30px rgba(11,46,99,.6); }
   .hero__title em { font-style: normal; color: var(--saffron); }
-  .hero__brand { font-size: .34em; line-height: 1.2; margin-bottom: .06em; color: var(--yellow); }
+  .hero__brand { font-size: .34em; line-height: 1.2; margin-bottom: .06em; color: var(--red); }
   .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
 
   /* edition pills */
