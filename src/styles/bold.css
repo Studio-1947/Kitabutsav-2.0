@@ -361,8 +361,8 @@
 .hero__upnext .hero__word.is-on { opacity: 1; transform: none; }
 .hero__upnext .hero__word.is-out { opacity: 0; transform: translateY(-100%); }
 
-/* hero bunting, mela-canopy style (src/components/Bunting.astro) */
-.bhero .bunting { position: absolute; z-index: -1; inset: 0; pointer-events: none; --fs: 1; }
+/* hero bunting: logo medallion in the centre, two strings swagging up to each side (src/components/Bunting.astro) */
+.bhero .bunting { position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: clamp(150px, 13vw, 190px); pointer-events: none; --fs: 1; }
 .bhero .hero__blob { z-index: -2; }
 .bunting__strings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .bunting__strings path { fill: none; stroke: #c9b78a; stroke-width: 1.5; }
@@ -381,7 +381,7 @@
 .flag--yellow { background: var(--yellow); color: var(--ink); }
 .flag--sky { background: var(--sky); color: var(--ink); }
 .flag--sand { background: var(--sand); color: var(--red); }
-.bunting__knot { width: calc(72px * var(--fs)); height: calc(72px * var(--fs)); margin: calc(-36px * var(--fs)) 0 0 calc(-36px * var(--fs)); background: #fff; box-shadow: 0 0 0 3px var(--red); transform-origin: 50% 50%; animation: knot-sway 6s ease-in-out infinite alternate; }
+.bunting__knot { width: calc(68px * var(--fs)); height: calc(68px * var(--fs)); margin: calc(-34px * var(--fs)) 0 0 calc(-34px * var(--fs)); background: #fff; box-shadow: 0 0 0 3px var(--red); transform-origin: 50% 50%; animation: knot-sway 6s ease-in-out infinite alternate; }
 .bunting__knot::before { display: none; }
 .bunting__knot img { width: 80%; height: auto; }
 @keyframes flag-sway { 0%, 100% { transform: rotate(-7deg) skewX(2deg); } 50% { transform: rotate(7deg) skewX(-2deg); } }
@@ -390,6 +390,8 @@
 /* buttons sit above the strings */
 .bhero .hero__ctas .btn--line-dark { background: #fff; }
 .bhero .hero__ctas .btn--line-dark:hover { background: var(--ink); }
-/* the canopy needs width; phones and small tablets get a clean hero */
+/* the bunting needs width; phones and small tablets get a clean hero */
 @media (max-width: 900px) { .bhero .bunting { display: none; } }
 @media (prefers-reduced-motion: reduce) { .flag, .bunting__row, .bunting__knot { animation: none; } }
+/* home: the centre medallion is the logo, so the header mark steps aside (it stays on phones and inner pages) */
+@media (min-width: 901px) { .bhero .top .pill--logo { visibility: hidden; } }

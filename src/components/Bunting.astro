@@ -1,51 +1,50 @@
 ---
 /**
- * Festival bunting, mela-canopy style: strings radiate from one knot near the top of the hero
- * (the Kitab Utsav logo sits on the knot), rising to the top edge and falling to the left and
- * right edges. Flags alternate between pennants and round medallions and spell किताब उत्सव and
- * राजकमल, one akshara each, reading outward from the knot. Everything sways gently.
- * Coordinates are percentages of the hero box; the strings are cubic Béziers starting at the knot.
+ * Festival bunting across the top of the hero: a round logo medallion hangs in the centre and
+ * two strings swag up to the left and two to the right. Flags alternate between pennants and
+ * round medallions and carry one Hindi akshara each (किताब उत्सव, राजकमल), reading outward from
+ * the centre. Everything sways gently. Coordinates are percentages of the band.
  * Purely decorative (aria-hidden); the motion stops for prefers-reduced-motion.
  */
 const seg = new Intl.Segmenter("hi", { granularity: "grapheme" });
 const aksharas = (s: string) => [...seg.segment(s.replace(/\s/g, ""))].map((x) => x.segment);
 
 type Pt = [number, number];
-const knot: Pt = [48, 21];
-const strands: { c1: Pt; c2: Pt; end: Pt; text: string; mobile?: boolean }[] = [
-  { c1: [40, 25], c2: [33, 18], end: [28, -2], text: "किताब", mobile: true },
-  { c1: [60, 28], c2: [67, 18], end: [66, -2], text: "उत्सव", mobile: true },
-  { c1: [58, 38], c2: [80, 62], end: [101, 72], text: "राजकमल" },
-  { c1: [55, 45], c2: [68, 72], end: [85, 82], text: "किताब उत्सव" },
-  { c1: [40, 40], c2: [25, 68], end: [-1, 76], text: "राजकमल" },
-  { c1: [44, 52], c2: [22, 86], end: [-1, 97], text: "किताब उत्सव" },
+const knot: Pt = [50, 72];
+// end point on the top edge and how far the string sags below the straight line
+const strands: { end: Pt; sag: number; text: string; from: number }[] = [
+  { end: [17, -4], sag: 36, text: "किताब उत्सव", from: 0.3 },
+  { end: [35, -4], sag: 10, text: "किताब", from: 0.24 },
+  { end: [65, -4], sag: 10, text: "उत्सव", from: 0.24 },
+  { end: [80, -4], sag: 36, text: "राजकमल", from: 0.3 },
 ];
 const tones = ["red", "saffron", "blue", "yellow", "sky", "sand"];
 
-const bez = (t: number, a: Pt, b: Pt, c: Pt, d: Pt): Pt => {
+// quadratic Bézier from the knot to the end, control point pulled down by `sag`
+const q = (t: number, a: Pt, c: Pt, b: Pt): Pt => {
   const u = 1 - t;
-  return [0, 1].map((k) => u * u * u * a[k] + 3 * u * u * t * b[k] + 3 * u * t * t * c[k] + t * t * t * d[k]) as Pt;
+  return [0, 1].map((k) => u * u * a[k] + 2 * u * t * c[k] + t * t * b[k]) as Pt;
 };
 
 const rows = strands.map((s, r) => {
+  const ctrl: Pt = [(knot[0] + s.end[0]) / 2, Math.max(knot[1], s.end[1]) + s.sag];
   const glyphs = aksharas(s.text);
   const n = glyphs.length;
   const flags = glyphs.map((g, i) => {
-    const t = 0.14 + (0.8 * (i + 0.5)) / n;
-    const [x, y] = bez(t, knot, s.c1, s.c2, s.end);
+    const t = s.from + ((0.93 - s.from) * (i + 0.5)) / n;
+    const [x, y] = q(t, knot, ctrl, s.end);
     return { g, x, y, round: (i + r) % 2 === 1, tone: tones[(i + r * 2) % tones.length], d: ((i * 37 + r * 11) % 23) / 10, dur: 3.2 + ((i * 13 + r) % 9) / 5 };
   });
-  const path = `M${knot.join(",")} C${s.c1.join(",")} ${s.c2.join(",")} ${s.end.join(",")}`;
-  return { ...s, flags, path };
+  return { flags, path: `M${knot.join(",")} Q${ctrl.join(",")} ${s.end.join(",")}` };
 });
 const pct = (n: number) => `${n.toFixed(2)}%`;
 ---
 <div class="bunting" aria-hidden="true">
   <svg class="bunting__strings" viewBox="0 0 100 100" preserveAspectRatio="none">
-    {rows.map((row) => <path class:list={[!row.mobile && "bunting--desk"]} d={row.path} vector-effect="non-scaling-stroke" />)}
+    {rows.map((row) => <path d={row.path} vector-effect="non-scaling-stroke" />)}
   </svg>
   {rows.map((row, r) => (
-    <div class:list={["bunting__row", `bunting__row--${r}`, !row.mobile && "bunting--desk"]}>
+    <div class:list={["bunting__row", `bunting__row--${r}`]}>
       {row.flags.map((f) => (
         <span
           class:list={["flag", f.round ? "flag--round" : "flag--pennant", `flag--${f.tone}`]}
