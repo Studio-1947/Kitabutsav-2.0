@@ -41,6 +41,10 @@ const title = hi
 const description = hi
   ? `किताब उत्सव: किताबों, पाठकों और लेखकों के संवाद का उत्सव। ${up ? `राजकमल प्रकाशन समूह के इस उत्सव का अगला पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}।` : `हाल का पड़ाव ${fe.city.hi}, ${formatRange(fe, "hi")}; अगले शहर की घोषणा जल्द।`} पाठ, बातचीत, चर्चा, लोकार्पण और पुस्तक प्रदर्शनी।`
   : `Kitab Utsav is Rajkamal Prakashan's five-day Hindi book and literature festival. ${up ? `Next stop: ${fe.city.en}, ${formatRange(fe, "en")}.` : `Most recently in ${fe.city.en}, ${formatRange(fe, "en")}; next city announcing soon.`} Readings, conversations, book launches and a book exhibition.`;
+// Hero city rotates through every city the festival has visited (latest edition per city first).
+const metaOf = (e: (typeof editions)[number]) => `${formatRange(e, lang)}${e.venue ? ` · ${e.venue[lang].split(",")[0]}, ${e.city[lang]}` : ""}`;
+const heroCities = [fe, ...byDate.filter((e) => e.city.en !== fe.city.en)]
+  .filter((e, i, all) => all.findIndex((x) => x.city.en === e.city.en) === i);
 const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : [];
 ---
 
@@ -49,11 +53,21 @@ const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : []
     <section class="bhero">
       <BoldHeader lang={lang} altHref={altHref} />
       <div class="hero__foot">
-        <h1 class="hero__title">
-          <span class="sr">{hi ? "किताब उत्सव " : "Kitab Utsav "}</span>
-          <span>{fe.city[lang]}</span>
-        </h1>
-        <p class="hero__meta">{formatRange(fe, lang)}{fe.venue ? ` · ${fe.venue[lang].split(",")[0]}, ${fe.city[lang]}` : ""}</p>
+        <div class="hero__line">
+          <h1 class="hero__title">
+            <span class="sr">{hi ? "किताब उत्सव " : "Kitab Utsav "}</span>
+            <span class="hero__city" data-rotate>
+              {heroCities.map((e, i) => (
+                <span class:list={["hero__word", i === 0 && "is-on"]} data-meta={metaOf(e)} aria-hidden={i ? "true" : undefined}>{e.city[lang]}</span>
+              ))}
+            </span>
+          </h1>
+          <div class="hero__arrows">
+            <button type="button" class="hero__arrow" data-rotate-prev aria-label={hi ? "पिछला शहर" : "Previous city"}><Icon name="arrowLeft" size={24} /></button>
+            <button type="button" class="hero__arrow" data-rotate-next aria-label={hi ? "अगला शहर" : "Next city"}><Icon name="arrowRight" size={24} /></button>
+          </div>
+        </div>
+        <p class="hero__meta" data-rotate-meta aria-live="off">{metaOf(fe)}</p>
         <div class="hero__ctas">
           <a class="btn btn--red" href={seat}>{s.bookSeat}<Icon name="arrowUpRight" size={20} /></a>
           <a class="btn btn--line btn--line-dark" href={L("/programme/")}>{s.upcomingEvents}</a>
@@ -159,5 +173,31 @@ const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : []
       </ul>
       <a class="under under--light" href={L("/partners/")}>{hi ? `सभी ${partners.length} साथी` : `All ${partners.length} partners`}</a>
     </section>
+  <script is:inline>
+    /* Hero: cycle the city name (and its date + venue line) through every festival city. */
+    (function () {
+      var box = document.querySelector("[data-rotate]");
+      var meta = document.querySelector("[data-rotate-meta]");
+      if (!box) return;
+      var still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var words = box.querySelectorAll(".hero__word"), i = 0, timer;
+      if (words.length < 2) return;
+      function show(n) {
+        var cur = words[i], next = words[(i = (n + words.length) % words.length)];
+        if (cur === next) return;
+        cur.classList.remove("is-on"); cur.classList.add("is-out");
+        setTimeout(function () { cur.classList.remove("is-out"); }, 600);
+        next.classList.add("is-on");
+        if (meta) { meta.classList.add("is-fade"); setTimeout(function () { meta.textContent = next.getAttribute("data-meta"); meta.classList.remove("is-fade"); }, 250); }
+      }
+      function play() { clearInterval(timer); if (!still) timer = setInterval(function () { show(i + 1); }, 2600); }
+      var prev = document.querySelector("[data-rotate-prev]"), nxt = document.querySelector("[data-rotate-next]");
+      prev && prev.addEventListener("click", function () { show(i - 1); play(); });
+      nxt && nxt.addEventListener("click", function () { show(i + 1); play(); });
+      box.addEventListener("mouseenter", function () { clearInterval(timer); });
+      box.addEventListener("mouseleave", play);
+      play();
+    })();
+  </script>
 </Base>
 
