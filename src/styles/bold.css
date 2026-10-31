@@ -473,3 +473,5 @@
 @media (prefers-reduced-motion: reduce) { .hero__titlecloud { animation: none; } }
 /* English buttons are wider; the small cloud by them steps out */
 :lang(en) .cloud--d { display: none; }
+/* the skyline stops at the character (nothing to the right of it, behind the tree) */
+.hero__skyline { clip-path: inset(0 calc(.96% + .42 * min(1080px, 66vw)) 0 0); }
