@@ -1,0 +1,48 @@
+---
+/**
+ * Festival bunting: strings of pennant flags, each carrying one Hindi akshara, hanging across the
+ * hero and swaying gently as if in a breeze. Purely decorative (aria-hidden); the motion stops for
+ * prefers-reduced-motion.
+ */
+interface Props { class?: string }
+const { class: klass } = Astro.props;
+
+const seg = new Intl.Segmenter("hi", { granularity: "grapheme" });
+const aksharas = (s: string) => [...seg.segment(s)].map((x) => x.segment);
+
+// Two strings, each a gentle parabola (y in % of the band height) spanning part of the width.
+const strings = [
+  { text: "किताब उत्सव · साथ जुड़ें साथ पढ़ें", from: 15, to: 103, top: 0, sag: 62, size: 1 },
+  { text: "पाठ बातचीत चर्चा लोकार्पण", from: 52, to: 104, top: 0, sag: 34, size: 0.82 },
+];
+const tones = ["red", "saffron", "blue", "yellow", "sky", "sand"];
+
+const rows = strings.map((s, r) => {
+  const glyphs = aksharas(s.text);
+  const n = glyphs.length;
+  const flags = glyphs.map((g, i) => {
+    const t = (i + 0.5) / n;
+    const x = s.from + (s.to - s.from) * t;
+    const y = s.top + s.sag * 4 * t * (1 - t);
+    return { g: g.trim() && g !== "·" ? g : "", x, y, tone: tones[(i + r * 2) % tones.length], d: ((i * 37 + r * 11) % 23) / 10, dur: 3.2 + ((i * 13 + r) % 9) / 5 };
+  });
+  // the string itself, sampled along the same parabola
+  const pts = Array.from({ length: 41 }, (_, k) => {
+    const t = k / 40;
+    return `${(s.from + (s.to - s.from) * t).toFixed(2)},${(s.top + s.sag * 4 * t * (1 - t)).toFixed(2)}`;
+  });
+  return { ...s, flags, path: `M${pts.join(" L")}` };
+});
+---
+<div class:list={["bunting", klass]} aria-hidden="true">
+  {rows.map((row, r) => (
+    <div class:list={["bunting__row", `bunting__row--${r}`]} style={`--fs:${row.size}`}>
+      <svg class="bunting__string" viewBox="0 0 100 100" preserveAspectRatio="none"><path d={row.path} vector-effect="non-scaling-stroke" /></svg>
+      {row.flags.map((f) => (
+        <span class:list={["flag", `flag--${f.tone}`]} style={`left:${f.x.toFixed(2)}%;top:${f.y.toFixed(2)}%;--d:-${f.d}s;--dur:${f.dur.toFixed(2)}s`} lang="hi">
+          <b>{f.g}</b>
+        </span>
+      ))}
+    </div>
+  ))}
+</div>

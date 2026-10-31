@@ -360,3 +360,29 @@
 .hero__upnext .hero__word { grid-area: 1 / 1; justify-self: start; width: max-content; opacity: 0; transform: translateY(100%); transition: opacity .35s ease, transform .5s cubic-bezier(.22,1,.36,1); }
 .hero__upnext .hero__word.is-on { opacity: 1; transform: none; }
 .hero__upnext .hero__word.is-out { opacity: 0; transform: translateY(-100%); }
+
+/* hero bunting: Hindi letter flags swaying in the breeze (src/components/Bunting.astro) */
+.bhero .bunting { position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: clamp(110px, 9.5vw, 140px); pointer-events: none; }
+.bunting__row { position: absolute; inset: 0; animation: bunting-bob 7s ease-in-out infinite alternate; }
+.bunting__row--1 { animation-duration: 8.5s; animation-delay: -3s; }
+.bunting__string { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.bunting__string path { fill: none; stroke: #c9b78a; stroke-width: 1.5; }
+.flag { position: absolute; display: grid; justify-items: center; width: calc(36px * var(--fs)); height: calc(48px * var(--fs)); margin-left: calc(-18px * var(--fs)); padding-top: calc(5px * var(--fs)); clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%); transform-origin: 50% 0; animation: flag-sway var(--dur, 4s) ease-in-out var(--d, 0s) infinite; }
+.flag b { font: 700 calc(1.15rem * var(--fs))/1.2 var(--display); }
+.flag--red { background: var(--red); color: #fff; }
+.flag--saffron { background: var(--saffron); color: var(--ink); }
+.flag--blue { background: var(--blue); color: var(--cream); }
+.flag--yellow { background: var(--yellow); color: var(--ink); }
+.flag--sky { background: var(--sky); color: var(--ink); }
+.flag--sand { background: var(--sand); color: var(--red); }
+@keyframes flag-sway { 0%, 100% { transform: rotate(-7deg) skewX(2deg); } 50% { transform: rotate(7deg) skewX(-2deg); } }
+@keyframes bunting-bob { from { transform: translateY(0); } to { transform: translateY(7px); } }
+@media (max-width: 720px) {
+  .bhero .bunting { top: 96px; height: 34px; }
+  .bhero .hero__foot { margin-top: 58px; }
+  .flag { width: calc(26px * var(--fs)); height: calc(36px * var(--fs)); margin-left: calc(-13px * var(--fs)); }
+  .flag b { font-size: calc(.85rem * var(--fs)); }
+  .bunting__row--1 { display: none; }
+  .bunting__row--0 { left: -18%; right: -2%; }
+}
+@media (prefers-reduced-motion: reduce) { .flag, .bunting__row { animation: none; } }

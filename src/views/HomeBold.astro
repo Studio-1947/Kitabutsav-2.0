@@ -6,6 +6,7 @@
 import Base from "../layouts/Base.astro";
 import BoldHeader from "../components/BoldHeader.astro";
 import Icon from "../components/Icon.astro";
+import Bunting from "../components/Bunting.astro";
 import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
 import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
@@ -51,6 +52,7 @@ const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : []
     <!-- HERO -->
     <section class="bhero">
       <BoldHeader lang={lang} altHref={altHref} />
+      <Bunting />
       <div class="hero__foot">
         <h1 class="hero__title">
           <span class="sr">{hi ? "किताब उत्सव " : "Kitab Utsav "}</span>
