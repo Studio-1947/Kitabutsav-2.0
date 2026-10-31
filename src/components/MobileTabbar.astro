@@ -16,8 +16,7 @@ const tabs = [
 ---
 <nav class="mobile-tabbar" aria-label={lang === "hi" ? "त्वरित नेविगेशन" : "Quick navigation"}>
   <a class:list={["mobile-tab", "mobile-tab--home", { "is-on": on("/") }]} href={localePath(lang, "/")}>
-    <img class="mobile-tab__logo mobile-tab__logo--light" src="/brand/rkp-favicon.svg" alt="" width="20" height="20" />
-    <img class="mobile-tab__logo mobile-tab__logo--dark" src="/brand/rkp-favicon-dark.svg" alt="" width="20" height="20" />
+    <img class="mobile-tab__logo" src="/brand/kitab-utsav-logo.svg" alt="" width="34" height="31" />
     <span>{s.nav.home}</span>
   </a>
   {tabs.map((tb) => (

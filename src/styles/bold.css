@@ -57,7 +57,7 @@
   /* header */
   .top { display: flex; align-items: center; gap: 10px; margin-bottom: clamp(8px, 2vw, 24px); }
   .pill--logo { background: transparent; padding: 0; border-radius: 24px; }
-  .pill--logo img { width: 74px; height: auto; }
+  .pill--logo img { width: 100px; height: auto; }
   .pill--nav { margin-left: auto; background: #f6eedd; gap: 4px; padding: 6px; }
   .pill--nav a { padding: 10px 14px; border-radius: 999px; text-decoration: none; color: var(--ink); }
   .pill--nav a:hover { background: var(--red); color: var(--cream); }
@@ -191,7 +191,7 @@
   @media (max-width: 720px) { .pill--nav a:not(:last-child) { display: none; } }
   @media (max-width: 640px) {
     body { font-size: 16px; }
-    .pill--logo img { width: 58px; }
+    .pill--logo img { width: 74px; }
     .top__book { padding: 14px 16px; font-size: .88rem; }
     .bhero { min-height: 0; padding-bottom: 0; }
     .hero__blob { position: relative; right: auto; width: 128%; max-width: none; margin: 8px -14% 0 -6%; align-self: flex-end; }
@@ -229,6 +229,8 @@
   html .mobile-tabbar, html[data-theme] .mobile-tabbar { background: var(--ink); border: 0; box-shadow: 0 14px 34px -14px rgba(11,46,99,.8); }
   html .mobile-tabbar .mobile-tab { color: var(--cream); font-family: var(--display); font-weight: 600; }
   html .mobile-tabbar .mobile-tab.is-on { background: var(--red); color: #fff; }
+  html .mobile-tabbar .mobile-tab--home, html .mobile-tabbar .mobile-tab--home.is-on { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: #fff; }
+  html .mobile-tabbar .mobile-tab--home .mobile-tab__logo { width: 34px; height: auto; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────

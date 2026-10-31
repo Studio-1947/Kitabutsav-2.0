@@ -20,7 +20,7 @@ const seat = bookSeatUrl ?? L(`/editions/${(nextEdition ?? featuredEdition).slug
 ---
 <header class="top" id="siteHeader">
   <a class="pill pill--logo" href={L("/")} aria-label={`${s.siteName}, ${s.by}`}>
-    <img src="/brand/kitab-utsav-logo.svg" alt="" width="74" height="68" />
+    <img src="/brand/kitab-utsav-logo.svg" alt="" width="100" height="92" />
   </a>
   <nav class="pill pill--nav" aria-label={hi ? "मुख्य नेविगेशन" : "Main navigation"}>
     {nav.map((n) => <a href={n.href} aria-current={n.on ? "page" : undefined}>{n.label}</a>)}

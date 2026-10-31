@@ -50,7 +50,7 @@ const jsonLd = up ? [eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg")] : []
       <BoldHeader lang={lang} altHref={altHref} />
       <div class="hero__foot">
         <h1 class="hero__title">
-          <span class="hero__brand">{hi ? "किताब उत्सव" : "Kitab Utsav"}</span>
+          <span class="sr">{hi ? "किताब उत्सव " : "Kitab Utsav "}</span>
           <span>{fe.city[lang]}</span>
         </h1>
         <p class="hero__meta">{formatRange(fe, lang)}{fe.venue ? ` · ${fe.venue[lang].split(",")[0]}, ${fe.city[lang]}` : ""}</p>
