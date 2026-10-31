@@ -345,3 +345,11 @@
 .top__book svg, .btn svg { transition: transform .25s; }
 .top__book:hover svg, .btn:hover svg, .ag__go:hover svg { transform: translate(2px, -2px); }
 .ag__go { flex-direction: row; gap: 8px; }
+
+/* header: logo left, nav centred, language + book right */
+.top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+.top .pill--logo { justify-self: start; }
+.top .pill--nav { margin: 0; justify-self: center; }
+.top__end { justify-self: end; display: flex; align-items: center; gap: 10px; }
+@media (max-width: 720px) { .top { grid-template-columns: auto 1fr; } .top__end { grid-column: 2; } }
+@media (min-width: 721px) { html .mobile-tabbar { display: none !important; } }
