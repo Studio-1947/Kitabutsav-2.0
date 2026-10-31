@@ -473,5 +473,5 @@
 @media (prefers-reduced-motion: reduce) { .hero__titlecloud { animation: none; } }
 /* English buttons are wider; the small cloud by them steps out */
 :lang(en) .cloud--d { display: none; }
-/* the whole skyline fits between the left edge and where the character starts */
-.hero__skyline { width: calc(103% - min(1080px, 66vw) + 2%); }
+/* zoomed 1.5x on its right end (Sea Link, Gateway): the right edge stays at the character, the left runs off the box */
+.hero__skyline { --zw: calc(1.5 * (105% - min(1080px, 66vw))); width: var(--zw); left: calc(103% - min(1080px, 66vw) - var(--zw)); }
