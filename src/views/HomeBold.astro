@@ -44,7 +44,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
   <main>
@@ -201,7 +201,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
 
 <style is:global>
   :root {
-    --red: #de2026; --ink: #17110f; --cream: #fbf0d9; --blue: #114b9c; --navy: #0b2e63;
+    --red: #de2026; --ink: #0b2e63; --cream: #fbf0d9; --blue: #114b9c; --navy: #0b2e63;
     --saffron: #f2a33a; --sand: #e6cf94; --yellow: #ffe18a; --sky: #8fd0f2; --lilac: #c9b8ff; --lime: #d9f26b;
     --display: "Baloo 2", "Mukta", system-ui, sans-serif;
     --text: "Mukta", "Baloo 2", system-ui, sans-serif;
@@ -222,22 +222,24 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .mega, .big, .hero__title, .cap__t, .names__list a, .foot__nav a, .invite__t, .foot__book, .tile__ini {
     font-family: var(--display); font-weight: 800; letter-spacing: -.01em; text-transform: uppercase;
   }
-  .kick { font: 800 .9rem/1.2 var(--text); text-transform: uppercase; margin: 0 0 18px; }
+  .hero__brand, .names__list a, .foot__nav a, .ag__name, .invite__t { font-weight: 700; }
+  .foot__card p, .ag__date { font-weight: 500; }
+  .kick { font: 600 .9rem/1.2 var(--text); text-transform: uppercase; margin: 0 0 18px; }
   .big { font-size: clamp(2.6rem, 7vw, 6.2rem); line-height: 1.05; margin: 0 0 36px; text-align: center; }
   .big--light { color: var(--cream); }
 
   /* pills + buttons */
-  .pill { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; padding: 10px 20px; text-decoration: none; font: 800 .95rem/1 var(--display); }
+  .pill { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; padding: 10px 20px; text-decoration: none; font: 600 .95rem/1 var(--display); }
   .pill--cream { background: var(--cream); }
   .pill--ink { background: var(--ink); color: var(--cream); }
-  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 64px; padding: 0 32px; border-radius: 999px; text-decoration: none; font: 800 1.05rem/1 var(--display); text-transform: uppercase; white-space: nowrap; transition: transform .25s cubic-bezier(.3,1.6,.5,1), background .2s, color .2s; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 64px; padding: 0 32px; border-radius: 999px; text-decoration: none; font: 600 1.05rem/1 var(--display); text-transform: uppercase; white-space: nowrap; transition: transform .25s cubic-bezier(.3,1.6,.5,1), background .2s, color .2s; }
   .btn:hover { transform: scale(1.06) rotate(-2deg); }
   .btn--ink { background: var(--ink); color: var(--cream); }
   .btn--cream { background: var(--cream); color: var(--ink); }
   .btn--line { border: 3px solid var(--cream); color: var(--cream); }
   .btn--line:hover { background: var(--cream); color: var(--ink); }
   .btn--red { background: var(--red); color: #fff; }
-  .btn--red:hover { background: var(--ink); }
+  .btn--red:hover { background: var(--blue); }
   .btn--line-dark { border-color: var(--ink); color: var(--ink); }
   .btn--line-dark:hover { background: var(--ink); color: #fff; }
 
@@ -249,7 +251,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .pill--nav a { padding: 10px 14px; border-radius: 999px; text-decoration: none; color: var(--ink); }
   .pill--nav a:hover { background: var(--red); color: var(--cream); }
   .top__book { padding: 16px 22px; }
-  .top__book:hover { background: var(--navy); }
+  .top__book:hover { background: var(--blue); }
 
   /* hero */
   .hero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(350px + 0.445 * min(1000px, 62vw)); border-radius: clamp(28px, 5vw, 64px); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
@@ -269,20 +271,21 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .cap { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: clamp(130px, 14vw, 200px); padding: 18px clamp(22px, 4vw, 56px); border-radius: 999px; background: var(--cream); }
   .cap__t { margin: 0; font-size: clamp(2rem, 5vw, 4.4rem); line-height: 1.05; }
   .cap__t small { font-size: .55em; color: var(--red); }
-  .cap__d { margin: 8px 0 0; font-weight: 700; color: #5a4a40; }
+  .cap__d { margin: 8px 0 0; font-weight: 500; color: #3b5179; }
   .row--lead .cap { background: var(--yellow); }
   .tile { position: relative; overflow: hidden; display: grid; place-items: center; border-radius: 999px; text-decoration: none; min-height: 100%; transition: transform .3s cubic-bezier(.3,1.5,.5,1); }
   .tile:hover { transform: rotate(-3deg) scale(1.02); }
   .tile::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent 0 22px, rgba(255,255,255,.14) 22px 34px); }
   .tile__ini { position: relative; font-size: clamp(4rem, 9vw, 8rem); line-height: 1; transform: translateY(.06em) rotate(-6deg); }
-  .tile__yr { position: absolute; right: 12%; bottom: 16%; padding: 6px 12px; border-radius: 999px; background: var(--ink); color: var(--cream); font: 800 .9rem/1 var(--display); }
+  .tile__yr { position: absolute; right: 12%; bottom: 16%; padding: 6px 12px; border-radius: 999px; background: var(--ink); color: var(--cream); font: 600 .9rem/1 var(--display); }
   .tile--blue { background: var(--blue); color: var(--yellow); }
   .tile--saffron { background: var(--saffron); color: var(--navy); }
   .tile--navy { background: var(--navy); color: var(--saffron); }
+  .tile--navy .tile__yr { background: var(--saffron); color: var(--navy); }
   .tile--sand { background: var(--sand); color: var(--red); }
   .tile--red { background: #b5161c; color: var(--cream); }
   .tile--sky { background: var(--sky); color: var(--navy); }
-  .more { justify-self: center; margin: 12px 0 0; padding: 14px 24px; border-radius: 999px; background: var(--ink); color: var(--cream); text-decoration: none; font: 800 1rem/1 var(--display); text-transform: uppercase; }
+  .more { justify-self: center; margin: 12px 0 0; padding: 14px 24px; border-radius: 999px; background: var(--ink); color: var(--cream); text-decoration: none; font: 600 1rem/1 var(--display); text-transform: uppercase; }
 
   /* waves */
   section.mani, section.agenda, section.names, section.formats { position: relative; padding: clamp(110px, 12vw, 180px) clamp(16px, 4vw, 48px) clamp(80px, 9vw, 130px); }
@@ -293,22 +296,23 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .mani__in { position: relative; max-width: 1100px; margin: 0 auto; }
   .mega { margin: 0 0 30px; font-size: clamp(3.2rem, 10vw, 9rem); line-height: 1.05; color: var(--navy); }
   .totals { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 34px; padding: 0; }
-  .totals li { padding: 12px 22px; border-radius: 999px; background: var(--cream); font: 700 1.05rem/1 var(--display); }
+  .totals li { padding: 12px 22px; border-radius: 999px; background: var(--cream); font: 500 1.05rem/1 var(--display); }
+  .totals b { font-weight: 700; }
   .totals b { font-size: 1.5em; color: var(--red); }
 
   .agenda { background: var(--sky); }
   .agenda .wave path { fill: var(--saffron); }
   .agenda__list { list-style: none; margin: 0 auto; padding: 0; max-width: 1320px; display: grid; gap: 6px; }
   .ag { display: grid; grid-template-columns: 1.1fr 1.1fr .8fr 2fr 1fr; gap: 6px; }
-  .ag__p { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-height: 64px; padding: 8px 16px; border-radius: 999px; background: #fff; font: 800 .92rem/1.15 var(--display); text-transform: uppercase; }
-  .ag__where { font-weight: 600; text-transform: none; }
-  .ag__where b { font-weight: 800; text-transform: uppercase; }
+  .ag__p { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-height: 64px; padding: 8px 16px; border-radius: 999px; background: #fff; font: 600 .92rem/1.15 var(--display); text-transform: uppercase; }
+  .ag__where { font-weight: 500; text-transform: none; }
+  .ag__where b { font-weight: 600; text-transform: uppercase; }
   .ag__tag { background: var(--lilac); }
   .ag__tag--live { background: var(--lime); }
   .ag__name { font-size: clamp(1rem, 1.8vw, 1.5rem); }
   .ag__go { background: var(--ink); color: var(--cream); text-decoration: none; transition: background .2s; }
   .ag__go:hover { background: var(--red); }
-  .under { display: table; margin: 34px auto 0; font: 800 1rem/1 var(--display); text-transform: uppercase; text-underline-offset: 6px; text-decoration-thickness: 3px; }
+  .under { display: table; margin: 34px auto 0; font: 600 1rem/1 var(--display); text-transform: uppercase; text-underline-offset: 6px; text-decoration-thickness: 3px; }
   .under--light { color: var(--cream); }
 
   .names { background: var(--red); text-align: center; color: var(--ink); }
@@ -325,7 +329,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .formats .wave path { fill: var(--red); }
   .ticker { overflow: hidden; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)) 60px; padding: 30px 0; }
   .ticker__t { display: flex; gap: 18px; width: max-content; animation: tick 38s linear infinite; }
-  .sticker { padding: 18px 30px; border-radius: 999px; font: 800 clamp(1.3rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; white-space: nowrap; }
+  .sticker { padding: 18px 30px; border-radius: 999px; font: 700 clamp(1.3rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; white-space: nowrap; }
   .s0 { background: var(--ink); color: var(--lime); transform: rotate(-4deg); }
   .s1 { background: var(--yellow); transform: rotate(3deg); }
   .s2 { background: var(--blue); color: var(--cream); transform: rotate(-2deg); }
@@ -334,7 +338,7 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   @keyframes tick { to { transform: translateX(-50%); } }
   .invite { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 22px; max-width: 1120px; margin: 0 auto; padding: clamp(28px, 4vw, 52px); border-radius: clamp(28px, 5vw, 60px); background: var(--lime); }
   .invite__t { margin: 0 0 8px; font-size: clamp(1.9rem, 4vw, 3.4rem); line-height: 1.1; }
-  .invite p { margin: 0; max-width: 560px; font-weight: 600; }
+  .invite p { margin: 0; max-width: 560px; font-weight: 500; }
 
   .partners { padding: clamp(70px, 8vw, 120px) clamp(16px, 4vw, 48px); background: var(--navy); }
   .logos { list-style: none; margin: 0 auto; padding: 0; max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
@@ -347,14 +351,14 @@ const title = hi ? "किताब उत्सव · बोल्ड डिज
   .foot__nav a { text-decoration: none; font-size: clamp(2rem, 4.6vw, 4rem); line-height: 1.15; }
   .foot__nav a:hover { color: var(--red); }
   .foot__card { padding: clamp(24px, 4vw, 44px); border-radius: clamp(28px, 4vw, 48px); background: var(--ink); color: var(--cream); }
-  .foot__card h3 { margin: 0 0 10px; font: 800 clamp(1.5rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; color: var(--yellow); }
+  .foot__card h3 { margin: 0 0 10px; font: 700 clamp(1.5rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; color: var(--yellow); }
   .foot__pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
   .foot__pills .pill { color: var(--ink); }
   .foot__book { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: clamp(22px, 3vw, 34px) clamp(26px, 4vw, 56px); border-radius: 999px; background: var(--yellow); text-decoration: none; font-size: clamp(1.8rem, 5.4vw, 5rem); line-height: 1; transition: background .2s; }
   .foot__book i { font-style: normal; transition: transform .3s; }
   .foot__book:hover { background: var(--cream); }
   .foot__book:hover i { transform: translateX(10px); }
-  .foot__note { grid-column: 1 / -1; margin: 6px 8px 10px; font-weight: 700; font-size: .85rem; color: var(--cream); }
+  .foot__note { grid-column: 1 / -1; margin: 6px 8px 10px; font-weight: 500; font-size: .85rem; color: var(--cream); }
 
   /* Hindi letters orbiting the cursor over the footer (public/scripts/letters.js) */
   .cursor-letters { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
