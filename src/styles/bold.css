@@ -377,13 +377,13 @@
 .flag--round b { line-height: 1; transform: translateY(.08em); }
 .flag--red { background: var(--red); color: #fff; }
 .flag--saffron { background: var(--saffron); color: var(--ink); }
-.flag--blue { background: var(--blue); color: #fff; }
+.flag--blue { background: var(--blue); color: var(--cream); }
 .flag--yellow { background: var(--yellow); color: var(--ink); }
 .flag--sky { background: var(--sky); color: var(--ink); }
 .flag--sand { background: var(--sand); color: var(--red); }
-.bunting__knot { width: calc(68px * var(--fs)); height: calc(68px * var(--fs)); margin: calc(-34px * var(--fs)) 0 0 calc(-34px * var(--fs)); background: #fff; box-shadow: 0 0 0 3px var(--red); transform-origin: 50% 50%; animation: knot-sway 6s ease-in-out infinite alternate; }
+.bunting__knot { width: calc(112px * var(--fs)); height: calc(112px * var(--fs)); margin: calc(-56px * var(--fs)) 0 0 calc(-56px * var(--fs)); background: #fff; box-shadow: 0 0 0 3px var(--red); transform-origin: 50% 50%; animation: knot-sway 6s ease-in-out infinite alternate; }
 .bunting__knot::before { display: none; }
-.bunting__knot img { width: 80%; height: auto; }
+.bunting__knot img { width: 78%; height: auto; }
 @keyframes flag-sway { 0%, 100% { transform: rotate(-7deg) skewX(2deg); } 50% { transform: rotate(7deg) skewX(-2deg); } }
 @keyframes bunting-bob { from { transform: translateY(0); } to { transform: translateY(6px); } }
 @keyframes knot-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }

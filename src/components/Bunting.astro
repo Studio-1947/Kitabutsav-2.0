@@ -2,7 +2,7 @@
 /**
  * Festival bunting across the top of the hero: a round logo medallion hangs in the centre and
  * two strings swag up to the left and two to the right. Flags alternate between pennants and
- * round medallions, red and blue with white letters, and carry one Hindi akshara each (किताब उत्सव, राजकमल), reading outward from
+ * round medallions in the festival colours, and carry one Hindi akshara each (किताब उत्सव, राजकमल), reading outward from
  * the centre. Everything sways gently. Coordinates are percentages of the band.
  * Purely decorative (aria-hidden); the motion stops for prefers-reduced-motion.
  */
@@ -10,15 +10,15 @@ const seg = new Intl.Segmenter("hi", { granularity: "grapheme" });
 const aksharas = (s: string) => [...seg.segment(s.replace(/\s/g, ""))].map((x) => x.segment);
 
 type Pt = [number, number];
-const knot: Pt = [50, 72];
+const knot: Pt = [50, 66];
 // end point on the top edge and how far the string sags below the straight line
 const strands: { end: Pt; sag: number; text: string; from: number }[] = [
-  { end: [24, -4], sag: 34, text: "किताब उत्सव", from: 0.28 },
-  { end: [37, -4], sag: 10, text: "किताब", from: 0.24 },
-  { end: [63, -4], sag: 10, text: "उत्सव", from: 0.24 },
-  { end: [76, -4], sag: 34, text: "राजकमल", from: 0.28 },
+  { end: [24, -4], sag: 34, text: "किताब उत्सव", from: 0.34 },
+  { end: [37, -4], sag: 10, text: "किताब", from: 0.36 },
+  { end: [63, -4], sag: 10, text: "उत्सव", from: 0.36 },
+  { end: [76, -4], sag: 34, text: "राजकमल", from: 0.34 },
 ];
-const tones = ["red", "blue"];
+const tones = ["red", "saffron", "blue", "yellow", "sky", "sand"];
 
 // quadratic Bézier from the knot to the end, control point pulled down by `sag`
 const q = (t: number, a: Pt, c: Pt, b: Pt): Pt => {
@@ -33,7 +33,7 @@ const rows = strands.map((s, r) => {
   const flags = glyphs.map((g, i) => {
     const t = s.from + ((0.93 - s.from) * (i + 0.5)) / n;
     const [x, y] = q(t, knot, ctrl, s.end);
-    return { g, x, y, round: (i + r) % 2 === 1, tone: tones[(i + r) % tones.length], d: ((i * 37 + r * 11) % 23) / 10, dur: 3.2 + ((i * 13 + r) % 9) / 5 };
+    return { g, x, y, round: (i + r) % 2 === 1, tone: tones[(i + r * 2) % tones.length], d: ((i * 37 + r * 11) % 23) / 10, dur: 3.2 + ((i * 13 + r) % 9) / 5 };
   });
   return { flags, path: `M${knot.join(",")} Q${ctrl.join(",")} ${s.end.join(",")}` };
 });
