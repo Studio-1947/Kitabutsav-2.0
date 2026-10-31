@@ -65,7 +65,7 @@
   .top__book:hover { background: var(--blue); }
 
   /* hero */
-  .bhero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(350px + 0.445 * min(1000px, 62vw)); border-radius: clamp(28px, 5vw, 64px); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
+  .bhero { position: relative; isolation: isolate; margin: var(--g); min-height: calc(350px + 0.445 * min(1000px, 62vw)); border-radius: clamp(14px, 2.5vw, 32px); background: #fff; color: var(--navy); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) clamp(26px, 4vw, 56px); }
   .hero__blob { position: absolute; z-index: -1; right: 1%; bottom: 0; width: min(1000px, 62vw); height: auto; transform-origin: 50% 100%; }
   .hero__foot { display: grid; justify-items: start; gap: 26px; position: relative; padding-left: clamp(8px, 3.2vw, 40px); }
   .hero__title { margin: 0; font-size: clamp(2.8rem, 6.2vw, 6.2rem); line-height: 1; }
@@ -247,12 +247,13 @@
   --ku-shadow: none; --ku-radius: 28px;
   --ku-display: "Baloo 2", "Mukta", system-ui, sans-serif;
   --box-r: clamp(28px, 4vw, 56px);
+  --hero-r: clamp(14px, 2vw, 28px);
 }
 
 /* the header box merges with the page hero below it into one white box */
-.topbox { margin: var(--g) var(--g) 0; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) 0; border-radius: var(--box-r) var(--box-r) 0 0; background: #fff; }
+.topbox { margin: var(--g) var(--g) 0; padding: clamp(14px, 1.8vw, 24px) clamp(22px, 5vw, 64px) 0; border-radius: var(--hero-r) var(--hero-r) 0 0; background: #fff; }
 .topbox .top { margin: 0; }
-.is-inner main > .page-hero:first-child { margin: 0 var(--g); padding: clamp(30px, 4vw, 60px) 0 clamp(40px, 5vw, 76px); border: 0; border-radius: 0 0 var(--box-r) var(--box-r); background: #fff; box-shadow: none; }
+.is-inner main > .page-hero:first-child { margin: 0 var(--g); padding: clamp(30px, 4vw, 60px) 0 clamp(40px, 5vw, 76px); border: 0; border-radius: 0 0 var(--hero-r) var(--hero-r); background: #fff; box-shadow: none; }
 .is-inner main > .page-hero::after { color: rgba(11,46,99,.04); }
 .page-hero h1 { max-width: 16ch; font-family: var(--display); font-weight: 800; font-size: clamp(2.8rem, 7vw, 6rem); line-height: 1.05; letter-spacing: -.01em; color: var(--ink); text-transform: uppercase; }
 .lang-hi .page-hero h1 { line-height: 1.15; }
