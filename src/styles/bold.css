@@ -437,3 +437,5 @@
 /* buttons start where "किताब उत्सव" starts */
 .bhero .hero__ctas { margin-left: calc(-1 * clamp(0px, 2.5vw, 40px) + 3px); }
 @media (max-width: 900px) { .hero__lockup { margin-left: 0; } .bhero .hero__ctas { margin-left: 0; } }
+/* header: menus sit closer to the box edges (home and inner pages) */
+@media (min-width: 901px) { .bhero .top, .topbox .top { margin-inline: calc(-1 * clamp(0px, 2.5vw, 40px)); } }
