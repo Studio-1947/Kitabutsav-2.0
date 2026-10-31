@@ -371,7 +371,7 @@
 .bunting__row--2, .bunting__row--5 { animation-duration: 9.5s; animation-delay: -5s; }
 .flag { position: absolute; display: grid; justify-items: center; transform-origin: 50% 0; animation: flag-sway var(--dur, 4s) ease-in-out var(--d, 0s) infinite; }
 .flag--pennant { width: calc(40px * var(--fs)); height: calc(52px * var(--fs)); margin-left: calc(-20px * var(--fs)); padding-top: calc(6px * var(--fs)); clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%); }
-.flag--round { width: calc(44px * var(--fs)); height: calc(44px * var(--fs)); margin-left: calc(-22px * var(--fs)); margin-top: calc(8px * var(--fs)); align-items: center; border-radius: 50%; }
+.flag--round { width: calc(40px * var(--fs)); height: calc(40px * var(--fs)); margin-left: calc(-20px * var(--fs)); margin-top: calc(8px * var(--fs)); align-items: center; border-radius: 50%; }
 .flag--round::before { content: ""; position: absolute; left: 50%; top: calc(-9px * var(--fs)); width: 1.5px; height: calc(10px * var(--fs)); background: #c9b78a; }
 .flag b { font: 700 calc(1.2rem * var(--fs))/1.2 var(--display); }
 .flag--round b { line-height: 1; transform: translateY(.08em); }

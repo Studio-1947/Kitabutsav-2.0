@@ -1,8 +1,8 @@
 ---
 /**
  * Festival bunting across the top of the hero: a round logo medallion hangs in the centre and
- * two strings swag up to the left and two to the right. Flags alternate between pennants and
- * round medallions in the festival colours, and carry one Hindi akshara each (किताब उत्सव, राजकमल), reading outward from
+ * two strings swag up to the left and two to the right. Flags are round medallions in the festival
+ * colours, and carry one Hindi akshara each (किताब उत्सव, राजकमल), reading outward from
  * the centre. Everything sways gently. Coordinates are percentages of the band.
  * Purely decorative (aria-hidden); the motion stops for prefers-reduced-motion.
  */
@@ -13,10 +13,10 @@ type Pt = [number, number];
 const knot: Pt = [50, 60];
 // end point on the top edge and how far the string sags below the straight line
 const strands: { end: Pt; sag: number; text: string; from: number }[] = [
-  { end: [24, -4], sag: 34, text: "किताब उत्सव", from: 0.4 },
+  { end: [24, -4], sag: 34, text: "किताब उत्सव", from: 0.36 },
   { end: [37, -4], sag: 10, text: "किताब", from: 0.46 },
   { end: [63, -4], sag: 10, text: "उत्सव", from: 0.46 },
-  { end: [76, -4], sag: 34, text: "राजकमल", from: 0.4 },
+  { end: [76, -4], sag: 34, text: "राजकमल", from: 0.38 },
 ];
 const tones = ["red", "saffron", "blue", "yellow", "sky", "sand"];
 
@@ -31,9 +31,9 @@ const rows = strands.map((s, r) => {
   const glyphs = aksharas(s.text);
   const n = glyphs.length;
   const flags = glyphs.map((g, i) => {
-    const t = s.from + ((0.93 - s.from) * (i + 0.5)) / n;
+    const t = s.from + ((0.98 - s.from) * (i + 0.5)) / n;
     const [x, y] = q(t, knot, ctrl, s.end);
-    return { g, x, y, round: (i + r) % 2 === 1, tone: tones[(i + r * 2) % tones.length], d: ((i * 37 + r * 11) % 23) / 10, dur: 3.2 + ((i * 13 + r) % 9) / 5 };
+    return { g, x, y, round: true, tone: tones[(i + r * 2) % tones.length], d: ((i * 37 + r * 11) % 23) / 10, dur: 3.2 + ((i * 13 + r) % 9) / 5 };
   });
   return { flags, path: `M${knot.join(",")} Q${ctrl.join(",")} ${s.end.join(",")}` };
 });
