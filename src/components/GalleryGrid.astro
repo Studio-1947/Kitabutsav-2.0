@@ -13,7 +13,10 @@ const tones = ["blue", "sand", "red", "sky", "orange", "ink"];
     <li class:list={["gallery__item", `gallery__item--${p.shape ?? "square"}`, !p.src && `is-slot tone-${tones[i % tones.length]}`]}>
       <figure>
         {p.src ? (
-          <img src={p.src} alt={p.alt?.[lang] ?? p.caption[lang]} loading="lazy" decoding="async" width={p.w} height={p.h} />
+          <>
+            <img src={p.src} alt={p.alt?.[lang] ?? p.caption[lang]} loading="lazy" decoding="async" width={p.w} height={p.h} />
+            <button type="button" class="gallery__open" aria-label={hi ? `बड़ा देखें: ${p.caption[lang]}` : `View larger: ${p.caption[lang]}`}></button>
+          </>
         ) : (
           <div class="gallery__slot" aria-hidden="true">
             <span class="gallery__kind">{momentLabel[p.moment][lang]}</span>

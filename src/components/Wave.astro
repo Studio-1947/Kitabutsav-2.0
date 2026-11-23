@@ -1,0 +1,44 @@
+---
+/**
+ * Animated wave divider at the top of a coloured section. The fill is the colour of the section
+ * above (set by the parent's `.wave path { fill }` rule), so the wave reads as that section
+ * flowing into this one.
+ *
+ * One wave drifts sideways. It is a periodic curve drawn twice as wide as the box and slid by
+ * exactly one period, so the loop never jumps. Only `transform` animates, which stays cheap on phones; reduced-motion users get
+ * a still wave.
+ */
+interface Props { seed?: number }
+const { seed = 0 } = Astro.props;
+
+const P = 1440; // one period, in viewBox units
+const W = P * 2;
+const H = 120;
+const phase = (seed * 1.7) % (Math.PI * 2);
+
+/** Two harmonics give an uneven, hand-drawn swell instead of a plain sine. */
+const curve = (mid: number, a1: number, a2: number, shift: number) => {
+  const pts: string[] = [];
+  for (let x = 0; x <= W; x += 16) {
+    const t = (x / P) * Math.PI * 2;
+    const y = mid + a1 * Math.sin(t + phase + shift) + a2 * Math.sin(2 * t + phase * 1.3 + shift);
+    pts.push(`${x} ${y.toFixed(1)}`);
+  }
+  return `M0 ${H} L${pts.join(" L")} L${W} ${H} Z`;
+};
+
+const front = curve(62, 30, 12, 0);
+---
+<div class="wave" aria-hidden="true">
+  <svg class="wave__layer wave__layer--front" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"><path d={front} /></svg>
+</div>
+<style>
+  .wave__layer { position: absolute; top: 0; left: 0; width: 200%; height: 100%; will-change: transform; }
+  .wave__layer--front { animation: wave-drift 17s linear infinite; }
+  @keyframes wave-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  /* Phones: the box is narrow, so the same distance covers more screen; slow it down to match. */
+  @media (max-width: 720px) {
+    .wave__layer--front { animation-duration: 24s; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wave__layer { animation: none; } }
+</style>

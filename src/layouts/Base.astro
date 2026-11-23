@@ -2,6 +2,7 @@
 import "../styles/rk-chrome.css";
 import "../styles/site.css";
 import "../styles/bold.css";
+import "../styles/motion.css";
 import BoldHeader from "../components/BoldHeader.astro";
 import BoldFooter from "../components/BoldFooter.astro";
 import MobileTabbar from "../components/MobileTabbar.astro";
@@ -142,6 +143,7 @@ const ld = { "@context": "https://schema.org", "@graph": [...graph, ...jsonLd] }
     <MobileTabbar lang={lang} altHref={altHref} />
     <script is:inline src="/scripts/chrome.js" defer></script>
     <script is:inline src="/scripts/letters.js" data-target=".foot" defer></script>
+    <script is:inline src="/scripts/motion.js" defer></script>
     <script is:inline>
       /* Deep links to a section (e.g. #wall) can land in the wrong place: the browser's
          built-in scroll races against images still loading further down the page, which

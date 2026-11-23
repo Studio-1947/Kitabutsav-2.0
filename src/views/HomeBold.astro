@@ -8,6 +8,7 @@ import BoldHeader from "../components/BoldHeader.astro";
 import Icon from "../components/Icon.astro";
 import Bunting from "../components/Bunting.astro";
 import Landmark from "../components/Landmark.astro";
+import Wave from "../components/Wave.astro";
 import { coverFor, focusOf } from "../data/gallery";
 import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
@@ -33,6 +34,32 @@ const tones = ["blue", "saffron", "navy", "sand", "red", "sky"] as const;
 const headline = ["gulzar", "javed-akhtar", "geetanjali-shree", "piyush-mishra", "raghubir-yadav", "alok-dhanwa", "mridula-garg"]
   .map((slug) => allSpeakers.find((p) => p.slug === slug))
   .filter((p): p is NonNullable<typeof p> => !!p);
+
+/** Decorative barcode for a ticket stub, the same for the same edition on every build. */
+const barcode = (slug: string) => {
+  let h = 7;
+  const bars: [number, number][] = [];
+  for (let x = 0; x < 58; ) {
+    for (const ch of slug) h = (h * 31 + ch.charCodeAt(0) + x) % 9973;
+    const w = 1 + (h % 3);
+    bars.push([x, w]);
+    x += w + 1 + ((h >> 3) % 2);
+  }
+  return bars;
+};
+
+// Letters floating around the manifesto: [akshara, x%, y%, size rem, depth, bob seconds, colour]
+const floaters = ([
+  ["क", 6, 18, 5.5, 1.4, 7, "navy"], ["ता", 88, 14, 4.2, -1, 8.5, "red"], ["ब", 14, 74, 3.6, -1.6, 6.5, "cream"],
+  ["उ", 80, 70, 5, 1.2, 9, "navy"], ["त्स", 3, 46, 3, .8, 7.5, "red"], ["व", 93, 44, 3.4, -.9, 6, "cream"],
+  ["प", 30, 8, 2.6, 1.8, 8, "cream"], ["ढ़", 68, 90, 3, -1.3, 7, "red"], ["सा", 24, 92, 2.4, 1, 9.5, "navy"],
+  ["थ", 72, 6, 2.6, -1.7, 6.8, "navy"],
+] as const).map(([g, x, y, s, d, b, c]) => ({ g, x, y, s, d, b, c }));
+
+// Everyone else who has been on stage, in two rows that drift in opposite directions.
+const others = allSpeakers.filter((p) => !headline.includes(p)).map((p) => p.name[lang]);
+const half = Math.ceil(others.length / 2);
+const marqueeRows = [others.slice(0, half), others.slice(half)];
 
 const formats = hi
   ? ["लेखक से मुलाक़ात", "काव्य-पाठ", "लोकार्पण", "परिचर्चा", "पुस्तक प्रदर्शनी", "दास्तानगोई", "कार्यशाला", "बाल-साहित्य", "हस्ताक्षर"]
@@ -103,8 +130,11 @@ const jsonLd = heroEv ? [heroEv] : [];
 
     <!-- MANIFESTO -->
     <section class="mani">
-      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 40 C240 0 420 90 720 60 C980 34 1160 -10 1440 50 L1440 120 Z" /></svg>
+      <Wave seed={1} />
       <div class="mani__blob" aria-hidden="true"></div>
+      <div class="mani__letters" aria-hidden="true">
+        {floaters.map((f) => <span lang="hi" style={`left:${f.x}%;top:${f.y}%;--fs:${f.s}rem;--depth:${f.d};--bob:${f.b}s;--c:var(--${f.c})`}>{f.g}</span>)}
+      </div>
       <div class="mani__in">
         <p class="kick">{hi ? "राजकमल प्रकाशन समूह का घूमता पुस्तक उत्सव" : "Rajkamal Prakashan's travelling book festival"}</p>
         <h2 class="mega">{tagline[lang]}</h2>
@@ -117,18 +147,31 @@ const jsonLd = heroEv ? [heroEv] : [];
 
     <!-- AGENDA -->
     <section class="agenda">
-      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 70 C300 120 520 10 820 40 C1080 66 1260 110 1440 30 L1440 120 Z" /></svg>
+      <Wave seed={2} />
       <h2 class="big">{hi ? "कब, कहाँ" : "When & where"}</h2>
-      <ol class="agenda__list">
-        {byDate.slice(0, 5).map((e) => {
+      <ol class="tix">
+        {byDate.slice(0, 5).map((e, i) => {
           const live = nextEdition?.slug === e.slug;
+          const cover = coverFor(e.slug);
           return (
-            <li class="ag">
-              <span class="ag__p ag__date">{formatRange(e, lang, true)}</span>
-              <span class="ag__p ag__where"><b>{e.city[lang]}</b>{e.state[lang]}</span>
-              <span class:list={["ag__p", "ag__tag", live && "ag__tag--live"]}>{live ? (hi ? "आगामी" : "Upcoming") : (hi ? "सम्पन्न" : "Past")}</span>
-              <span class="ag__p ag__name">{hi ? `किताब उत्सव ${e.city.hi}` : `Kitab Utsav ${e.city.en}`}</span>
-              <a class="ag__p ag__go" href={live ? seat : L(`/editions/${e.slug}/`)}>{live ? <>{s.bookSeat}<Icon name="arrowUpRight" size={18} /></> : (hi ? "झलकियाँ" : "Highlights")}</a>
+            <li class:list={["tix__item", live && "is-live"]} style={`--tilt:${i % 2 ? .6 : -.6}deg`}>
+              <a class="tix__card" href={live ? seat : L(`/editions/${e.slug}/`)}>
+                <span class="tix__photo" aria-hidden="true">
+                  {cover ? <img src={cover.src} alt="" loading="lazy" decoding="async" width={cover.w} height={cover.h} style={`object-position:${focusOf(cover)}`} /> : <Landmark slug={e.slug} class="tix__art" />}
+                </span>
+                <span class="tix__main">
+                  <span class="tix__kick">{hi ? "किताब उत्सव · प्रवेश" : "Kitab Utsav · Admit one"}</span>
+                  <b class="tix__city">{e.city[lang]}</b>
+                  <span class="tix__state">{e.state[lang]}</span>
+                  <span class="tix__venue">{e.venue ? e.venue[lang].split(",")[0] : (hi ? "स्थान की घोषणा जल्द" : "Venue to be announced")}</span>
+                </span>
+                <span class="tix__stub">
+                  <span class="tix__date">{formatRange(e, lang, true)}</span>
+                  <span class="tix__tag">{live && <i class="tix__dot" aria-hidden="true"></i>}{live ? (hi ? "आगामी" : "Upcoming") : (hi ? "सम्पन्न" : "Past")}</span>
+                  <span class="tix__go">{live ? <>{s.bookSeat}<Icon name="arrowUpRight" size={16} /></> : <>{hi ? "झलकियाँ" : "Highlights"} →</>}</span>
+                  <svg class="tix__code" viewBox="0 0 60 14" preserveAspectRatio="none" aria-hidden="true">{barcode(e.slug).map(([x, w]) => <rect x={x} width={w} height="14" />)}</svg>
+                </span>
+              </a>
             </li>
           );
         })}
@@ -138,21 +181,37 @@ const jsonLd = heroEv ? [heroEv] : [];
 
     <!-- NAMES -->
     <section class="names">
-      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 30 C200 90 460 100 700 50 C960 0 1220 40 1440 90 L1440 120 Z" /></svg>
+      <Wave seed={3} />
       <p class="kick">{hi ? "मंच पर अब तक" : "On our stage so far"}</p>
       <ul class="names__list">
         {headline.map((p, i) => (
           <li style={`--r:${(i % 3) - 1}deg`}>
-            <a href={L(`/resources/#${p.slug}`)}><span>{p.name[lang]}</span><i aria-hidden="true"></i></a>
+            <span class="names__row">
+              <a href={L(`/resources/#${p.slug}`)}><span>{p.name[lang]}</span></a>
+              <button type="button" class="names__more" aria-expanded="false" aria-controls={`nm-${p.slug}`} aria-label={hi ? `${p.name.hi} के बारे में` : `About ${p.name.en}`}><i aria-hidden="true"></i></button>
+            </span>
+            <div class="names__card" id={`nm-${p.slug}`} hidden>
+              <p class="names__role">{p.role[lang]}</p>
+              {p.appearances && (
+                <ul class="names__at" aria-label={hi ? "किताब उत्सव में" : "At Kitab Utsav"}>
+                  {p.appearances.map((a) => <li>{a.edition ? <a href={L(`/editions/${a.edition}/`)}>{a.city[lang]} {a.year}</a> : <span>{a.city[lang]} {a.year}</span>}</li>)}
+                </ul>
+              )}
+            </div>
           </li>
         ))}
       </ul>
+      <div class="marquee" aria-hidden="true">
+        {marqueeRows.map((row) => (
+          <div class="marquee__row">{[...row, ...row].map((n) => <span class="marquee__name">{n}</span>)}</div>
+        ))}
+      </div>
       <a class="btn btn--cream" href={L("/resources/")}>{hi ? `सभी ${allSpeakers.length} नाम` : `All ${allSpeakers.length} names`} →</a>
     </section>
 
     <!-- FORMATS -->
     <section class="formats">
-      <svg class="wave wave--top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L0 80 C260 20 520 20 760 70 C1000 120 1240 60 1440 20 L1440 120 Z" /></svg>
+      <Wave seed={4} />
       <h2 class="big">{hi ? "उत्सव में क्या-क्या" : "What happens"}</h2>
       <div class="ticker" aria-hidden="true">
         <div class="ticker__t">{[...formats, ...formats].map((f, i) => <span class={`bsticker s${i % 5}`}>{f}</span>)}</div>
@@ -163,7 +222,10 @@ const jsonLd = heroEv ? [heroEv] : [];
           <h3 class="invite__t">{hi ? "उत्सव को अपने शहर बुलाएँ" : "Bring the festival to your city"}</h3>
           <p>{hi ? "संस्थान, कॉलेज या साहित्यिक समूह हैं? हमें लिखें, अगला पड़ाव आपका शहर हो सकता है।" : "An institution, college or literary group? Write to us; your city could be the next stop."}</p>
         </div>
-        <a class="btn btn--ink" href={`mailto:${org.email}?subject=${encodeURIComponent("Kitab Utsav in our city")}`}>{hi ? "हमें लिखें" : "Write to us"}</a>
+        <a class="btn btn--ink btn--plane" href={`mailto:${org.email}?subject=${encodeURIComponent("Kitab Utsav in our city")}`}>
+          <svg class="plane" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 11.5 21.5 3 17 21l-5.5-6.2L2 11.5Z" /><path d="M21.5 3 11.5 14.8V20l2.8-3" /></svg>
+          {hi ? "हमें लिखें" : "Write to us"}
+        </a>
       </div>
     </section>
 
