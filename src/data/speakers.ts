@@ -4,7 +4,7 @@
  * The first block has bios condensed from the festival's own announcement posts. The roster
  * below it comes from the festival team's list of everyone who has attended (October 2026):
  * name, role and the editions they joined. Add a `bio` only from a real source. `photo` is
- * optional (put a square portrait in public/speakers/ and reference "/speakers/x.jpg"); without
+ * optional (square portraits in public/speakers/, the first ten from the Kitab Utsav 1.0 site); without
  * one the site draws a name tile, never a stand-in face.
  *
  * Appearances are written as "City Year, City Year". When an edition page exists for that
@@ -51,6 +51,7 @@ const at = (list: string): NonNullable<Speaker["appearances"]> =>
 const featured: Speaker[] = [
   {
     slug: "geetashree",
+    photo: "/speakers/geetashree.webp",
     edition: "bareilly-2026",
     name: { hi: "गीताश्री", en: "Geetashree" },
     role: { hi: "पत्रकार और लेखक", en: "Journalist and writer" },
@@ -62,6 +63,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "sujata",
+    photo: "/speakers/sujata.webp",
     edition: "bareilly-2026",
     name: { hi: "सुजाता", en: "Sujata" },
     role: { hi: "कवि, उपन्यासकार और आलोचक", en: "Poet, novelist and critic" },
@@ -73,6 +75,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "adnan-kafeel-darvesh",
+    photo: "/speakers/adnan-kafeel-darvesh.webp",
     edition: "bareilly-2026",
     name: { hi: "अदनान कफ़ील दरवेश", en: "Adnan Kafeel Darvesh" },
     role: { hi: "कवि", en: "Poet" },
@@ -92,6 +95,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "rajesh-joshi",
+    photo: "/speakers/rajesh-joshi.webp",
     edition: "bhopal-2025",
     name: { hi: "राजेश जोशी", en: "Rajesh Joshi" },
     role: { hi: "कवि, कथाकार और नाटककार", en: "Poet, writer and playwright" },
@@ -100,6 +104,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "shivmurti",
+    photo: "/speakers/shivmurti.webp",
     edition: "bhopal-2025",
     name: { hi: "शिवमूर्ति", en: "Shivmurti" },
     role: { hi: "कथाकार और उपन्यासकार", en: "Story writer and novelist" },
@@ -108,6 +113,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "kumar-ambuj",
+    photo: "/speakers/kumar-ambuj.webp",
     edition: "bhopal-2025",
     name: { hi: "कुमार अम्बुज", en: "Kumar Ambuj" },
     role: { hi: "कवि और आलोचक", en: "Poet and critic" },
@@ -116,6 +122,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "naresh-saxena",
+    photo: "/speakers/naresh-saxena.webp",
     edition: "mumbai-2026",
     name: { hi: "नरेश सक्सेना", en: "Naresh Saxena" },
     role: { hi: "कवि", en: "Poet" },
@@ -124,6 +131,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "geet-chaturvedi",
+    photo: "/speakers/geet-chaturvedi.webp",
     name: { hi: "गीत चतुर्वेदी", en: "Geet Chaturvedi" },
     role: { hi: "कवि और कथाकार", en: "Poet and fiction writer" },
     bio: { hi: "कविता, कहानी और अनुवाद में सक्रिय समकालीन हिन्दी लेखक।", en: "Contemporary Hindi writer working across poetry, fiction and translation." },
@@ -139,6 +147,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "udayan-vajpeyi",
+    photo: "/speakers/udayan-vajpeyi.webp",
     edition: "bhopal-2025",
     name: { hi: "उदयन वाजपेयी", en: "Udayan Vajpeyi" },
     role: { hi: "कवि, निबन्धकार, कथाकार और अनुवादक", en: "Poet, essayist, short story writer and translator" },
@@ -154,6 +163,7 @@ const featured: Speaker[] = [
   },
   {
     slug: "abdul-bismillah",
+    photo: "/speakers/abdul-bismillah.webp",
     edition: "bhopal-2025",
     name: { hi: "अब्दुल बिस्मिल्लाह", en: "Abdul Bismillah" },
     role: { hi: "उपन्यासकार और कथाकार", en: "Novelist and story writer" },

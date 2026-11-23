@@ -547,6 +547,9 @@ nav.chips { margin-top: 26px; }
 .gallery figure:hover img { transform: scale(1.04); }
 .gallery figcaption { position: absolute; inset: auto 0 0; padding: 26px 14px 12px; background: linear-gradient(180deg, transparent, rgba(7,28,73,.72)); color: #fff; font-size: .8rem; font-weight: 700; line-height: 1.35; }
 .gallery figcaption small { font-weight: 500; opacity: .8; }
+.gallery figcaption small a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+/* Long Hindi session titles: keep captions to three lines, two on phones, so the photo stays visible. */
+.gallery__cap { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .gallery__slot { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 6px; padding: 14px; color: var(--g-fg); background: var(--g-bg); background-image: repeating-linear-gradient(135deg, transparent 0 14px, rgba(255,255,255,.08) 14px 16px); }
 .gallery__slot svg { width: 30px; height: 30px; opacity: .55; }
 .gallery__kind { position: absolute; top: 12px; left: 14px; font-family: var(--ku-display); font-size: 1.05rem; font-weight: 800; }
@@ -566,6 +569,7 @@ nav.chips { margin-top: 26px; }
 .gallery-block__head h2 span { color: var(--ku-sand-ink); }
 .gallery-block__head p { margin: 0; flex: 1 1 260px; color: var(--ku-muted); font-size: .92rem; }
 @media (max-width: 900px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 150px; } }
+@media (max-width: 600px) { .gallery figcaption { padding: 22px 10px 8px; font-size: .72rem; } .gallery__cap { -webkit-line-clamp: 2; } .gallery figcaption small { display: none; } }
 @media (max-width: 480px) { .gallery { grid-auto-rows: 132px; gap: 8px; } .gallery__kind { font-size: .9rem; } }
 @media (max-width: 600px) { .gallery__item--square .gallery__soon { display: none; } .gallery__item--square .gallery__slot svg { transform: translateY(-10px); } }
 

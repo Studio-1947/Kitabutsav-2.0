@@ -13,7 +13,7 @@ const tones = ["blue", "sand", "red", "sky", "orange", "ink"];
     <li class:list={["gallery__item", `gallery__item--${p.shape ?? "square"}`, !p.src && `is-slot tone-${tones[i % tones.length]}`]}>
       <figure>
         {p.src ? (
-          <img src={p.src} alt={p.alt?.[lang] ?? p.caption[lang]} loading="lazy" />
+          <img src={p.src} alt={p.alt?.[lang] ?? p.caption[lang]} loading="lazy" decoding="async" width={p.w} height={p.h} />
         ) : (
           <div class="gallery__slot" aria-hidden="true">
             <span class="gallery__kind">{momentLabel[p.moment][lang]}</span>
@@ -21,7 +21,7 @@ const tones = ["blue", "sand", "red", "sky", "orange", "ink"];
             <span class="gallery__soon">{hi ? "फ़ोटो जल्द" : "Photo coming"}</span>
           </div>
         )}
-        <figcaption>{p.caption[lang]}{p.credit && <small> · {p.credit}</small>}</figcaption>
+        <figcaption><span class="gallery__cap">{p.caption[lang]}</span>{p.credit && <small> · {p.href ? <a href={p.href} target="_blank" rel="noopener">{p.credit}</a> : p.credit}</small>}</figcaption>
       </figure>
     </li>
   ))}

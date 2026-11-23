@@ -36,7 +36,9 @@ const ev = eventLd(e, lang, site, og);
 const announced = speakersFor(e.slug);
 const others = editions.filter((x) => x.slug !== e.slug).slice(0, 3);
 const { prev, next } = neighbours(e.slug);
-const photos = galleryFor(e.slug);
+const allPhotos = galleryFor(e.slug);
+// A preview on the edition page (two rows on desktop, four on phones); the full set is in the About gallery.
+const photos = allPhotos.slice(0, 8);
 const label = (x: Edition) => (hi ? `${x.city.hi} ${x.year}` : `${x.city.en} ${x.year}`);
 ---
 <Base lang={lang} route={route} title={title} description={description} crumbs={crumbs} jsonLd={ev ? [ev] : []}>
@@ -116,7 +118,7 @@ const label = (x: Edition) => (hi ? `${x.city.hi} ${x.year}` : `${x.city.en} ${x
       <div class="wrap">
         <div class="section-head">
           <div><p class="eyebrow">{hi ? "गैलरी" : "Gallery"}</p><h2 class="h2" id="photos">{hi ? `${e.city.hi}, तस्वीरों में` : `${e.city.en} in pictures`}</h2></div>
-          <a class="link-more" href={localePath(lang, `/about/#gallery-${e.slug}`)}>{hi ? "पूरी गैलरी" : "Full gallery"}</a>
+          <a class="link-more" href={localePath(lang, `/about/#gallery-${e.slug}`)}>{hi ? `पूरी गैलरी (${allPhotos.length})` : `Full gallery (${allPhotos.length})`}</a>
         </div>
         <GalleryGrid items={photos} lang={lang} />
       </div>

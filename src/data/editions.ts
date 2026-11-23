@@ -197,6 +197,34 @@ export const editions: Edition[] = [
     },
   },
   {
+    slug: "bareilly-2025",
+    city: { hi: "बरेली", en: "Bareilly" },
+    state: { hi: "उत्तर प्रदेश", en: "Uttar Pradesh" },
+    year: 2025,
+    start: "2025-11-05",
+    end: "2025-11-09",
+    venue: {
+      hi: "विंडरमेयर थियेटर, बलवंत सिंह मार्ग, सिविल लाइन्स, बरेली",
+      en: "Windermere Theatre, Balwant Singh Marg, Civil Lines, Bareilly",
+    },
+    address: { street: "Windermere Theatre, Balwant Singh Marg, Civil Lines", locality: "Bareilly", region: "Uttar Pradesh" },
+    mapQuery: "Windermere Theatre, Balwant Singh Marg, Civil Lines, Bareilly",
+    summary: {
+      hi: "5 से 9 नवम्बर 2025, विंडरमेयर थियेटर, सिविल लाइन्स, बरेली। बरेली में किताब उत्सव का पहला संस्करण।",
+      en: "5 to 9 November 2025 at Windermere Theatre, Civil Lines, Bareilly. Kitab Utsav's first edition in Bareilly.",
+    },
+    body: {
+      hi: [
+        "किताब उत्सव पहली बार बरेली पहुँचा, 5 से 9 नवम्बर 2025 को, विंडरमेयर थियेटर, सिविल लाइन्स में। पाँच दिन लेखक-पाठक संवाद, किताबों पर चर्चा, रचना-पाठ और लोकार्पण हुए, साथ में राजकमल प्रकाशन समूह की किताबों की प्रदर्शनी लगी।",
+        "एक सुबह वीरेन डंगवाल के स्मारक पर उनकी कविताओं का पाठ हुआ। मंच पर आए रचनाकारों में मृदुला गर्ग, पुरुषोत्तम अग्रवाल, ख़ालिद जावेद, अखिलेश और उदयन वाजपेयी शामिल थे।",
+      ],
+      en: [
+        "Kitab Utsav came to Bareilly for the first time from 5 to 9 November 2025, at Windermere Theatre, Civil Lines. Five days of writer and reader conversations, book discussions, readings and launches ran alongside an exhibition of books from the Rajkamal Prakashan group.",
+        "One morning was spent reading Viren Dangwal's poems at his memorial. Writers on stage included Mridula Garg, Purushottam Agarwal, Khalid Javed, Akhilesh and Udayan Vajpeyi.",
+      ],
+    },
+  },
+  {
     slug: "bhopal-2025",
     city: { hi: "भोपाल", en: "Bhopal" },
     state: { hi: "मध्य प्रदेश", en: "Madhya Pradesh" },

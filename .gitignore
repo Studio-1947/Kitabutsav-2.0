@@ -3,3 +3,6 @@ dist/
 .astro/
 .env
 .DS_Store
+
+# Previous version of the site (reference only)
+Kitab utsav 1.0/
