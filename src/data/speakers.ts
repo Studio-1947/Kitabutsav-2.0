@@ -17,6 +17,8 @@ export interface Speaker {
   name: L10n;
   role: L10n;
   bio?: L10n;
+  /** A festival photo they appear in, cropped onto them: `focus` is the face (CSS position), `zoom` how close. */
+  stagePhoto?: { src: string; focus: string; zoom: number };
   /** Main edition for this listing. Derived from the latest linked appearance when omitted. */
   edition?: string;
   photo?: string;
@@ -222,7 +224,7 @@ const roster: Row[] = [
   ["hrishikesh-sulabh", "हृषीकेश सुलभ", "Hrishikesh Sulabh", "नाटककार और कथाकार", "Playwright and short story writer", ""],
   ["prabhat-singh", "प्रभात सिंह", "Prabhat Singh", "अनुवादक और पत्रकार", "Translator and journalist", ""],
   ["brijeshwer-singh", "डॉ. बृजेश्वर सिंह", "Dr. Brijeshwer Singh", "हड्डी रोग विशेषज्ञ, समाजसेवी और कला-संरक्षक", "Orthopaedic surgeon, philanthropist and arts patron", ""],
-  ["mridula-garg", "मृदुला गर्ग", "Mridula Garg", "लेखक", "Author", ""],
+  ["mridula-garg", "मृदुला गर्ग", "Mridula Garg", "लेखक", "Author", "Bareilly 2025"],
   ["ravi-singh", "रवि सिंह", "Ravi Singh", "प्रकाशक और साहित्यिक सम्पादक", "Publisher and literary editor", ""],
   ["alka-saraogi", "अलका सरावगी", "Alka Sarawgi", "लेखक", "Author", ""],
   ["atul-tiwari", "अतुल तिवारी", "Atul Tiwari", "पटकथा लेखक, अभिनेता और रंग-निर्देशक", "Screenwriter, actor and theatre director", ""],
@@ -235,6 +237,65 @@ const roster: Row[] = [
   ["asghar-wajahat", "असग़र वजाहत", "Asghar Wajahat", "लेखक", "Author", ""],
 ];
 
+/**
+ * Short bios and festival photos for the headline names on the home page bookshelf.
+ * Bios are condensed from the public record (awards, best-known works); check them with the
+ * festival team before launch. Photos are festival photos they appear in.
+ */
+const headliners: Record<string, Pick<Speaker, "bio" | "stagePhoto">> = {
+  gulzar: {
+    bio: {
+      hi: "हिन्दी-उर्दू के सबसे प्रिय कवियों और गीतकारों में से एक, और फ़िल्मकार। ज्ञानपीठ पुरस्कार (2023), दादासाहेब फाल्के पुरस्कार (2013), और 'जय हो' के लिए ऑस्कर व ग्रैमी से सम्मानित।",
+      en: "One of the best-loved poets and lyricists in Hindi and Urdu, and a filmmaker. Winner of the Jnanpith Award (2023), the Dadasaheb Phalke Award (2013), and an Academy Award and a Grammy for 'Jai Ho'.",
+    },
+    stagePhoto: { src: "/gallery/mumbai-2026/mumbai-2026-188.webp", focus: "47% 28%", zoom: 2 },
+  },
+  "javed-akhtar": {
+    bio: {
+      hi: "कवि, गीतकार और पटकथा लेखक। सलीम ख़ान के साथ 'ज़ंजीर', 'दीवार' और 'शोले' लिखीं; कविता-संग्रह 'लावा' के लिए साहित्य अकादेमी पुरस्कार (2013)। पद्मभूषण (2007)।",
+      en: "Poet, lyricist and screenwriter. With Salim Khan he wrote 'Zanjeer', 'Deewaar' and 'Sholay'; his poetry collection 'Lava' won the Sahitya Akademi Award (2013). Padma Bhushan (2007).",
+    },
+    stagePhoto: { src: "/gallery/mumbai-2026/mumbai-2026-214.webp", focus: "27% 27%", zoom: 1.9 },
+  },
+  "geetanjali-shree": {
+    bio: {
+      hi: "हिन्दी उपन्यासकार और कथाकार। 'रेत समाधि' के डेज़ी रॉकवेल द्वारा किए अनुवाद 'टूम ऑफ़ सैंड' को 2022 का अंतरराष्ट्रीय बुकर पुरस्कार मिला, किसी भारतीय भाषा से अनूदित पहली किताब को। अन्य उपन्यासों में 'माई' और 'हमारा शहर उस बरस'।",
+      en: "Hindi novelist and story writer. 'Ret Samadhi', in Daisy Rockwell's translation 'Tomb of Sand', won the 2022 International Booker Prize, the first book translated from an Indian language to do so. Her other novels include 'Mai' and 'Hamara Shahar Us Baras'.",
+    },
+    stagePhoto: { src: "/gallery/indore-2026/indore-2026-082.webp", focus: "71% 36%", zoom: 2.2 },
+  },
+  "piyush-mishra": {
+    bio: {
+      hi: "अभिनेता, गीतकार, गायक और नाटककार; राष्ट्रीय नाट्य विद्यालय से प्रशिक्षित। 'गुलाल' और 'गैंग्स ऑफ़ वासेपुर' के गीतों और किरदारों के लिए, और अपने बैंड 'बल्लीमारान' के लिए जाने जाते हैं।",
+      en: "Actor, lyricist, singer and playwright, trained at the National School of Drama. Known for the songs and roles of 'Gulaal' and 'Gangs of Wasseypur', and for his band Ballimaaraan.",
+    },
+    // Photo supplied by the site owner (November 2026): at a Rajkamal launch of 'Tumhari Auqaat'.
+    stagePhoto: { src: "/speakers/piyush-mishra.jpg", focus: "54% 26%", zoom: 1.5 },
+  },
+  "raghubir-yadav": {
+    bio: {
+      hi: "अभिनेता, संगीतकार और रंगकर्मी; राष्ट्रीय नाट्य विद्यालय से प्रशिक्षित। 'मैसी साहब' और 'सलाम बॉम्बे' से 'पीपली लाइव' और 'पंचायत' तक, चार दशकों से मंच और परदे पर।",
+      en: "Actor, musician and theatre artist, trained at the National School of Drama. From 'Massey Sahib' and 'Salaam Bombay!' to 'Peepli Live' and 'Panchayat', four decades on stage and screen.",
+    },
+    stagePhoto: { src: "/gallery/bareilly-2026/bareilly-2026-004.webp", focus: "50% 30%", zoom: 1.7 },
+  },
+  "alok-dhanwa": {
+    bio: {
+      hi: "बिहार के कवि, जिनकी लम्बी कविताएँ 'गोली दागो पोस्टर', 'जनता का आदमी' और 'भागी हुई लड़कियाँ' आधुनिक हिन्दी कविता की कसौटी बनीं। कविता-संग्रह 'दुनिया रोज़ बनती है'।",
+      en: "Poet from Bihar whose long poems 'Goli Daago Poster', 'Janta ka Aadmi' and 'Bhaagi Hui Ladkiyan' became touchstones of modern Hindi poetry. His collection is 'Duniya Roz Banti Hai'.",
+    },
+    // Photo supplied by the site owner (November 2026), upscaled 2x with Magnific Precision (photo), which keeps features as they are.
+    stagePhoto: { src: "/speakers/alok-dhanwa.jpg", focus: "52% 30%", zoom: 1.4 },
+  },
+  "mridula-garg": {
+    bio: {
+      hi: "हिन्दी उपन्यासकार, कथाकार और निबन्धकार। उपन्यासों में 'उसके हिस्से की धूप', 'चितकोबरा' और 'कठगुलाब'; 'मिलजुल मन' के लिए साहित्य अकादेमी पुरस्कार (2013)।",
+      en: "Hindi novelist, story writer and essayist. Her novels include 'Uske Hisse ki Dhoop', 'Chittakobra' and 'Kathgulab'; 'Miljul Man' won the Sahitya Akademi Award (2013).",
+    },
+    stagePhoto: { src: "/gallery/bareilly-2025/bareilly-2025-230.webp", focus: "75% 40%", zoom: 2.3 },
+  },
+};
+
 const fromRoster = roster.map(([slug, hi, en, roleHi, roleEn, list]): Speaker => {
   const appearances = at(list);
   return {
@@ -243,6 +304,7 @@ const fromRoster = roster.map(([slug, hi, en, roleHi, roleEn, list]): Speaker =>
     role: { hi: roleHi, en: roleEn },
     edition: [...appearances].reverse().find((a) => a.edition)?.edition,
     ...(appearances.length ? { appearances } : {}),
+    ...headliners[slug],
   };
 });
 

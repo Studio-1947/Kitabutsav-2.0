@@ -11,7 +11,7 @@ import Landmark from "../components/Landmark.astro";
 import Wave from "../components/Wave.astro";
 import { coverFor, focusOf } from "../data/gallery";
 import { bookSeatUrl, org } from "../site.config";
-import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
+import { editions, featuredEdition as fe, nextEdition, type L10n } from "../data/editions";
 import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
 import { partners } from "../data/partners";
 import { formatRange, localePath, t, type Lang } from "../i18n";
@@ -56,14 +56,37 @@ const floaters = ([
   ["थ", 72, 6, 2.6, -1.7, 6.8, "navy"],
 ] as const).map(([g, x, y, s, d, b, c]) => ({ g, x, y, s, d, b, c }));
 
+// Book spines for the headline names: height, width, colours and a slight lean, varied like a real shelf.
+const spine = [
+  { h: 360, w: 96, bg: "navy", fg: "yellow", lean: 0 },
+  { h: 320, w: 104, bg: "saffron", fg: "navy", lean: 0 },
+  { h: 384, w: 112, bg: "cream", fg: "red", lean: 0 },
+  { h: 300, w: 92, bg: "sky", fg: "navy", lean: 0 },
+  { h: 348, w: 106, bg: "lime", fg: "navy", lean: 0 },
+  { h: 330, w: 98, bg: "blue", fg: "cream", lean: 0 },
+  { h: 370, w: 108, bg: "lilac", fg: "navy", lean: -4 },
+];
+
 // Everyone else who has been on stage, in two rows that drift in opposite directions.
 const others = allSpeakers.filter((p) => !headline.includes(p)).map((p) => p.name[lang]);
 const half = Math.ceil(others.length / 2);
 const marqueeRows = [others.slice(0, half), others.slice(half)];
 
-const formats = hi
-  ? ["लेखक से मुलाक़ात", "काव्य-पाठ", "लोकार्पण", "परिचर्चा", "पुस्तक प्रदर्शनी", "दास्तानगोई", "कार्यशाला", "बाल-साहित्य", "हस्ताक्षर"]
-  : ["Author meets", "Poetry", "Book launches", "Conversations", "Book exhibition", "Dastangoi", "Workshops", "Children's books", "Signings"];
+// The festival's formats, each with a photo of that kind of session (the same picks and lines
+// as the 1.0 site). `span` sets the tile size in the bento grid; the order is what packs it with no gaps
+// (4 columns on desktop, 2 on phones, where the last tall tile turns wide). `pos` anchors a
+// photo whose heads would otherwise be cropped off the top.
+const formats: { title: L10n; text: L10n; src: string; span: "big" | "wide" | "tall" | "one"; pos?: string }[] = [
+  { span: "big", src: "/gallery/bareilly-2026/bareilly-2026-004.webp", title: { hi: "लेखक से मुलाक़ात", en: "Author meets" }, text: { hi: "लेखकों से आमने-सामने, उनकी किताबों और ज़िंदगी पर बात।", en: "Face to face with writers about their books and lives." } },
+  { span: "one", src: "/gallery/bareilly-2026/bareilly-2026-028.webp", title: { hi: "रचना-पाठ", en: "Readings" }, text: { hi: "कहानियाँ, कविताएँ और गद्य, लेखकों की अपनी आवाज़ में।", en: "Stories, poems and prose in the writers' own voices." } },
+  { span: "one", src: "/gallery/bareilly-2026/bareilly-2026-030.webp", title: { hi: "लोकार्पण", en: "Book launches" }, text: { hi: "नई किताबें, पहली बार पाठकों के बीच।", en: "New titles meeting readers for the first time." } },
+  { span: "wide", src: "/gallery/mumbai-2026/mumbai-2026-195.webp", title: { hi: "परिचर्चा", en: "Conversations" }, text: { hi: "किताबों और हमारे समय के सवालों पर खुली बहस।", en: "Open debate on books and the questions around us." } },
+  { span: "tall", src: "/gallery/bareilly-2026/bareilly-2026-015.webp", title: { hi: "पुस्तक प्रदर्शनी", en: "Book exhibition" }, text: { hi: "राजकमल, राधाकृष्ण, लोकभारती और राजकमल उर्दू की किताबें।", en: "Books from Rajkamal, Radhakrishna, Lokbharti and Rajkamal Urdu." } },
+  { span: "one", src: "/gallery/bareilly-2026/bareilly-2026-018.webp", title: { hi: "दास्तानगोई", en: "Dastangoi" }, text: { hi: "दास्तानगोई, लोक-प्रस्तुतियाँ और काव्य-संध्याएँ।", en: "Dastangoi, folk performances and poetry evenings." } },
+  { span: "one", src: "/gallery/bareilly-2026/bareilly-2026-017.webp", title: { hi: "कार्यशाला", en: "Workshops" }, text: { hi: "लेखन, अनुवाद, रंगमंच और क़िस्सागोई की कार्यशालाएँ।", en: "Writing, translation, theatre and storytelling workshops." } },
+  { span: "tall", src: "/gallery/indore-2026/indore-2026-056.webp", title: { hi: "हस्ताक्षर", en: "Signings" }, text: { hi: "अपनी पसंदीदा किताब पर लेखक के हस्ताक्षर लीजिए।", en: "Get your favourite book signed by its author." } },
+  { span: "wide", pos: "50% 0%", src: "/gallery/patna-2026/patna-2026-140.webp", title: { hi: "बाल-साहित्य", en: "Children's books" }, text: { hi: "नन्हे पाठकों के लिए कहानियाँ, कविताएँ और किताबों से जुड़ी गतिविधियाँ।", en: "Story hours, poems and book activities for young readers." } },
+];
 
 const title = hi
   ? `किताब उत्सव ${fe.year} | राजकमल प्रकाशन समूह का पुस्तक उत्सव`
@@ -182,25 +205,52 @@ const jsonLd = heroEv ? [heroEv] : [];
     <!-- NAMES -->
     <section class="names">
       <Wave seed={3} />
-      <p class="kick">{hi ? "मंच पर अब तक" : "On our stage so far"}</p>
-      <ul class="names__list">
+      <h2 class="big big--light">{hi ? "मंच पर अब तक" : "On our stage so far"}</h2>
+      <div class="shelf" data-shelf>
+        <ul class="shelf__books">
+          {headline.map((p, i) => (
+            <li class="book" style={`--bh:${spine[i].h}px;--bw:${spine[i].w}px;--bg:var(--${spine[i].bg});--fg:var(--${spine[i].fg});--lean:${spine[i].lean}deg`}>
+              <button type="button" class="book__spine" aria-expanded={i === 0 ? "true" : "false"} aria-controls={`bk-${p.slug}`}>
+                <span class="book__title">{p.name[lang]}</span>
+                <span class="book__mark" aria-hidden="true">कि</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div class="shelf__board" aria-hidden="true"></div>
+        <p class="shelf__hint" aria-hidden="true">
+          <span class="shelf__hint--wide">{hi ? "कोई भी किताब खोलकर देखें" : "Pick a book to open it"}</span>
+          <span class="shelf__hint--phone">{hi ? "← खिसकाएँ, किताब पर टैप करें →" : "← swipe the shelf, tap a book →"}</span>
+        </p>
         {headline.map((p, i) => (
-          <li style={`--r:${(i % 3) - 1}deg`}>
-            <span class="names__row">
-              <a href={L(`/resources/#${p.slug}`)}><span>{p.name[lang]}</span></a>
-              <button type="button" class="names__more" aria-expanded="false" aria-controls={`nm-${p.slug}`} aria-label={hi ? `${p.name.hi} के बारे में` : `About ${p.name.en}`}><i aria-hidden="true"></i></button>
-            </span>
-            <div class="names__card" id={`nm-${p.slug}`} hidden>
-              <p class="names__role">{p.role[lang]}</p>
+          <div class="book__open" id={`bk-${p.slug}`} hidden={i !== 0} style={`--bg:var(--${spine[i].bg});--fg:var(--${spine[i].fg})`}>
+            <div class="book__page book__page--l">
+              <figure class="book__photo" aria-hidden="true">
+                {p.stagePhoto ? (
+                  <img src={p.stagePhoto.src} alt="" loading="lazy" decoding="async" style={`object-position:${p.stagePhoto.focus};transform-origin:${p.stagePhoto.focus};transform:scale(${p.stagePhoto.zoom})`} />
+                ) : (
+                  <span class="book__ini" lang="hi">{[...new Intl.Segmenter("hi", { granularity: "grapheme" }).segment(p.name.hi)][0]?.segment}</span>
+                )}
+              </figure>
+              <div class="book__id">
+                <p class="book__kick">{hi ? "मंच पर" : "On stage"}</p>
+                <h3 class="book__name">{p.name[lang]}</h3>
+                <p class="book__role">{p.role[lang]}</p>
+              </div>
+            </div>
+            <div class="book__page book__page--r">
+              {p.bio && <p class="book__bio">{p.bio[lang]}</p>}
+              {p.appearances && <p class="book__kick">{hi ? "किताब उत्सव में" : "At Kitab Utsav"}</p>}
               {p.appearances && (
-                <ul class="names__at" aria-label={hi ? "किताब उत्सव में" : "At Kitab Utsav"}>
+                <ul class="book__at">
                   {p.appearances.map((a) => <li>{a.edition ? <a href={L(`/editions/${a.edition}/`)}>{a.city[lang]} {a.year}</a> : <span>{a.city[lang]} {a.year}</span>}</li>)}
                 </ul>
               )}
+              <a class="book__more" href={L(`/resources/#${p.slug}`)}>{hi ? "पूरा परिचय" : "Full profile"} →</a>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       <div class="marquee" aria-hidden="true">
         {marqueeRows.map((row) => (
           <div class="marquee__row">{[...row, ...row].map((n) => <span class="marquee__name">{n}</span>)}</div>
@@ -213,10 +263,18 @@ const jsonLd = heroEv ? [heroEv] : [];
     <section class="formats">
       <Wave seed={4} />
       <h2 class="big">{hi ? "उत्सव में क्या-क्या" : "What happens"}</h2>
-      <div class="ticker" aria-hidden="true">
-        <div class="ticker__t">{[...formats, ...formats].map((f, i) => <span class={`bsticker s${i % 5}`}>{f}</span>)}</div>
-      </div>
-      <ul class="sr">{formats.map((f) => <li>{f}</li>)}</ul>
+      <ul class="fmts">
+        {formats.map((f, i) => (
+          <li class:list={["fmt", `fmt--${f.span}`]}>
+            <img class="fmt__img" src={f.src} alt="" loading="lazy" decoding="async" style={f.pos && `object-position:${f.pos}`} />
+            <span class="fmt__no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <div class="fmt__body">
+              <h3 class={`fmt__t bsticker s${i % 5}`}>{f.title[lang]}</h3>
+              <p class="fmt__d">{f.text[lang]}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
       <div class="invite">
         <div>
           <h3 class="invite__t">{hi ? "उत्सव को अपने शहर बुलाएँ" : "Bring the festival to your city"}</h3>

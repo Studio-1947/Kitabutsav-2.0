@@ -168,30 +168,128 @@ html.lb-open { overflow: hidden; }
   .tix__code { display: none; }
 }
 
-/* 10. Names: + opens a card; the + turns into a ×. */
-.names__row { display: inline-flex; align-items: center; gap: .3em; font-size: clamp(2.3rem, 7.4vw, 6.4rem); line-height: 1.2; }
-.names__row > a { font-size: 1em; }
-.names__more { flex: none; display: grid; place-items: center; width: .56em; height: .56em; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; font-size: inherit; }
-.names__more i { display: block; width: 100%; height: 100%; }
-.names__more:hover i, .names__row > a:hover + .names__more i { transform: rotate(90deg); background-color: var(--yellow); }
-.names__list li.is-open .names__more i { transform: rotate(135deg); background-color: var(--yellow); }
-.names__more:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
-.names__card { max-width: 520px; margin: 4px auto 18px; padding: 16px 20px; border-radius: 22px; background: var(--cream); color: var(--ink); font: 500 1rem/1.4 var(--display, sans-serif); text-align: center; transform-origin: 50% 0; animation: card-pop .45s cubic-bezier(.34, 1.56, .64, 1); }
-.names__card[hidden] { display: none; }
-@keyframes card-pop { from { opacity: 0; transform: translateY(-10px) scale(.92); } }
-.names__role { margin: 0 0 10px; font-weight: 700; color: var(--red); }
-.names__at { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.names__at a, .names__at span { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--ink); color: var(--cream); font-size: .85rem; text-decoration: none; }
-.names__at a:hover { background: var(--blue); }
-.names__at li { transform: none; }
-.names__at a, .names__at a:hover { color: var(--cream); line-height: 1.2; }
-
-/* 11. What happens: stickers pop under the mouse and the ticker waits. */
-.bsticker { transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+/* 10. Names as a bookshelf. Spines lift on hover; the open one stands proud and its book opens
+       below the shelf as a two-page spread. Phones: the shelf scrolls sideways. */
+.names .scribble path { stroke: var(--yellow); }
+.names .big { margin-bottom: clamp(28px, 4vw, 48px); }
+.shelf { max-width: 1100px; margin: 0 auto 56px; }
+.shelf__books { display: flex; align-items: flex-end; justify-content: center; gap: 6px; margin: 0; padding: 40px 12px 0; list-style: none; }
+.book { flex: none; transform-origin: 50% 100%; rotate: var(--lean); }
+.book__spine { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: var(--bw); height: var(--bh); padding: 22px 0 16px; border: 0; border-radius: 6px 6px 3px 3px; background: var(--bg); color: var(--fg); cursor: pointer;
+  /* rounded spine shading and two printed bands */
+  background-image:
+    linear-gradient(90deg, rgba(0,0,0,.16), transparent 18%, rgba(255,255,255,.14) 42%, transparent 60%, rgba(0,0,0,.18)),
+    linear-gradient(var(--fg), var(--fg)), linear-gradient(var(--fg), var(--fg));
+  background-size: 100% 100%, 70% 3px, 70% 3px;
+  background-position: 0 0, 50% 12px, 50% calc(100% - 48px);
+  background-repeat: no-repeat;
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,.12), 0 2px 0 rgba(0,0,0,.08);
+  transition: translate .45s cubic-bezier(.34, 1.56, .64, 1), rotate .45s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s; }
+/* Long names wrap into a second line down the spine instead of being cut off. */
+.book__title { writing-mode: vertical-rl; max-height: calc(var(--bh) - 96px); font: 800 clamp(1.3rem, 2vw, 1.85rem)/1.02 var(--display); text-align: center; text-transform: uppercase; letter-spacing: .02em; text-wrap: balance; }
+.book__mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 2px solid currentColor; font: 800 .85rem/1 var(--display); }
 @media (hover: hover) and (pointer: fine) {
-  .ticker:hover .ticker__t { animation-play-state: paused; }
-  .bsticker:hover { transform: rotate(0) scale(1.14); }
+  .book__spine:hover { translate: 0 -10px; rotate: -1.5deg; box-shadow: inset 0 -6px 0 rgba(0,0,0,.12), 0 18px 24px rgba(7, 28, 73, .25); }
 }
+/* The open book stays on the shelf and carries a ribbon bookmark over its top edge. */
+.book__spine::after { content: ""; position: absolute; top: 0; right: 10px; width: 14px; height: 0; background: var(--red); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 7px), 0 100%); transition: height .35s cubic-bezier(.34, 1.56, .64, 1); }
+.book.is-open .book__spine::after { height: 46px; }
+.book.is-open .book__spine { box-shadow: inset 0 -6px 0 rgba(0,0,0,.12), 0 0 0 3px var(--cream); }
+.book__spine:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
+.shelf__board { position: relative; height: 22px; margin: 0 auto; border-radius: 6px; background: linear-gradient(#8a4b2a, #6b3720); box-shadow: 0 12px 0 rgba(0,0,0,.18); }
+.shelf__board::before, .shelf__board::after { content: ""; position: absolute; top: 100%; width: 22px; height: 26px; background: #5a2e1a; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.shelf__board::before { left: 8%; }
+.shelf__board::after { right: 8%; transform: scaleX(-1); }
+
+.shelf__hint { margin: 22px 0 0; font: 600 .85rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--cream); opacity: .8; }
+.shelf__hint--phone { display: none; }
+
+/* the open book */
+.book__open { display: grid; grid-template-columns: 1fr 1fr; max-width: 880px; margin: 22px auto 0; perspective: 1400px; color: var(--ink); text-align: left; }
+.book__open[hidden] { display: none; }
+.book__page { padding: clamp(20px, 3vw, 34px); background: var(--cream); min-height: 210px; }
+.book__page--l { border-radius: 18px 4px 4px 18px; box-shadow: inset -18px 0 24px -18px rgba(0,0,0,.25); border-left: 10px solid var(--bg); transform-origin: 100% 50%; animation: page-l .6s cubic-bezier(.22, 1, .36, 1); }
+.book__page--r { border-radius: 4px 18px 18px 4px; box-shadow: inset 18px 0 24px -18px rgba(0,0,0,.25); border-right: 10px solid var(--bg); transform-origin: 0 50%; animation: page-r .7s cubic-bezier(.22, 1, .36, 1); }
+@keyframes page-l { from { transform: rotateY(60deg); opacity: 0; } }
+@keyframes page-r { from { transform: rotateY(-100deg); opacity: 0; } }
+/* Left page: the photo pasted in at a slight angle, with the name beside it. Right page: the bio. */
+.book__page--l { display: grid; grid-template-columns: minmax(120px, 42%) 1fr; align-items: center; gap: clamp(16px, 2vw, 24px); }
+.book__photo { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border: 5px solid #fff; border-radius: 12px; background: var(--bg); box-shadow: 0 8px 18px rgba(7, 28, 73, .22); rotate: -3deg; }
+.book__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.book__ini { display: grid; place-items: center; height: 100%; color: var(--fg); font: 800 clamp(3.4rem, 6vw, 5rem)/1 var(--display); }
+.book__bio { margin: 0 0 18px; font-size: .98rem; line-height: 1.6; }
+.book__kick { margin: 0 0 8px; font: 600 .75rem/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--red); }
+.book__name { margin: 0 0 10px; font: 800 clamp(1.6rem, 2.8vw, 2.4rem)/1.05 var(--display); color: var(--navy); }
+.book__role { margin: 0; font-weight: 600; }
+.book__at { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; padding: 0; list-style: none; }
+.book__at a, .book__at span { display: inline-block; padding: 7px 13px; border-radius: 999px; background: var(--ink); color: var(--cream); font: 600 .85rem/1 var(--display); text-decoration: none; transition: background .2s; }
+.book__at a:hover { background: var(--blue); }
+.book__more { font: 700 .95rem/1 var(--display); color: var(--red); text-underline-offset: 5px; }
+
+
+@media (max-width: 720px) {
+  .shelf { margin-bottom: 40px; }
+  .shelf__books { justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; padding: 44px 20px 0; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)); }
+  .shelf__books::-webkit-scrollbar { display: none; }
+  .shelf__books { -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent); mask-image: linear-gradient(90deg, #000 82%, transparent); }
+  .shelf__hint--wide { display: none; }
+  .shelf__hint--phone { display: inline; }
+  .shelf__hint { margin-top: 18px; font-size: .75rem; }
+  .book { scroll-snap-align: center; }
+  .book__spine { width: calc(var(--bw) * .72); height: calc(var(--bh) * .66); padding: 16px 0 12px; background-position: 0 0, 50% 9px, 50% calc(100% - 40px); }
+  .book__title { font-size: 1.05rem; max-height: calc(var(--bh) * .66 - 76px); }
+  .book__mark { width: 24px; height: 24px; font-size: .7rem; }
+  .shelf__board { margin: 0 calc(-1 * clamp(16px, 4vw, 48px)); border-radius: 0; }
+  .shelf__board::before, .shelf__board::after { display: none; }
+  .book__open { grid-template-columns: 1fr; margin-top: 30px; }
+  .book__page { min-height: 0; }
+  .book__page--l { grid-template-columns: 112px 1fr; gap: 16px; }
+  .book__bio { font-size: .92rem; }
+  .book__page--l { border-radius: 18px 18px 4px 4px; border-left: 0; border-top: 10px solid var(--bg); box-shadow: inset 0 -18px 24px -18px rgba(0,0,0,.2); transform-origin: 50% 100%; animation-name: page-t; }
+  .book__page--r { border-radius: 4px 4px 18px 18px; border-right: 0; border-bottom: 10px solid var(--bg); box-shadow: inset 0 18px 24px -18px rgba(0,0,0,.2); transform-origin: 50% 0; animation-name: page-b; }
+  @keyframes page-t { from { transform: rotateX(-50deg); opacity: 0; } }
+  @keyframes page-b { from { transform: rotateX(80deg); opacity: 0; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .book__page { animation: none !important; }
+  .book__spine { transition: none; }
+}
+
+/* 11. What happens: a bento grid of photo tiles, one per format. The title is a sticker; on
+       desktop the line about it slides up on hover, on touch screens it is always shown. */
+.fmts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(170px, 16vw, 232px); grid-auto-flow: dense; gap: 14px; max-width: 1240px; margin: 0 auto 64px; padding: 0; list-style: none; }
+.fmt--big { grid-column: span 2; grid-row: span 2; }
+.fmt--wide { grid-column: span 2; }
+.fmt--tall { grid-row: span 2; }
+.fmt { position: relative; isolation: isolate; overflow: hidden; border-radius: var(--r-lg); background: var(--navy); }
+.fmt__img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.22, 1, .36, 1); }
+.fmt::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(7, 28, 73, 0) 35%, rgba(7, 28, 73, .78)); transition: opacity .4s; }
+.fmt__no { position: absolute; top: 14px; left: 14px; padding: 6px 10px; border-radius: 999px; background: rgba(7, 28, 73, .6); color: var(--cream); font: 700 .8rem/1 var(--display); letter-spacing: .06em; }
+.fmt__body { position: absolute; inset: auto 0 0; display: grid; grid-template-rows: auto 0fr; justify-items: start; gap: 0; padding: 16px 18px 18px; transition: grid-template-rows .45s cubic-bezier(.22, 1, .36, 1), gap .45s; }
+.fmt__t.bsticker { margin: 0; padding: 11px 18px; font-size: clamp(1rem, 1.5vw, 1.4rem); transition: transform .4s cubic-bezier(.34, 1.56, .64, 1); }
+.fmt--big .fmt__t.bsticker { padding: 14px 24px; font-size: clamp(1.4rem, 2.6vw, 2.4rem); }
+.fmt__d { min-height: 0; overflow: hidden; margin: 0; max-width: 38ch; color: var(--cream); font-weight: 500; font-size: .95rem; line-height: 1.4; }
+.fmt--big .fmt__d { font-size: 1.1rem; }
+@media (hover: hover) and (pointer: fine) {
+  .fmt:hover .fmt__img { transform: scale(1.08); }
+  .fmt:hover .fmt__body { grid-template-rows: auto 1fr; gap: 10px; }
+  .fmt:hover .fmt__t.bsticker { transform: rotate(0) scale(1.05); }
+}
+@media (hover: none) { .fmt__body { grid-template-rows: auto 1fr; gap: 8px; } }
+/* Phones: two across. The big tile keeps 2 x 2, wide ones span the row, the tall one runs two rows.
+   Single tiles drop the line so the sticker has room. */
+@media (max-width: 720px) {
+  .fmts { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 168px; gap: 10px; margin-bottom: 44px; }
+  .fmt__body { padding: 12px; grid-template-rows: auto 1fr; gap: 8px; }
+  .fmt--one .fmt__d { display: none; }
+  .fmt--tall:nth-last-child(2) { grid-row: auto; grid-column: span 2; }
+  .fmt__t.bsticker { padding: 9px 14px; font-size: 1rem; }
+  .fmt--big .fmt__t.bsticker { font-size: 1.35rem; }
+  .fmt__d, .fmt--big .fmt__d { font-size: .85rem; }
+  .fmt__no { top: 10px; left: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .fmt__img, .fmt__body, .fmt__t.bsticker { transition: none; } }
+
 /* "Write to us": a paper plane that takes off on hover. */
 .btn--plane { gap: 10px; overflow: visible; }
 .plane { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; animation: plane-idle 3s ease-in-out infinite; }

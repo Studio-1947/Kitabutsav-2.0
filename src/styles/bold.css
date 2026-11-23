@@ -121,26 +121,15 @@
 
   .names { background: var(--red); text-align: center; color: var(--ink); }
   .names .wave path { fill: var(--sky); }
-  .names__list { list-style: none; margin: 0 0 40px; padding: 0; display: grid; gap: 0; justify-items: center; }
-  .names__list li { transform: rotate(var(--r)); }
-  .names__list a { display: inline-flex; align-items: center; gap: .3em; text-decoration: none; font-size: clamp(2.3rem, 7.4vw, 6.4rem); line-height: 1.2; }
-  .names__list i { flex: none; width: .56em; height: .56em; border-radius: 50%; background: var(--cream) linear-gradient(var(--ink), var(--ink)) center / 46% 14% no-repeat; position: relative; transition: transform .3s; }
-  .names__list i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--ink), var(--ink)) center / 14% 46% no-repeat; }
-  .names__list a { color: var(--cream); }
-  .names__list a:hover { color: var(--yellow); }
-  .names__list a:hover i { transform: rotate(90deg); background-color: var(--yellow); }
 
   .formats { background: var(--lilac); }
   .formats .wave path { fill: var(--red); }
-  .ticker { overflow: hidden; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)) 60px; padding: 30px 0; }
-  .ticker__t { display: flex; gap: 18px; width: max-content; animation: tick 38s linear infinite; }
   .bsticker { padding: 18px 30px; border-radius: 999px; font: 700 clamp(1.3rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; white-space: nowrap; }
   .s0 { background: var(--ink); color: var(--lime); transform: rotate(-4deg); }
   .s1 { background: var(--yellow); transform: rotate(3deg); }
   .s2 { background: var(--blue); color: var(--cream); transform: rotate(-2deg); }
   .s3 { background: var(--cream); transform: rotate(5deg); }
   .s4 { background: var(--red); color: var(--cream); transform: rotate(-5deg); }
-  @keyframes tick { to { transform: translateX(-50%); } }
   .invite { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 22px; max-width: 1120px; margin: 0 auto; padding: clamp(28px, 4vw, 52px); border-radius: var(--r-lg); background: var(--lime); }
   .invite__t { margin: 0 0 8px; font-size: clamp(1.9rem, 4vw, 3.4rem); line-height: 1.1; }
   .invite p { margin: 0; max-width: 560px; font-weight: 500; }
@@ -198,7 +187,7 @@
     .logos li { height: 84px; }
     .foot__book { border-radius: var(--r-lg); }
   }
-  @media (prefers-reduced-motion: reduce) { .ticker__t { animation: none; } .btn, .tile, .names__list i { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .btn, .tile { transition: none; } }
 
 /* ── shared chrome additions ── */
 .top__book svg { flex: none; }

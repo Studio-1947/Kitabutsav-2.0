@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".names__list > li", ".names .marquee", ".invite", ".logos li", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".logos li", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -236,7 +236,7 @@
   /* 7. Headings: words rise in one by one, then a hand-drawn line draws itself under the last
         word. Words hop when the mouse passes over them. Split by word, not letter, so Hindi
         conjuncts and matras stay shaped together. */
-  var heads = Array.prototype.slice.call(document.querySelectorAll(".mani .mega, .agenda .big, .formats .big, .bpartners .big"));
+  var heads = Array.prototype.slice.call(document.querySelectorAll(".mani .mega, .agenda .big, .names .big, .formats .big, .bpartners .big"));
   heads.forEach(function (h) {
     var words = h.textContent.trim().split(/\s+/);
     h.setAttribute("aria-label", h.textContent.trim());
@@ -278,14 +278,28 @@
     });
   }
 
-  /* 10. Names: the + opens a card with the speaker's role and the editions they came to. */
-  document.querySelectorAll(".names__more").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var card = document.getElementById(btn.getAttribute("aria-controls"));
-      var open = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", String(!open));
-      card.hidden = open;
-      btn.closest("li").classList.toggle("is-open", !open);
+  /* 10. Names bookshelf: a spine opens its book (one at a time); arrow keys move along the shelf. */
+  document.querySelectorAll("[data-shelf]").forEach(function (shelf) {
+    var spines = Array.prototype.slice.call(shelf.querySelectorAll("button.book__spine"));
+    var open = function (btn, focus) {
+      spines.forEach(function (s) {
+        var on = s === btn;
+        s.setAttribute("aria-expanded", String(on));
+        s.closest(".book").classList.toggle("is-open", on);
+        var panel = document.getElementById(s.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) btn.focus();
+    };
+    spines.forEach(function (s, i) {
+      if (s.getAttribute("aria-expanded") === "true") s.closest(".book").classList.add("is-open");
+      s.addEventListener("click", function () { open(s); });
+      s.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          open(spines[(i + (e.key === "ArrowRight" ? 1 : -1) + spines.length) % spines.length], true);
+        }
+      });
     });
   });
 
