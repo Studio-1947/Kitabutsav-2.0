@@ -417,6 +417,13 @@
 .ecard:hover .tile__art { transform: scale(1.06) rotate(-2deg); }
 .ecard .tile::before { opacity: .45; }
 .ecard .tile__yr { top: 10px; left: 10px; right: auto; bottom: auto; transform: none; }
+/* Edition photo fills the tile; the tone colour shows while it loads. */
+.ecard .tile__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.ecard:hover .tile__photo { transform: scale(1.06); }
+.ecard .tile--photo::before { display: none; }
+.ecard .tile--photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,28,73,.35), transparent 40%); pointer-events: none; }
+.ecard .tile--photo .tile__yr { z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .ecard .tile__photo { transition: none; } }
 .ecard__body { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 10px; padding: clamp(18px, 2.4vw, 34px); }
 .ecard .cap__t { font-size: clamp(1.8rem, 3.2vw, 3rem); }
 .ecard .cap__d { margin: 0; display: block; }

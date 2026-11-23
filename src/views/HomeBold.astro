@@ -8,6 +8,7 @@ import BoldHeader from "../components/BoldHeader.astro";
 import Icon from "../components/Icon.astro";
 import Bunting from "../components/Bunting.astro";
 import Landmark from "../components/Landmark.astro";
+import { coverFor, focusOf } from "../data/gallery";
 import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition } from "../data/editions";
 import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
@@ -26,6 +27,7 @@ const altHref = localePath(hi ? "en" : "hi", "/");
 
 const byDate = [...editions].sort((a, b) => (b.start ?? `${b.year}`).localeCompare(a.start ?? `${a.year}`));
 const rows = byDate.slice(0, 6);
+const covers = rows.map((e) => coverFor(e.slug));
 const tones = ["blue", "saffron", "navy", "sand", "red", "sky"] as const;
 
 const headline = ["gulzar", "javed-akhtar", "geetanjali-shree", "piyush-mishra", "raghubir-yadav", "alok-dhanwa", "mridula-garg"]
@@ -80,8 +82,12 @@ const jsonLd = heroEv ? [heroEv] : [];
       <div class="ecards">
         {rows.map((e, i) => (
           <a class:list={["ecard", i === 0 && "ecard--lead"]} href={L(`/editions/${e.slug}/`)}>
-            <span class:list={["tile", `tile--${tones[i % tones.length]}`]} aria-hidden="true">
-              <Landmark slug={e.slug} class="tile__art" />
+            <span class:list={["tile", `tile--${tones[i % tones.length]}`, covers[i] && "tile--photo"]} aria-hidden="true">
+              {covers[i] ? (
+                <img class="tile__photo" src={covers[i]!.src} alt="" loading={i < 2 ? "eager" : "lazy"} decoding="async" width={covers[i]!.w} height={covers[i]!.h} style={`object-position:${focusOf(covers[i]!)}`} />
+              ) : (
+                <Landmark slug={e.slug} class="tile__art" />
+              )}
               <span class="tile__yr">{e.year}</span>
             </span>
             <span class="ecard__body">
