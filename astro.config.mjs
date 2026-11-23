@@ -18,9 +18,6 @@ export default defineConfig({
     "/en/editions/": "/en/about/#editions",
     "/gallery/": "/about/#gallery",
     "/en/gallery/": "/en/about/#gallery",
-    // The bold design preview became the main site.
-    "/2/": "/",
-    "/en/2/": "/en/",
   },
   i18n: {
     locales: ["hi", "en"],
@@ -29,7 +26,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes("/404") && !/\/(en\/)?2\/$/.test(new URL(page).pathname) && !/\/(en\/)?(editions|gallery)\/$/.test(new URL(page).pathname),
+      filter: (page) => !page.includes("/404") && !/\/(en\/)?(editions|gallery)\/$/.test(new URL(page).pathname),
       i18n: {
         defaultLocale: "hi",
         locales: { hi: "hi-IN", en: "en-IN" },
