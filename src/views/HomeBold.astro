@@ -9,6 +9,8 @@ import Icon from "../components/Icon.astro";
 import Bunting from "../components/Bunting.astro";
 import Landmark from "../components/Landmark.astro";
 import Wave from "../components/Wave.astro";
+// Rajkamal Prakashan emblem, inlined into the page so it never depends on a separate request.
+import rkpEmblemRaw from "../../public/brand/rkp-favicon.svg?raw";
 import { coverFor, focusOf } from "../data/gallery";
 import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition, type L10n } from "../data/editions";
@@ -107,6 +109,7 @@ const description = hi
   : `Kitab Utsav is Rajkamal Prakashan's five-day Hindi book and literature festival. ${up ? `Next stop: ${fe.city.en}, ${formatRange(fe, "en")}.` : `Most recently in ${fe.city.en}, ${formatRange(fe, "en")}; next city announcing soon.`} Readings, conversations, book launches and a book exhibition.`;
 const heroEv = up ? eventLd(fe, lang, Astro.site!, "/og/kitab-utsav.jpg") : null;
 const jsonLd = heroEv ? [heroEv] : [];
+const rkpEmblem = rkpEmblemRaw.replace(/ width="64" height="64"/, "");
 ---
 
 <Base lang={lang} route="/" title={title} description={description} jsonLd={jsonLd} home>
@@ -220,7 +223,7 @@ const jsonLd = heroEv ? [heroEv] : [];
             <li class="book" style={`--bh:${spine[i].h}px;--bw:${spine[i].w}px;--bg:var(--${spine[i].bg});--fg:var(--${spine[i].fg});--lean:${spine[i].lean}deg`}>
               <button type="button" class="book__spine" aria-expanded={i === 0 ? "true" : "false"} aria-controls={`bk-${p.slug}`}>
                 <span class="book__title">{p.name[lang]}</span>
-                <span class="book__mark" aria-hidden="true"></span>
+                <span class="book__mark" aria-hidden="true" set:html={rkpEmblem} />
               </button>
             </li>
           ))}
