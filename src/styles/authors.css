@@ -1,20 +1,74 @@
 /*
  * Authors page, "library catalogue" (src/views/Resources.astro), Hindi and English.
- * Headliners as a fan of book covers; search, city and kind filters; an A–Z bar; catalogue cards
+ * Headliners on a spotlight stage; search, city and kind filters; an A–Z bar; catalogue cards
  * grouped by letter; a side panel with the bio (motion.js, section 21).
  */
 
-/* Hero */
-.au-hero__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 4vw, 50px); }
-.au-covers { position: relative; height: clamp(260px, 26vw, 340px); }
-/* Each cover shows its name down the left edge, which stays visible in the fan. */
-.au-cover { position: absolute; left: calc(var(--i) / (var(--n) - 1) * (100% - 34%)); bottom: 0; display: grid; grid-template-columns: 30px 1fr; width: 34%; aspect-ratio: 3 / 4.4; padding: 8px 8px 8px 0; border: 0; border-radius: 10px 14px 14px 10px; background: var(--tone); color: var(--navy); cursor: pointer; box-shadow: inset 8px 0 0 rgba(0, 0, 0, .12), 0 12px 24px rgba(7, 28, 73, .22); transform-origin: 50% 110%; rotate: calc((var(--i) - (var(--n) - 1) / 2) * 5deg); transition: rotate .45s cubic-bezier(.34, 1.56, .64, 1), translate .45s cubic-bezier(.34, 1.56, .64, 1); z-index: var(--i); }
-.au-cover:nth-child(6) { color: var(--cream); }
-.au-cover__img { grid-column: 2; grid-row: 1; overflow: hidden; border-radius: 6px; background: #000; }
-.au-cover__img img { width: 100%; height: 100%; object-fit: cover; }
-.au-cover__name { grid-column: 1; grid-row: 1; justify-self: center; overflow: hidden; writing-mode: vertical-rl; rotate: 180deg; white-space: nowrap; text-overflow: ellipsis; font: 800 clamp(.72rem, .95vw, .9rem)/1 var(--display); text-transform: uppercase; text-align: left; }
-.au-cover:hover, .au-cover:focus-visible { translate: 0 -26px; rotate: 0deg; z-index: 20; }
-.au-cover:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+/* Hero: text, stat stickers and jump chips left; a spotlight stage right. One headliner stands
+   in the light at a time (motion.js, section 22): it cycles on its own, the thumbnails pick one,
+   and the featured portrait opens that author's panel. The beam and confetti follow the mouse. */
+.au-hero__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 4vw, 56px); }
+.au-hero .lead { max-width: 46ch; }
+
+.au-facts { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 0; padding: 0; list-style: none; }
+.au-facts li { padding: 10px 16px; border-radius: 999px; background: var(--bg); color: var(--navy); font: 600 1rem/1 var(--display); rotate: var(--tilt); transition: rotate .35s cubic-bezier(.34, 1.56, .64, 1), scale .35s cubic-bezier(.34, 1.56, .64, 1); }
+.au-facts li:hover { rotate: 0deg; scale: 1.08; }
+.au-facts b { margin-right: 4px; color: var(--red); font-size: 1.5rem; }
+
+.au-jump { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 18px; }
+.au-jump > span { flex: 0 0 auto; white-space: nowrap; color: var(--ku-muted); font-size: .9rem; font-weight: 600; }
+.au-jump button { min-height: 40px; padding: 8px 14px; border: 2px solid var(--navy); border-radius: 999px; background: transparent; color: var(--navy); font: 700 .9rem/1 var(--display); cursor: pointer; transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), background-color .2s, color .2s; }
+.au-jump button:hover, .au-jump button:focus-visible { background: var(--navy); color: var(--cream); transform: translateY(-3px) rotate(-2deg); }
+.au-jump button:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+/* The stage */
+.au-stage { position: relative; display: grid; justify-items: center; gap: 18px; padding: 10px 0 0; isolation: isolate; }
+.au-stage__beam { position: absolute; left: 50%; top: -40%; z-index: -1; width: 120%; aspect-ratio: 1; margin-left: -60%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 225, 138, .55), rgba(255, 225, 138, .18) 55%, transparent); pointer-events: none; transform: translate(calc(var(--mx, 0) * 70px), calc(var(--my, 0) * 30px)); transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+.au-stage__bits { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.au-stage__bits i { position: absolute; display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--saffron); translate: calc(var(--mx, 0) * var(--d)) calc(var(--my, 0) * var(--d)); animation: au-bob 6s ease-in-out infinite alternate; transition: translate .6s cubic-bezier(.22, 1, .36, 1); }
+.au-stage__bits i:nth-child(1) { --d: -28px; left: 6%; top: 18%; }
+.au-stage__bits i:nth-child(2) { --d: 22px; right: 8%; top: 8%; width: 26px; height: 26px; border-radius: 6px; background: var(--sky); rotate: 18deg; animation-delay: -2s; }
+.au-stage__bits i:nth-child(3) { --d: -16px; left: 14%; bottom: 30%; width: 12px; height: 12px; background: var(--red); animation-delay: -4s; }
+.au-stage__bits i:nth-child(4) { --d: 34px; right: 12%; bottom: 36%; width: 30px; height: 30px; background: none; border: 4px solid var(--lilac); animation-delay: -1s; }
+.au-stage__bits i:nth-child(5) { --d: -40px; right: 26%; top: -2%; width: 14px; height: 14px; border-radius: 3px; background: var(--lime); rotate: 45deg; animation-delay: -3s; }
+@keyframes au-bob { to { transform: translateY(-14px) rotate(25deg); } }
+
+/* Every portrait sits in the same grid cell; only the one in the light shows. */
+.au-stage__spots { display: grid; width: min(100%, 380px); perspective: 900px; }
+.au-spot { grid-area: 1 / 1; position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; color: var(--navy); text-align: left; cursor: pointer; opacity: 0; pointer-events: none; transform: translateX(60px) rotate(6deg) scale(.92); transition: opacity .45s ease, transform .7s cubic-bezier(.22, 1, .36, 1); }
+.au-spot.is-out { transform: translateX(-60px) rotate(-6deg) scale(.92); }
+.au-spot.is-on { opacity: 1; pointer-events: auto; transform: rotateY(calc(var(--mx, 0) * 8deg)) rotateX(calc(var(--my, 0) * -6deg)); }
+.au-spot__disc { position: absolute; inset: 8% -6% 18% -6%; z-index: -1; border-radius: 50%; background: var(--tone); opacity: .55; transform: scale(.7); transition: transform .9s cubic-bezier(.34, 1.56, .64, 1) .1s; }
+.au-spot.is-on .au-spot__disc { transform: scale(1); }
+.au-spot__img { display: block; width: 78%; margin: 0 auto; aspect-ratio: 4 / 5; overflow: hidden; border: 6px solid var(--tone); border-radius: 999px 999px 26px 26px; background: var(--navy); box-shadow: 0 22px 40px rgba(7, 28, 73, .28); }
+.au-spot__img img { width: 100%; height: 100%; object-fit: cover; }
+.au-spot__tag { position: relative; display: grid; gap: 2px; width: max-content; max-width: 92%; margin: -42px auto 0; padding: 12px 20px; border-radius: 18px; background: #fff; box-shadow: 0 10px 0 rgba(7, 28, 73, .12); text-align: center; rotate: -2.5deg; transform: translateY(20px); opacity: 0; transition: transform .6s cubic-bezier(.34, 1.56, .64, 1) .2s, opacity .4s ease .2s; }
+.au-spot.is-on .au-spot__tag { transform: none; opacity: 1; }
+.au-spot__tag b { font: 800 clamp(1.4rem, 2.4vw, 1.9rem)/1.05 var(--display); }
+.au-spot__tag span { color: var(--ku-muted); font-size: .88rem; line-height: 1.3; }
+.au-spot__more { position: absolute; right: 2%; top: 10%; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; background: var(--red); color: #fff; font: 700 .82rem/1 var(--display); rotate: 8deg; transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+.au-spot__more svg { width: 14px; height: 14px; transition: transform .3s; }
+.au-spot__no { position: absolute; left: 0; top: 4%; color: var(--navy); font: 800 2.4rem/1 var(--display); }
+.au-spot__no small { font-size: .9rem; opacity: .5; }
+.au-spot:hover .au-spot__more, .au-spot:focus-visible .au-spot__more { transform: scale(1.1) rotate(-8deg); }
+.au-spot:hover .au-spot__more svg { transform: translateX(3px); }
+.au-spot:focus-visible { outline: none; }
+.au-spot:focus-visible .au-spot__img { outline: 3px solid var(--red); outline-offset: 4px; }
+
+/* Thumbnails: the featured one is lifted, with a bar that fills until the next one. */
+.au-stars { display: flex; justify-content: center; gap: 8px; margin: 0; padding: 4px 0 8px; list-style: none; }
+.au-star { position: relative; display: block; width: 52px; padding: 0; border: 0; background: none; cursor: pointer; transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+.au-star__img { display: block; aspect-ratio: 1; overflow: hidden; border: 3px solid var(--tone); border-radius: 50%; background: var(--navy); filter: grayscale(.7); opacity: .75; transition: filter .3s, opacity .3s; }
+.au-star__img img { width: 100%; height: 100%; object-fit: cover; }
+.au-star::after { content: ""; position: absolute; left: 10%; right: 10%; bottom: -8px; height: 3px; border-radius: 3px; background: var(--red); transform: scaleX(0); transform-origin: left; }
+.au-star:hover { transform: translateY(-4px); }
+.au-star:hover .au-star__img, .au-star[aria-pressed="true"] .au-star__img { filter: none; opacity: 1; }
+.au-star[aria-pressed="true"] { transform: translateY(-6px) scale(1.12); }
+.au-star[aria-pressed="true"]::after { transform: scaleX(1); }
+.au-stage.is-playing .au-star[aria-pressed="true"]::after { animation: au-fill var(--dwell, 5s) linear; }
+.au-stage.is-paused .au-star[aria-pressed="true"]::after { animation-play-state: paused; }
+@keyframes au-fill { from { transform: scaleX(0); } }
+.au-star:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; border-radius: 50%; }
 
 /* Tools */
 .au-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 18px; }
@@ -57,8 +111,7 @@
 .au-card__name { font: 800 1.08rem/1.2 var(--display); }
 .au-card__role { font-size: .85rem; line-height: 1.35; opacity: .75; }
 .au-card__stamps { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.au-card__stamps i { padding: 2px 7px; border: 1.5px solid var(--red); border-radius: 5px; color: var(--red); font: 700 .68rem/1.3 var(--display); font-style: normal; text-transform: uppercase; rotate: -2deg; }
-.au-card__stamps i:nth-child(even) { rotate: 2deg; }
+.au-card__stamps i { padding: 2px 7px; border: 1.5px solid var(--red); border-radius: 5px; color: var(--red); font: 700 .68rem/1.3 var(--display); font-style: normal; text-transform: uppercase; }
 .au-card__bio { position: absolute; top: 10px; right: 10px; color: var(--saffron); }
 .au-card__bio svg { width: 16px; height: 16px; }
 .au-none { padding: 22px; border-radius: var(--r-md); background: #fff; color: var(--navy); text-align: center; font-weight: 600; }
@@ -87,14 +140,19 @@
 
 /* Tablets and phones */
 @media (max-width: 900px) {
-  .au-hero__in { grid-template-columns: 1fr; }
-  .au-covers { height: 260px; max-width: 520px; }
+  .au-hero__in { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 720px) {
-  .au-covers { height: 200px; }
-  .au-cover { width: 36%; }
-  .au-cover { grid-template-columns: 22px 1fr; }
-  .au-cover__name { font-size: .62rem; }
+  /* Stage: a smaller portrait; thumbnails stay in one row and scroll if they must. */
+  .au-stage__spots { width: min(100%, 270px); }
+  .au-spot__no { font-size: 1.8rem; }
+  .au-spot__more { top: 6%; padding: 7px 10px; font-size: .76rem; }
+  .au-stars { justify-content: flex-start; gap: 10px; max-width: 100%; overflow-x: auto; scrollbar-width: none; padding: 10px 4px 14px; }
+  .au-stars::-webkit-scrollbar { display: none; }
+  .au-star { flex: 0 0 48px; width: 48px; }
+  .au-jump { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * clamp(16px, 4vw, 48px)); padding: 2px clamp(16px, 4vw, 48px) 6px; }
+  .au-jump::-webkit-scrollbar { display: none; }
+  .au-jump button { flex: 0 0 auto; }
   .au-select { flex: 1 1 100%; }
   .au-select select { width: 100%; }
   .au-kinds { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * clamp(16px, 4vw, 48px)); padding: 2px clamp(16px, 4vw, 48px); }
@@ -118,6 +176,7 @@
   .au-panel h3 { font-size: 1.5rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .au-cover, .au-card__btn, .au-kind { transition: none; }
+  .au-spot, .au-spot__disc, .au-spot__tag, .au-stage__beam, .au-star, .au-facts li, .au-jump button, .au-card__btn, .au-kind { transition: none; }
+  .au-stage__bits i { animation: none; }
   .au-panel[open] { animation: none; }
 }

@@ -54,6 +54,7 @@ const short = (a: NonNullable<Speaker["appearances"]>[number]) => `${a.city[lang
 const covers = ["gulzar", "javed-akhtar", "geetanjali-shree", "piyush-mishra", "raghubir-yadav", "alok-dhanwa", "mridula-garg"]
   .map((slug) => allSpeakers.find((sp) => sp.slug === slug)).filter((sp): sp is Speaker => !!sp && !!sp.stagePhoto);
 const coverTones = ["navy", "saffron", "cream", "sky", "lime", "blue", "lilac"];
+const editionCount = new Set(allSpeakers.flatMap((sp) => sp.appearances?.map((a) => `${a.city.en}-${a.year}`) ?? [])).size;
 const withPhoto = allSpeakers.filter((sp) => sp.photo || sp.stagePhoto).length;
 ---
 
@@ -69,14 +70,42 @@ const withPhoto = allSpeakers.filter((sp) => sp.photo || sp.stagePhoto).length;
             ? `किताब उत्सव के मंच पर आए लेखक, कवि और कलाकार, एक सूची-पत्र में। अभी ${allSpeakers.length} नाम दर्ज हैं; हर संस्करण के साथ सूची बढ़ रही है।`
             : `The writers, poets and artists who have shared the Kitab Utsav stage, in one catalogue. ${allSpeakers.length} names on record so far, with more after every edition.`}
         </p>
+        <ul class="au-facts">
+          <li style="--tilt:-3deg;--bg:var(--yellow)"><b data-count>{allSpeakers.length}</b> {hi ? "नाम" : "names"}</li>
+          <li style="--tilt:2deg;--bg:var(--sky)"><b data-count>{cityCount.size}</b> {hi ? "शहर" : "cities"}</li>
+          <li style="--tilt:-1.5deg;--bg:var(--lime)"><b data-count>{editionCount}</b> {hi ? "संस्करण" : "editions"}</li>
+        </ul>
+        <div class="au-jump" role="group" aria-label={hi ? "सीधे देखें" : "Jump to"}>
+          <span>{hi ? "सीधे देखें:" : "Jump to:"}</span>
+          {roleKinds.map((k) => <button type="button" data-jump={k.key}>{k.label[lang]}</button>)}
+        </div>
       </div>
-      <div class="au-covers" aria-label={hi ? "प्रमुख नाम" : "Headliners"}>
-        {covers.map((sp, i) => (
-          <button type="button" class="au-cover" data-open={sp.slug} style={`--i:${i};--n:${covers.length};--tone:var(--${coverTones[i % coverTones.length]})`}>
-            <span class="au-cover__img"><img src={sp.stagePhoto!.src} alt="" loading={i < 3 ? "eager" : "lazy"} decoding="async" style={photoStyle(sp.stagePhoto!)} /></span>
-            <span class="au-cover__name">{sp.name[lang]}</span>
-          </button>
-        ))}
+      <div class="au-stage" data-au-stage>
+        <span class="au-stage__beam" aria-hidden="true"></span>
+        <span class="au-stage__bits" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <div class="au-stage__spots">
+          {covers.map((sp, i) => (
+            <button type="button" class:list={["au-spot", { "is-on": i === 0 }]} data-open={sp.slug} data-spot={i} aria-hidden={i === 0 ? undefined : "true"} tabindex={i === 0 ? undefined : -1} style={`--tone:var(--${coverTones[i % coverTones.length]})`}>
+              <span class="au-spot__disc"></span>
+              <span class="au-spot__img"><img src={sp.stagePhoto!.src} alt="" loading={i < 2 ? "eager" : "lazy"} decoding="async" style={photoStyle(sp.stagePhoto!)} /></span>
+              <span class="au-spot__tag">
+                <b>{sp.name[lang]}</b>
+                <span>{sp.role[lang]}</span>
+              </span>
+              <span class="au-spot__more">{hi ? "परिचय पढ़ें" : "Read bio"} <Icon name="arrowRight" /></span>
+              <span class="au-spot__no">{String(i + 1).padStart(2, "0")}<small>/{String(covers.length).padStart(2, "0")}</small></span>
+            </button>
+          ))}
+        </div>
+        <ul class="au-stars" aria-label={hi ? "प्रमुख नाम" : "Headliners"}>
+          {covers.map((sp, i) => (
+            <li style={`--tone:var(--${coverTones[i % coverTones.length]})`}>
+              <button type="button" class="au-star" data-feature={i} aria-pressed={i === 0 ? "true" : "false"} aria-label={sp.name[lang]}>
+                <span class="au-star__img"><img src={sp.stagePhoto!.src} alt="" loading="lazy" decoding="async" style={photoStyle(sp.stagePhoto!)} /></span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   </section>

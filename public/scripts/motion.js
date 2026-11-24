@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".au-group", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".au-group", ".ed-lead", ".ed-side", ".ed-faces li", ".ed-route", ".ed-cards li", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -161,7 +161,7 @@
 
   /* 6. Photo viewer: tap a gallery photo to see it full screen. Arrows, Esc and swipe work. */
   var grids = document.querySelectorAll(".gallery");
-  if ((grids.length || document.querySelector("[data-albums]")) && window.HTMLDialogElement) {
+  if ((grids.length || document.querySelector("[data-albums], [data-filmstrip]")) && window.HTMLDialogElement) {
     var t = hi
       ? { close: "बंद करें", prev: "पिछली तस्वीर", next: "अगली तस्वीर", of: " / " }
       : { close: "Close", prev: "Previous photo", next: "Next photo", of: " of " };
@@ -660,5 +660,97 @@
     if (m && document.getElementById(m) && document.getElementById(m).classList.contains("au-card")) {
       window.addEventListener("load", function () { open(m); });
     }
+  });
+  /* 22. Edition filmstrip: a photo opens the full-screen viewer with the strip's photos. */
+  document.querySelectorAll("[data-filmstrip]").forEach(function (strip) {
+    var btns = Array.prototype.slice.call(strip.querySelectorAll(".ed-film__ph"));
+    var data = btns.map(function (b) { return { src: b.dataset.src, alt: b.dataset.cap, cap: b.dataset.cap, credit: b.dataset.credit, href: b.dataset.href }; });
+    btns.forEach(function (b, i) { b.addEventListener("click", function () { if (window.__openPhotos) window.__openPhotos(data, i); }); });
+  });
+  /* 22. Authors hero: a spotlight stage. One headliner stands in the light at a time and the
+         stage moves on every few seconds (not for reduced motion). It holds still while the mouse
+         or keyboard focus is on it, or when it is off screen. Thumbnails pick a headliner (arrow
+         keys move along them), a swipe on phones goes to the next one, and the featured portrait
+         opens the side panel (section 21). The beam and confetti lean toward the mouse. The
+         "Jump to" chips set the catalogue's kind filter and scroll down to it. */
+  document.querySelectorAll("[data-au-stage]").forEach(function (stage) {
+    var spots = Array.prototype.slice.call(stage.querySelectorAll(".au-spot"));
+    var stars = Array.prototype.slice.call(stage.querySelectorAll(".au-star"));
+    if (!spots.length) return;
+    var cur = 0, timer = 0, dwell = 5000, held = false, visible = true;
+    stage.style.setProperty("--dwell", dwell + "ms");
+    var show = function (i) {
+      i = (i + spots.length) % spots.length;
+      if (i === cur) return;
+      spots.forEach(function (sp, k) { sp.classList.toggle("is-out", k === cur); });
+      spots[cur].classList.remove("is-on");
+      spots[cur].setAttribute("aria-hidden", "true"); spots[cur].tabIndex = -1;
+      spots[i].classList.remove("is-out"); spots[i].classList.add("is-on");
+      spots[i].removeAttribute("aria-hidden"); spots[i].removeAttribute("tabindex");
+      stars.forEach(function (b, k) { b.setAttribute("aria-pressed", String(k === i)); });
+      cur = i;
+      play();
+    };
+    var play = function () {
+      clearTimeout(timer);
+      if (reduce) return;
+      stage.classList.remove("is-playing");
+      if (held || !visible) { stage.classList.add("is-paused"); return; }
+      stage.classList.remove("is-paused");
+      void stage.offsetWidth; // restart the progress bar
+      stage.classList.add("is-playing");
+      timer = setTimeout(function () { show(cur + 1); }, dwell);
+    };
+    var hold = function (on) { held = on; play(); };
+    stage.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") hold(true); });
+    stage.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") hold(false); });
+    stage.addEventListener("focusin", function () { hold(true); });
+    stage.addEventListener("focusout", function (e) { if (!stage.contains(e.relatedTarget)) hold(false); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) { visible = en[0].isIntersecting; play(); }, { threshold: 0.3 }).observe(stage);
+    }
+    document.addEventListener("visibilitychange", function () { visible = !document.hidden; play(); });
+
+    stars.forEach(function (b, k) {
+      b.addEventListener("click", function () { show(k); });
+      b.addEventListener("keydown", function (e) {
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var n = (k + d + stars.length) % stars.length;
+        stars[n].focus(); stars[n].scrollIntoView({ block: "nearest", inline: "nearest" });
+        show(n);
+      });
+    });
+
+    var x0 = null;
+    stage.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      if (x0 === null || !e.target.closest(".au-stage__spots")) { x0 = null; return; }
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+
+    if (finePointer && !reduce) {
+      var hero = stage.closest("section") || stage;
+      hero.addEventListener("pointermove", function (e) {
+        var r = stage.getBoundingClientRect();
+        var mx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+        var my = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+        stage.style.setProperty("--mx", mx.toFixed(3));
+        stage.style.setProperty("--my", my.toFixed(3));
+      });
+      hero.addEventListener("pointerleave", function () { stage.style.setProperty("--mx", 0); stage.style.setProperty("--my", 0); });
+    }
+    play();
+  });
+  document.querySelectorAll("[data-jump]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var cat = document.querySelector("[data-catalogue]");
+      var chip = cat && cat.querySelector('.au-kind[data-kind="' + b.dataset.jump + '"]');
+      if (!chip) return;
+      chip.click();
+      cat.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    });
   });
 })();
