@@ -12,7 +12,7 @@
 .fq-chat__who b { font: 800 1.1rem/1.1 var(--display); }
 .fq-chat__who small { display: flex; align-items: center; gap: 6px; font-size: .8rem; opacity: .8; }
 .fq-chat__who small i { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 3px rgba(217, 242, 107, .25); }
-.fq-chat__all { margin-left: auto; padding: 9px 14px; border: 2px solid rgba(251, 240, 217, .4); border-radius: 999px; background: none; color: var(--cream); font: 600 .85rem/1 var(--display); cursor: pointer; transition: background .2s, color .2s; }
+.fq-chat__all { margin-left: auto; padding: 9px 14px; border: 2px solid rgba(251, 240, 217, .4); border-radius: 999px; background: none; color: var(--cream); font: 600 .85rem/1 var(--display); cursor: pointer; transition: background .35s ease-out, color .35s ease-out; }
 @media (hover: hover) { .fq-chat__all:hover { background: var(--cream); color: var(--navy); } }
 .fq-chat:not(.is-chat) .fq-chat__all { display: none; }
 
@@ -40,12 +40,12 @@
 /* Ask: search + question chips */
 .fq-ask { padding: 16px 18px 20px; border-top: 1px solid rgba(11, 46, 99, .1); }
 .fq-chat:not(.is-chat) .fq-ask { display: none; }
-.fq-search { display: flex; align-items: center; gap: 10px; padding: 0 16px; border: 2px solid rgba(11, 46, 99, .15); border-radius: 999px; background: #fff; color: var(--navy); transition: border-color .2s; }
+.fq-search { display: flex; align-items: center; gap: 10px; padding: 0 16px; border: 2px solid rgba(11, 46, 99, .15); border-radius: 999px; background: #fff; color: var(--navy); transition: border-color .35s ease-out; }
 .fq-search:focus-within { border-color: var(--navy); }
 .fq-search svg { flex: none; width: 20px; height: 20px; opacity: .6; }
 .fq-search input { flex: 1; min-width: 0; height: 46px; border: 0; outline: 0; background: none; color: var(--navy); font: 500 1rem/1 var(--text, inherit); }
 .fq-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.fq-chip { padding: 10px 14px; border: 2px solid var(--navy); border-radius: 18px 18px 18px 6px; background: #fff; color: var(--navy); font: 600 .92rem/1.25 var(--display); text-align: left; cursor: pointer; transition: background .2s, color .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+.fq-chip { padding: 10px 14px; border: 2px solid var(--navy); border-radius: 18px 18px 18px 6px; background: #fff; color: var(--navy); font: 600 .92rem/1.25 var(--display); text-align: left; cursor: pointer; transition: background .35s ease-out, color .35s ease-out, transform .6s cubic-bezier(.22, 1, .36, 1); }
 @media (hover: hover) { .fq-chip:hover { background: var(--yellow); transform: translateY(-2px); } }
 .fq-chip:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
 .fq-chip.is-asked { border-color: rgba(11, 46, 99, .2); color: rgba(11, 46, 99, .55); }
@@ -57,7 +57,7 @@
 .fq-more h2 { margin: 0 0 4px; font: 800 clamp(1.4rem, 2.4vw, 1.9rem)/1.1 var(--display); text-transform: uppercase; color: var(--navy); }
 .fq-more p { margin: 0; }
 .fq-more__btns { display: flex; flex-wrap: wrap; gap: 8px; }
-.fq-more__btns a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--navy); color: var(--cream); text-decoration: none; font: 600 .9rem/1 var(--display); transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), background .2s; }
+.fq-more__btns a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--navy); color: var(--cream); text-decoration: none; font: 600 .9rem/1 var(--display); transition: transform .6s cubic-bezier(.22, 1, .36, 1), background .35s ease-out; }
 @media (hover: hover) { .fq-more__btns a:hover { transform: translateY(-3px); background: var(--red); } }
 .fq-more__btns svg { width: 18px; height: 18px; }
 

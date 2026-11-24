@@ -40,9 +40,10 @@
   .pill { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; padding: 10px 20px; text-decoration: none; font: 600 .95rem/1 var(--display); }
   .pill--cream { background: var(--cream); }
   .pill--ink { background: var(--ink); color: var(--cream); }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: auto; min-height: 56px; padding: 0 28px; border: 2.5px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); text-decoration: none; font: 600 1rem/1 var(--display); text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: transform .25s cubic-bezier(.3,1.6,.5,1), background .2s, color .2s, border-color .2s; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: auto; min-height: 56px; padding: 0 28px; border: 2.5px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); text-decoration: none; font: 600 1rem/1 var(--display); text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: transform .6s cubic-bezier(.22, 1, .36, 1), background .35s ease-out, color .35s ease-out, border-color .35s ease-out; }
   .btn svg { flex: none; width: 20px; height: 20px; }
-  @media (hover: hover) { .btn:hover { transform: scale(1.05) rotate(-2deg); background: var(--ink); border-color: var(--ink); color: #fff; } }
+  /* Buttons: a quiet lift and colour fill on hover, no spin. */
+  @media (hover: hover) { .btn:hover { transform: translateY(-2px); background: var(--ink); border-color: var(--ink); color: #fff; box-shadow: 0 8px 18px -8px rgba(11, 46, 99, .45); } }
   .btn--sm { min-height: 44px; padding: 0 20px; font-size: .9rem; }
   .bhero .btn { min-height: 64px; padding: 0 32px; font-size: 1.05rem; }
   .btn--ink { background: var(--ink); border-color: var(--ink); color: var(--cream); }
@@ -87,7 +88,7 @@
   .cap__t small { font-size: .55em; color: var(--red); }
   .cap__d { margin: 8px 0 0; font-weight: 500; color: #3b5179; }
   .row--lead .cap { background: var(--yellow); }
-  .tile { position: relative; overflow: hidden; display: grid; place-items: center; border-radius: var(--r-lg); text-decoration: none; min-height: 100%; transition: transform .3s cubic-bezier(.3,1.5,.5,1); }
+  .tile { position: relative; overflow: hidden; display: grid; place-items: center; border-radius: var(--r-lg); text-decoration: none; min-height: 100%; transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
   @media (hover: hover) { .tile:hover { transform: rotate(-3deg) scale(1.02); } }
   .tile::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent 0 22px, rgba(255,255,255,.14) 22px 34px); }
   .tile__ini { position: relative; font-size: clamp(4rem, 9vw, 8rem); line-height: 1; transform: translateY(.06em) rotate(-6deg); }
@@ -108,7 +109,7 @@
   .mani .wave path { fill: var(--red); }
   .mani__blob { position: absolute; left: 50%; top: 52%; width: min(760px, 90vw); aspect-ratio: 1.5; transform: translate(-50%, -50%) rotate(-6deg); border-radius: 46% 54% 38% 62% / 55% 40% 60% 45%; background: var(--yellow); }
   .mani__in { position: relative; max-width: 1100px; margin: 0 auto; }
-  .mega { margin: 0 0 30px; font-size: clamp(3.2rem, 10vw, 9rem); line-height: 1.05; color: var(--navy); }
+  .mega { margin: 0 0 clamp(36px, 4vw, 52px); font-size: clamp(3.2rem, 10vw, 9rem); line-height: 1.05; color: var(--navy); }
   .btotals { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 34px; padding: 0; }
   .btotals li { padding: 12px 22px; border-radius: 999px; background: var(--cream); font: 500 1.05rem/1 var(--display); }
   .btotals b { font-weight: 700; }
@@ -140,7 +141,7 @@
 
   /* Hindi letters orbiting the cursor over the footer (public/scripts/letters.js) */
   .cursor-letters { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
-  .cursor-letters span { position: absolute; left: 0; top: 0; opacity: 0; color: var(--blue); font-family: var(--display); font-weight: 800; line-height: 1; transition: opacity .35s; will-change: transform, opacity; }
+  .cursor-letters span { position: absolute; left: 0; top: 0; opacity: 0; color: var(--blue); font-family: var(--display); font-weight: 800; line-height: 1; transition: opacity .35s ease-out; will-change: transform, opacity; }
   .cursor-letters span:nth-child(3n) { color: var(--ink); }
   .cursor-letters span:nth-child(5n) { color: var(--saffron); }
   .cursor-letters.on span { opacity: .6; }
@@ -291,7 +292,7 @@
 /* fixes */
 .is-inner .clouds { display: none; }
 .is-inner main > .wrap { margin-block: var(--g); }
-.top__book svg, .btn svg { transition: transform .25s; }
+.top__book svg, .btn svg { transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
 @media (hover: hover) { .top__book:hover svg, .btn:hover svg, .ag__go:hover svg { transform: translate(2px, -2px); } }
 
 /* header: logo left, nav centred, language + book right */
@@ -304,8 +305,8 @@
 
 /* hero: "Upcoming in:" line with scrolling city names */
 .hero__upnext { display: flex; align-items: baseline; gap: .35em; margin: -24px 0 4px; font: 600 clamp(1.15rem, 1.8vw, 1.5rem)/1.3 var(--display); color: #3b5179; }
-.hero__upnext .hero__city { display: inline-grid; overflow: hidden; height: 1.3em; color: var(--red); transition: width .45s cubic-bezier(.22,1,.36,1); }
-.hero__upnext .hero__word { grid-area: 1 / 1; justify-self: start; width: max-content; opacity: 0; transform: translateY(100%); transition: opacity .35s ease, transform .5s cubic-bezier(.22,1,.36,1); }
+.hero__upnext .hero__city { display: inline-grid; overflow: hidden; height: 1.3em; color: var(--red); transition: width .6s cubic-bezier(.22, 1, .36, 1); }
+.hero__upnext .hero__word { grid-area: 1 / 1; justify-self: start; width: max-content; opacity: 0; transform: translateY(100%); transition: opacity .35s ease-out, transform .6s cubic-bezier(.22, 1, .36, 1); }
 .hero__upnext .hero__word.is-on { opacity: 1; transform: none; }
 .hero__upnext .hero__word.is-out { opacity: 0; transform: translateY(-100%); }
 
@@ -352,18 +353,18 @@
 
 /* home: the six latest editions as cards, 2 columns x 3 rows */
 .ecards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--g); }
-.ecard { display: grid; grid-template-columns: minmax(130px, 36%) 1fr; min-height: clamp(180px, 15vw, 230px); overflow: hidden; border-radius: var(--r-lg); background: var(--cream); color: var(--ink); text-decoration: none; transition: transform .3s cubic-bezier(.3,1.5,.5,1); }
+.ecard { display: grid; grid-template-columns: minmax(130px, 36%) 1fr; min-height: clamp(180px, 15vw, 230px); overflow: hidden; border-radius: var(--r-lg); background: var(--cream); color: var(--ink); text-decoration: none; transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
 @media (hover: hover) { .ecard:hover { transform: translateY(-4px) rotate(-.4deg); } }
 .ecard--lead { background: var(--yellow); }
 .ecard .tile { border-radius: 0; min-height: 100%; }
 @media (hover: hover) { .ecard .tile:hover { transform: none; } }
 .ecard .tile__ini { font-size: clamp(3.6rem, 6vw, 6rem); }
-.ecard .tile__art { position: absolute; inset: 6% 4% 14%; width: auto; height: auto; transition: transform .4s cubic-bezier(.3,1.5,.5,1); }
+.ecard .tile__art { position: absolute; inset: 6% 4% 14%; width: auto; height: auto; transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
 @media (hover: hover) { .ecard:hover .tile__art { transform: scale(1.06) rotate(-2deg); } }
 .ecard .tile::before { opacity: .45; }
 .ecard .tile__yr { top: 10px; left: 10px; right: auto; bottom: auto; transform: none; }
 /* Edition photo fills the tile; the tone colour shows while it loads. */
-.ecard .tile__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.ecard .tile__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
 @media (hover: hover) { .ecard:hover .tile__photo { transform: scale(1.06); } }
 .ecard .tile--photo::before { display: none; }
 .ecard .tile--photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,28,73,.35), transparent 40%); pointer-events: none; }

@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".au-group", ".ed-lead", ".ed-side", ".ed-faces li", ".ed-route", ".ed-cards li", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pc-map", ".pc-side", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".au-group", ".ed-lead", ".ed-side", ".ed-faces li", ".ed-route", ".ed-cards li", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -109,8 +109,8 @@
     document.querySelectorAll(".ecard, .edition-card").forEach(function (card) {
       card.addEventListener("pointermove", function (e) {
         var r = card.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
-        card.style.setProperty("--ry", ((px - 0.5) * 7).toFixed(2) + "deg");
-        card.style.setProperty("--rx", ((0.5 - py) * 7).toFixed(2) + "deg");
+        card.style.setProperty("--ry", ((px - 0.5) * 4).toFixed(2) + "deg");
+        card.style.setProperty("--rx", ((0.5 - py) * 4).toFixed(2) + "deg");
         card.style.setProperty("--gx", (px * 100).toFixed(1) + "%");
         card.style.setProperty("--gy", (py * 100).toFixed(1) + "%");
       });
@@ -263,7 +263,7 @@
         var w = e.target.closest(".w");
         if (!w || w.classList.contains("hop")) return;
         w.classList.add("hop");
-        setTimeout(function () { w.classList.remove("hop"); }, 600);
+        setTimeout(function () { w.classList.remove("hop"); }, 900);
       });
     }
   });
@@ -312,7 +312,7 @@
     document.querySelectorAll(".mani .btn, .names .btn, .invite .btn, .more").forEach(function (b) {
       b.addEventListener("pointermove", function (e) {
         var r = b.getBoundingClientRect();
-        b.style.translate = ((e.clientX - r.left - r.width / 2) * 0.25).toFixed(1) + "px " + ((e.clientY - r.top - r.height / 2) * 0.35).toFixed(1) + "px";
+        b.style.translate = ((e.clientX - r.left - r.width / 2) * 0.08).toFixed(1) + "px " + ((e.clientY - r.top - r.height / 2) * 0.12).toFixed(1) + "px";
       });
       b.addEventListener("pointerleave", function () { b.style.translate = ""; });
     });
@@ -815,7 +815,7 @@
       var w = e.target.closest(".split .w, .fword.is-in .fword__g");
       if (!w || reduce) return;
       w.classList.remove("hop"); void w.offsetWidth; w.classList.add("hop");
-      setTimeout(function () { w.classList.remove("hop"); }, 650);
+      setTimeout(function () { w.classList.remove("hop"); }, 950);
     }, { passive: true });
 
     // Paper planes take off before the mail app opens.
@@ -867,4 +867,36 @@
       tabbar.classList.toggle("at-footer", en[0].isIntersecting);
     }, { rootMargin: "0px 0px -12% 0px" }).observe(foot);
   }
+  /* 25. Partners "city by city": a pin on the map or a numbered chip picks a city; its card
+         (photo, names, partner list, edition link) slides in. Arrow keys move between cities. */
+  document.querySelectorAll("[data-pcity]").forEach(function (box) {
+    var pins = Array.prototype.slice.call(box.querySelectorAll(".pc-pin"));
+    var chips = Array.prototype.slice.call(box.querySelectorAll(".pc-chip"));
+    var cards = Array.prototype.slice.call(box.querySelectorAll(".pc-card"));
+    var keys = chips.map(function (c) { return c.dataset.city; });
+    var pick = function (key) {
+      pins.concat(chips).forEach(function (el) {
+        var on = el.dataset.city === key;
+        el.setAttribute("aria-pressed", String(on));
+        el.classList.toggle("is-on", on);
+      });
+      cards.forEach(function (c) {
+        var on = c.dataset.city === key;
+        if (on && c.hidden) { c.hidden = false; c.classList.remove("is-in"); void c.offsetWidth; c.classList.add("is-in"); }
+        else if (!on) c.hidden = true;
+      });
+    };
+    pins.concat(chips).forEach(function (el) {
+      el.addEventListener("click", function () { pick(el.dataset.city); });
+      el.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        e.preventDefault();
+        var i = keys.indexOf(el.dataset.city) + (e.key === "ArrowRight" ? 1 : -1);
+        var k = keys[(i + keys.length) % keys.length];
+        pick(k);
+        var same = el.classList.contains("pc-pin") ? pins : chips;
+        same.filter(function (x) { return x.dataset.city === k; })[0].focus();
+      });
+    });
+  });
 })();
