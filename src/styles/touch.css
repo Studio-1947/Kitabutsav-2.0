@@ -160,3 +160,16 @@
 @media (min-width: 721px) and (max-width: 1199px) {
   .mobile-tabbar.at-footer { transform: translate(-50%, calc(100% + 30px)) !important; pointer-events: none; }
 }
+
+/* ---------- 7. Hindi hero lockup ---------- */
+/* Devanagari has tall matras above the headline (ई, ि) and vowel signs below it (ु), so the
+   tight spacing that suits Latin makes the three lines collide. Hindi gets room above and below
+   the city name: the brand line no longer tucks under it, and the date sits clear of the
+   descenders. */
+:lang(hi) .hero__lockup .hero__brand { margin-bottom: .06em; }
+:lang(hi) .hero__lockup .hero__title { line-height: 1.22; }
+:lang(hi) .hero__lockup .hero__cityname { line-height: 1.22; }
+:lang(hi) .hero__when { bottom: -.34em; }
+@media (max-width: 720px) {
+  :lang(hi) .hero__when { margin-top: .35em; }
+}
