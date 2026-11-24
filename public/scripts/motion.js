@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pc-map", ".pc-side", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".au-group", ".ed-lead", ".ed-side", ".ed-faces li", ".ed-route", ".ed-cards li", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pc-map", ".pc-side", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".ed-lead", ".ed-side", ".ed-faces li", ".ed-route", ".ed-cards li", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -619,10 +619,8 @@
         el.hidden = !on; if (on) n++;
       });
       groups.forEach(function (g) {
-        var any = !!g.querySelector(".au-card:not([hidden])");
+        var shown = g.querySelectorAll(".au-card:not([hidden])").length, any = shown > 0;
         g.hidden = !any;
-        var link = cat.querySelector('.au-index a[data-letter="' + g.dataset.group + '"]');
-        if (link) link.classList.toggle("is-off", !any);
       });
       count.textContent = n; none.hidden = n > 0;
     };
