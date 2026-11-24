@@ -3,7 +3,9 @@
  * original Hindi session captions. Generated: edit by hand or re-run the import.
  * Photos belong to Rajkamal Prakashan Samuh or the photographers.
  */
+// chandigarh-2023-001: supplied by the site owner (November 2026), on stage at Punjab Kala Bhawan.
 export const importedPhotos: { edition: string; src: string; w: number; h: number; shape: "wide" | "tall" | "square"; moment: "opening" | "conversation" | "launch" | "exhibition" | "reading" | "performance" | "audience" | "signing"; caption: string; credit?: string; href?: string }[] = [
+  {"edition": "chandigarh-2023", "src": "/gallery/chandigarh-2023/chandigarh-2023-001.jpg", "w": 1200, "h": 900, "shape": "wide", "moment": "conversation", "caption": ""},
   {"edition": "bareilly-2025", "src": "/gallery/bareilly-2025/bareilly-2025-219.webp", "w": 1440, "h": 940, "shape": "wide", "moment": "audience", "caption": "", "credit": "@manpreetsinghmanni777", "href": "https://www.instagram.com/manpreetsinghmanni777/p/DQ7aeKQk4CC/"},
   {"edition": "bareilly-2025", "src": "/gallery/bareilly-2025/bareilly-2025-220.webp", "w": 1200, "h": 1600, "shape": "tall", "moment": "audience", "caption": "", "credit": "@manpreetsinghmanni777", "href": "https://www.instagram.com/manpreetsinghmanni777/p/DQ7P_DPASVo/"},
   {"edition": "bareilly-2025", "src": "/gallery/bareilly-2025/bareilly-2025-221.webp", "w": 576, "h": 768, "shape": "tall", "moment": "audience", "caption": "", "credit": "@socialist_mohammad_akram", "href": "https://www.instagram.com/socialist_mohammad_akram/p/DQ4SMl9kvVC/"},

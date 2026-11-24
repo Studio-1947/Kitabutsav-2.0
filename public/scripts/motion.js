@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".names__list > li", ".names .marquee", ".invite", ".logos li", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -34,7 +34,7 @@
     // it blink, since it has already been painted.
     var fold = window.innerHeight;
     var items = Array.prototype.slice.call(document.querySelectorAll(REVEAL)).filter(function (el) {
-      return !el.closest(".bhero, .page-hero, .foot") && !el.matches(".mega, .big") && el.getBoundingClientRect().top > fold;
+      return !el.closest(".bhero, .page-hero, .foot__bottom") && !el.matches(".mega, .big") && el.getBoundingClientRect().top > fold;
     });
     var count = new Map();
     items.forEach(function (el) {
@@ -131,7 +131,7 @@
     var frame = function (now) {
       if (!on) return;
       var dt = Math.min(64, now - (last || now)); last = now;
-      speed += (want - speed) * 0.06;
+      speed += ((mq.classList.contains("is-paused") ? 0 : want) - speed) * 0.06;
       state.forEach(function (s) {
         if (!s.w) return;
         s.x += s.dir * speed * dt * 0.045;
@@ -236,7 +236,7 @@
   /* 7. Headings: words rise in one by one, then a hand-drawn line draws itself under the last
         word. Words hop when the mouse passes over them. Split by word, not letter, so Hindi
         conjuncts and matras stay shaped together. */
-  var heads = Array.prototype.slice.call(document.querySelectorAll(".mani .mega, .agenda .big, .formats .big, .bpartners .big"));
+  var heads = Array.prototype.slice.call(document.querySelectorAll(".mani .mega, .agenda .big, .names .big, .formats .big, .bpartners .big"));
   heads.forEach(function (h) {
     var words = h.textContent.trim().split(/\s+/);
     h.setAttribute("aria-label", h.textContent.trim());
@@ -278,14 +278,28 @@
     });
   }
 
-  /* 10. Names: the + opens a card with the speaker's role and the editions they came to. */
-  document.querySelectorAll(".names__more").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var card = document.getElementById(btn.getAttribute("aria-controls"));
-      var open = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", String(!open));
-      card.hidden = open;
-      btn.closest("li").classList.toggle("is-open", !open);
+  /* 10. Names bookshelf: a spine opens its book (one at a time); arrow keys move along the shelf. */
+  document.querySelectorAll("[data-shelf]").forEach(function (shelf) {
+    var spines = Array.prototype.slice.call(shelf.querySelectorAll("button.book__spine"));
+    var open = function (btn, focus) {
+      spines.forEach(function (s) {
+        var on = s === btn;
+        s.setAttribute("aria-expanded", String(on));
+        s.closest(".book").classList.toggle("is-open", on);
+        var panel = document.getElementById(s.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) btn.focus();
+    };
+    spines.forEach(function (s, i) {
+      if (s.getAttribute("aria-expanded") === "true") s.closest(".book").classList.add("is-open");
+      s.addEventListener("click", function () { open(s); });
+      s.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          open(spines[(i + (e.key === "ArrowRight" ? 1 : -1) + spines.length) % spines.length], true);
+        }
+      });
     });
   });
 
@@ -299,4 +313,68 @@
       b.addEventListener("pointerleave", function () { b.style.translate = ""; });
     });
   }
+  /* 12. Partners: city chips. Picking a city eases the logo marquee to a stop and flips that
+         city's partners forward as cards; "All cities" sets the marquee moving again. */
+  document.querySelectorAll("[data-pfind]").forEach(function (box) {
+    var chips = box.querySelectorAll(".pchip"), cards = box.querySelectorAll(".pcard");
+    var hint = box.querySelector("[data-pfind-hint]");
+    var mq = box.parentElement.querySelector(".marquee--logos");
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var city = chip.dataset.city, n = 0;
+        chips.forEach(function (c) { c.setAttribute("aria-pressed", String(c === chip)); });
+        cards.forEach(function (card) {
+          var on = city !== "all" && card.dataset.city === city;
+          card.hidden = !on;
+          card.classList.remove("is-in");
+          if (on) { card.style.setProperty("--ci", n++); void card.offsetWidth; card.classList.add("is-in"); }
+        });
+        if (hint) hint.hidden = city !== "all";
+        if (mq) mq.classList.toggle("is-paused", city !== "all");
+      });
+    });
+  });
+  /* 13. Footer wordmark: its letters fill in one by one when it scrolls into view. */
+  var fword = document.querySelectorAll(".fword");
+  if (reduce) fword.forEach(function (w) { w.classList.add("is-in"); });
+  else inView(Array.prototype.slice.call(fword), function (w) { w.classList.add("is-in"); }, { threshold: 0.35 });
+  /* 14. About page route: a dashed line runs through every stop in order (whatever the layout)
+         and draws itself as the section scrolls past. Rebuilt on resize and once images load. */
+  document.querySelectorAll("[data-route]").forEach(function (box) {
+    var svg = box.querySelector(".route__line"), track = box.querySelector(".route__track"), ink = box.querySelector(".route__ink");
+    var stops = Array.prototype.slice.call(box.querySelectorAll(".stop__pin"));
+    var len = 0;
+    var build = function () {
+      var r = box.getBoundingClientRect();
+      svg.setAttribute("width", r.width); svg.setAttribute("height", r.height);
+      svg.setAttribute("viewBox", "0 0 " + r.width + " " + r.height);
+      var pts = stops.map(function (p) { var b = p.getBoundingClientRect(); return [b.left + b.width / 2 - r.left, b.top + b.height / 2 - r.top]; });
+      if (pts.length < 2) return;
+      // smooth curve through the pins (Catmull-Rom turned into cubic Béziers)
+      var d = "M" + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+      for (var i = 0; i < pts.length - 1; i++) {
+        var p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+        var c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+        var c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+        d += " C" + c1.map(function (n) { return n.toFixed(1); }).join(" ") + " " + c2.map(function (n) { return n.toFixed(1); }).join(" ") + " " + p2[0].toFixed(1) + " " + p2[1].toFixed(1);
+      }
+      track.setAttribute("d", d); ink.setAttribute("d", d);
+      len = ink.getTotalLength();
+      ink.style.strokeDasharray = len + " " + len;
+      progress();
+    };
+    var progress = function () {
+      if (!len) return;
+      if (reduce) { ink.style.strokeDashoffset = 0; stops.forEach(function (pin) { pin.closest(".stop").classList.add("is-reached"); }); return; }
+      var r = box.getBoundingClientRect(), vh = window.innerHeight;
+      var p = Math.min(1, Math.max(0, (vh * 0.75 - r.top) / r.height));
+      ink.style.strokeDashoffset = (len * (1 - p)).toFixed(1);
+      // pins light up as the line reaches them
+      stops.forEach(function (pin, i) { pin.closest(".stop").classList.toggle("is-reached", i / (stops.length - 1) <= p + 0.001); });
+    };
+    build();
+    window.addEventListener("load", build);
+    window.addEventListener("resize", build);
+    window.addEventListener("scroll", progress, { passive: true });
+  });
 })();
