@@ -13,7 +13,7 @@
 .fq-chat__who small { display: flex; align-items: center; gap: 6px; font-size: .8rem; opacity: .8; }
 .fq-chat__who small i { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 3px rgba(217, 242, 107, .25); }
 .fq-chat__all { margin-left: auto; padding: 9px 14px; border: 2px solid rgba(251, 240, 217, .4); border-radius: 999px; background: none; color: var(--cream); font: 600 .85rem/1 var(--display); cursor: pointer; transition: background .2s, color .2s; }
-.fq-chat__all:hover { background: var(--cream); color: var(--navy); }
+@media (hover: hover) { .fq-chat__all:hover { background: var(--cream); color: var(--navy); } }
 .fq-chat:not(.is-chat) .fq-chat__all { display: none; }
 
 /* Thread */
@@ -46,7 +46,7 @@
 .fq-search input { flex: 1; min-width: 0; height: 46px; border: 0; outline: 0; background: none; color: var(--navy); font: 500 1rem/1 var(--text, inherit); }
 .fq-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .fq-chip { padding: 10px 14px; border: 2px solid var(--navy); border-radius: 18px 18px 18px 6px; background: #fff; color: var(--navy); font: 600 .92rem/1.25 var(--display); text-align: left; cursor: pointer; transition: background .2s, color .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
-.fq-chip:hover { background: var(--yellow); transform: translateY(-2px); }
+@media (hover: hover) { .fq-chip:hover { background: var(--yellow); transform: translateY(-2px); } }
 .fq-chip:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
 .fq-chip.is-asked { border-color: rgba(11, 46, 99, .2); color: rgba(11, 46, 99, .55); }
 .fq-chip[hidden] { display: none; }
@@ -58,7 +58,7 @@
 .fq-more p { margin: 0; }
 .fq-more__btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .fq-more__btns a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--navy); color: var(--cream); text-decoration: none; font: 600 .9rem/1 var(--display); transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), background .2s; }
-.fq-more__btns a:hover { transform: translateY(-3px); background: var(--red); }
+@media (hover: hover) { .fq-more__btns a:hover { transform: translateY(-3px); background: var(--red); } }
 .fq-more__btns svg { width: 18px; height: 18px; }
 
 /* Phones: full-width chat like a messaging app. */

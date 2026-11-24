@@ -7,7 +7,7 @@
 /* Hero: next stop card and calls. */
 .ev-hero h1 { max-width: 14ch; }
 .ev-next { position: relative; display: grid; grid-template-columns: 170px 1fr auto; align-items: center; gap: 22px; max-width: 760px; margin-top: 28px; padding: 12px 24px 12px 12px; border-radius: var(--r-lg); background: var(--yellow); color: var(--navy); text-decoration: none; transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s; }
-.ev-next:hover { transform: translateY(-4px) rotate(-.5deg); box-shadow: 0 16px 30px rgba(7, 28, 73, .18); }
+@media (hover: hover) { .ev-next:hover { transform: translateY(-4px) rotate(-.5deg); box-shadow: 0 16px 30px rgba(7, 28, 73, .18); } }
 .ev-next:focus-visible { outline: 4px solid var(--navy); outline-offset: 4px; }
 .ev-next__photo { aspect-ratio: 4 / 3; overflow: hidden; border-radius: 16px; background: var(--blue); }
 .ev-next__photo img { width: 100%; height: 100%; object-fit: cover; }
@@ -20,7 +20,7 @@
 .ev-next__note { font-size: .9rem; opacity: .8; }
 .ev-next__go { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--navy); color: var(--yellow); transition: transform .45s cubic-bezier(.34, 1.56, .64, 1); }
 .ev-next__go svg { width: 24px; height: 24px; }
-.ev-next:hover .ev-next__go { transform: rotate(45deg); }
+@media (hover: hover) { .ev-next:hover .ev-next__go { transform: rotate(45deg); } }
 .ev-hero__ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .ev-hero__ctas .btn { gap: 10px; }
 
@@ -37,7 +37,7 @@
 .ev-day::before, .ev-day::after { content: ""; position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--cream); }
 .ev-day::before { left: -8px; }
 .ev-day::after { right: -8px; }
-.ev-day:hover { transform: translateY(-4px) rotate(-1deg); }
+@media (hover: hover) { .ev-day:hover { transform: translateY(-4px) rotate(-1deg); } }
 .ev-day[aria-selected="true"] { background: var(--navy); color: var(--cream); box-shadow: 0 12px 24px rgba(7, 28, 73, .25); }
 .ev-day:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
 .ev-day__n { font: 700 .75rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
@@ -52,7 +52,7 @@
 .ev-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
 .ev-key { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border: 2px solid transparent; border-radius: 999px; background: #fff; color: var(--navy); font: 600 .88rem/1 var(--display); cursor: pointer; transition: border-color .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
 .ev-key i { width: 12px; height: 12px; border-radius: 50%; background: var(--tone); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
-.ev-key:hover { transform: translateY(-2px); }
+@media (hover: hover) { .ev-key:hover { transform: translateY(-2px); } }
 .ev-key[aria-pressed="true"] { border-color: var(--navy); }
 .ev-key:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
 
@@ -66,7 +66,7 @@
 .ev-s__t small { font-size: .75rem; font-weight: 600; opacity: .7; }
 .ev-s__dot { justify-self: center; width: 18px; height: 18px; border: 4px solid var(--cream); border-radius: 50%; background: var(--tone); box-shadow: 0 0 0 2px var(--tone); z-index: 1; }
 .ev-s__card { display: grid; gap: 4px; padding: 16px 20px; border-left: 8px solid var(--tone); border-radius: 18px; background: #fff; color: var(--navy); transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s; }
-.ev-s:hover .ev-s__card { transform: translateX(6px); box-shadow: 0 10px 22px rgba(7, 28, 73, .12); }
+@media (hover: hover) { .ev-s:hover .ev-s__card { transform: translateX(6px); box-shadow: 0 10px 22px rgba(7, 28, 73, .12); } }
 .ev-s__kind { justify-self: start; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--tone) 30%, #fff); font: 700 .72rem/1 var(--display); letter-spacing: .04em; text-transform: uppercase; }
 .ev-s h4 { margin: 0; font: 700 1.15rem/1.3 var(--display); }
 .ev-s.is-tba h4 { font-weight: 500; font-style: italic; opacity: .6; }
