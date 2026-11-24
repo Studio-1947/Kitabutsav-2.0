@@ -1,0 +1,111 @@
+/*
+ * Events page, "festival day planner" (src/views/Programme.astro), Hindi and English.
+ * Hero with the next edition; day tickets; a vertical timeline for the chosen day with sessions
+ * coloured by kind; a legend that highlights one kind (motion.js, section 17).
+ */
+
+/* Hero: next stop card and calls. */
+.ev-hero h1 { max-width: 14ch; }
+.ev-next { position: relative; display: grid; grid-template-columns: 170px 1fr auto; align-items: center; gap: 22px; max-width: 760px; margin-top: 28px; padding: 12px 24px 12px 12px; border-radius: var(--r-lg); background: var(--yellow); color: var(--navy); text-decoration: none; transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s; }
+.ev-next:hover { transform: translateY(-4px) rotate(-.5deg); box-shadow: 0 16px 30px rgba(7, 28, 73, .18); }
+.ev-next:focus-visible { outline: 4px solid var(--navy); outline-offset: 4px; }
+.ev-next__photo { aspect-ratio: 4 / 3; overflow: hidden; border-radius: 16px; background: var(--blue); }
+.ev-next__photo img { width: 100%; height: 100%; object-fit: cover; }
+.ev-next__body { display: grid; gap: 4px; }
+.ev-next__kick { display: inline-flex; align-items: center; gap: 8px; font: 700 .78rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
+.ev-next__kick i { position: relative; width: 9px; height: 9px; border-radius: 50%; background: var(--red); }
+.ev-next__kick i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--red); animation: live-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite; }
+.ev-next__city { font: 800 clamp(1.6rem, 3vw, 2.4rem)/1.05 var(--display); text-transform: uppercase; }
+.ev-next__when { font-weight: 600; }
+.ev-next__note { font-size: .9rem; opacity: .8; }
+.ev-next__go { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--navy); color: var(--yellow); transition: transform .45s cubic-bezier(.34, 1.56, .64, 1); }
+.ev-next__go svg { width: 24px; height: 24px; }
+.ev-next:hover .ev-next__go { transform: rotate(45deg); }
+.ev-hero__ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.ev-hero__ctas .btn { gap: 10px; }
+
+/* Note above the planner */
+.ev-note { display: flex; align-items: flex-start; gap: 12px; max-width: 760px; margin: 0 0 26px; padding: 14px 18px; border-radius: var(--r-md); background: #fff; color: var(--navy); font-weight: 500; }
+.ev-note svg { flex: none; width: 22px; height: 22px; color: var(--red); }
+.ev-note a { color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Day tickets */
+.ev-days { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)) 18px; padding: 8px clamp(16px, 4vw, 48px) 12px; scroll-snap-type: x proximity; }
+.ev-days::-webkit-scrollbar { display: none; }
+.ev-day { position: relative; flex: 1 0 150px; display: grid; justify-items: start; gap: 2px; padding: 16px 18px 14px; border: 0; border-radius: 20px; background: #fff; color: var(--navy); text-align: left; cursor: pointer; scroll-snap-align: start; transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), background .25s, color .25s, box-shadow .3s; }
+/* ticket notches on the sides */
+.ev-day::before, .ev-day::after { content: ""; position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--cream); }
+.ev-day::before { left: -8px; }
+.ev-day::after { right: -8px; }
+.ev-day:hover { transform: translateY(-4px) rotate(-1deg); }
+.ev-day[aria-selected="true"] { background: var(--navy); color: var(--cream); box-shadow: 0 12px 24px rgba(7, 28, 73, .25); }
+.ev-day:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.ev-day__n { font: 700 .75rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
+.ev-day[aria-selected="true"] .ev-day__n { color: var(--yellow); }
+.ev-day__d { font: 800 2.6rem/1 var(--display); }
+.ev-day__m { font: 600 .9rem/1.2 var(--display); }
+.ev-day__count { margin-top: 8px; padding: 3px 9px; border-radius: 999px; background: rgba(11, 46, 99, .08); font: 600 .72rem/1.3 var(--display); }
+.ev-day[aria-selected="true"] .ev-day__count { background: rgba(255, 255, 255, .14); }
+.ev-day.is-today::after { background: var(--red); }
+
+/* Legend: tap a kind to highlight it */
+.ev-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.ev-key { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border: 2px solid transparent; border-radius: 999px; background: #fff; color: var(--navy); font: 600 .88rem/1 var(--display); cursor: pointer; transition: border-color .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+.ev-key i { width: 12px; height: 12px; border-radius: 50%; background: var(--tone); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
+.ev-key:hover { transform: translateY(-2px); }
+.ev-key[aria-pressed="true"] { border-color: var(--navy); }
+.ev-key:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+/* Timeline */
+.ev-panel { animation: ev-in .45s cubic-bezier(.22, 1, .36, 1); }
+@keyframes ev-in { from { opacity: 0; transform: translateY(12px); } }
+.ev-line { position: relative; display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.ev-line::before { content: ""; position: absolute; top: 14px; bottom: 14px; left: 125px; width: 4px; border-radius: 4px; background: rgba(11, 46, 99, .12); }
+.ev-s { position: relative; display: grid; grid-template-columns: 104px 42px 1fr; align-items: center; transition: opacity .3s; }
+.ev-s__t { justify-self: end; display: grid; justify-items: end; color: var(--navy); font: 800 1.15rem/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.ev-s__t small { font-size: .75rem; font-weight: 600; opacity: .7; }
+.ev-s__dot { justify-self: center; width: 18px; height: 18px; border: 4px solid var(--cream); border-radius: 50%; background: var(--tone); box-shadow: 0 0 0 2px var(--tone); z-index: 1; }
+.ev-s__card { display: grid; gap: 4px; padding: 16px 20px; border-left: 8px solid var(--tone); border-radius: 18px; background: #fff; color: var(--navy); transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s; }
+.ev-s:hover .ev-s__card { transform: translateX(6px); box-shadow: 0 10px 22px rgba(7, 28, 73, .12); }
+.ev-s__kind { justify-self: start; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--tone) 30%, #fff); font: 700 .72rem/1 var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.ev-s h4 { margin: 0; font: 700 1.15rem/1.3 var(--display); }
+.ev-s.is-tba h4 { font-weight: 500; font-style: italic; opacity: .6; }
+.ev-s__who { margin: 0; font-size: .9rem; opacity: .75; }
+.ev-s--exhibition .ev-s__card { background: color-mix(in srgb, var(--sand) 35%, #fff); }
+/* legend focus: matching sessions pop, the rest fade */
+[data-planner][data-focus]:not([data-focus=""]) .ev-s:not(.is-match) { opacity: .3; }
+.ev-s.is-match .ev-s__card { transform: translateX(6px); box-shadow: 0 10px 22px rgba(7, 28, 73, .14); }
+/* during the festival */
+.ev-s.is-past { opacity: .45; }
+.ev-now { position: relative; height: 0; margin: 2px 0; }
+.ev-now::before { content: ""; position: absolute; left: 118px; right: 0; top: -1px; height: 2px; background: var(--red); }
+.ev-now span { position: absolute; left: 70px; top: -11px; padding: 3px 8px; border-radius: 999px; background: var(--red); color: var(--cream); font: 700 .72rem/1.2 var(--display); }
+
+/* Phones: hero card stacks, days scroll, timeline uses less width. */
+@media (max-width: 720px) {
+  .ev-next { grid-template-columns: 1fr auto; padding: 12px; gap: 12px 14px; }
+  .ev-next__photo { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+  .ev-next__go { width: 46px; height: 46px; align-self: end; }
+  .ev-day { flex: 0 0 132px; padding: 14px 14px 12px; }
+  .ev-day__d { font-size: 2.1rem; }
+  .ev-line::before { left: 75px; }
+  .ev-s { grid-template-columns: 62px 28px 1fr; }
+  .ev-s__t { font-size: .95rem; }
+  .ev-s__dot { width: 14px; height: 14px; border-width: 3px; }
+  .ev-s__card { padding: 12px 14px; border-left-width: 6px; }
+  .ev-s h4 { font-size: 1rem; }
+  .ev-now::before { left: 72px; }
+  .ev-now span { left: 20px; }
+  /* Legend scrolls sideways in one row instead of stacking three deep. */
+  .ev-legend { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)) 18px; padding: 2px clamp(16px, 4vw, 48px); }
+  .ev-legend::-webkit-scrollbar { display: none; }
+  .ev-key { flex: none; }
+  /* Hindi times ("दोपहर 3 बजे") read as two lines: part of day small above, the hour below. */
+  .lang-hi .ev-s { grid-template-columns: 70px 28px 1fr; }
+  .lang-hi .ev-line::before { left: 83px; }
+  .lang-hi .ev-s__t { font-size: .9rem; line-height: 1.15; text-align: right; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ev-next, .ev-next__go, .ev-day, .ev-key, .ev-s__card { transition: none; }
+  .ev-panel, .ev-next__kick i::after { animation: none; }
+}

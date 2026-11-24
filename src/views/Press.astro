@@ -5,7 +5,9 @@ import Clouds from "../components/Clouds.astro";
 import Icon from "../components/Icon.astro";
 import { coverage, pressContact } from "../data/press";
 import { editions, editionBySlug } from "../data/editions";
-import { festivalTotals, tagline, hashtag } from "../data/speakers";
+import { festivalTotals, tagline, hashtag, allSpeakers } from "../data/speakers";
+import { partners } from "../data/partners";
+import { coverFor } from "../data/gallery";
 import { formatDate, formatRange, localePath, t, type Lang } from "../i18n";
 import { org } from "../site.config";
 
@@ -38,78 +40,99 @@ const facts = hi
       ["Line", `${tagline.en} ${hashtag}`],
     ];
 const assets = [
-  { href: "/brand/kitab-utsav-logo.svg", label: hi ? "किताब उत्सव लोगो (SVG)" : "Kitab Utsav logo (SVG)" },
-  { href: "/brand/rkp-logo.svg", label: hi ? "राजकमल लोगो (SVG)" : "Rajkamal logo (SVG)" },
-  { href: "/og/kitab-utsav.jpg", label: hi ? "शेयर इमेज (1200×630)" : "Share image (1200×630)" },
+  { href: "/brand/kitab-utsav-logo.svg", label: hi ? "किताब उत्सव लोगो" : "Kitab Utsav logo", type: "SVG", size: "58 KB", bg: "#fff" },
+  { href: "/brand/rkp-logo.svg", label: hi ? "राजकमल प्रकाशन लोगो" : "Rajkamal Prakashan logo", type: "SVG", size: "21 KB", bg: "#fff" },
+  { href: "/og/kitab-utsav.jpg", label: hi ? "शेयर इमेज, 1200×630" : "Share image, 1200×630", type: "JPG", size: "81 KB", bg: "#0b2e63" },
+];
+// Masthead numbers: volume = years running, issue = editions so far.
+const vol = festivalTotals.find((x) => x.label.en === "years")?.value ?? "";
+const issue = festivalTotals.find((x) => x.label.en === "editions")?.value ?? "";
+const numbers = [
+  ...festivalTotals.map((x) => ({ value: x.value, label: x.label[lang] })),
+  { value: String(partners.length), label: hi ? "साथी" : "partners" },
+  { value: `${allSpeakers.length}+`, label: hi ? "वक्ता" : "speakers" },
 ];
 ---
 <Base lang={lang} route="/press/" title={title} description={description} crumbs={crumbs}>
-  <section class="page-hero">
-    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+  <section class="page-hero nw-hero">
     <div class="wrap">
       <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{hi ? "मीडिया" : "Press"}</p>
-      <h1>{hi ? <>ख़बरों में <em>किताब उत्सव</em></> : <>Kitab Utsav <em>in the news</em></>}</h1>
-      <p class="lead">
-        {hi
-          ? "पत्रकारों और आयोजकों के लिए: कवरेज, तथ्य, लोगो और संपर्क एक जगह।"
-          : "For journalists and partners: coverage, facts, logos and contacts in one place."}
-      </p>
+      <header class="nw-mast">
+        <p class="nw-mast__top">
+          <span>{hi ? `खंड ${vol} · अंक ${issue}` : `Vol. ${vol} · No. ${issue}`}</span>
+          <span data-today></span>
+          <span>{hi ? "मीडिया और प्रेस" : "Press & media"}</span>
+        </p>
+        <h1 class="nw-mast__name">{hi ? "किताब उत्सव समाचार" : <>The Kitab Utsav <em>Times</em></>}</h1>
+        <p class="nw-mast__sub">{hi ? "पत्रकारों और आयोजकों के लिए: कवरेज, तथ्य, लोगो और संपर्क, एक जगह।" : "For journalists and partners: coverage, facts, logos and contacts, in one place."}</p>
+      </header>
+      <ul class="nw-ticker" aria-label={hi ? "अब तक" : "So far"}>
+        {numbers.map((n) => <li><b>{n.value}</b> {n.label}</li>)}
+      </ul>
     </div>
   </section>
 
-  <section class="section" style="padding-top:32px">
-    <div class="wrap detail-grid">
-      <div>
-        <h2 class="h2 h2--sm">{hi ? "कवरेज" : "Coverage"}</h2>
+  <section class="section nw-body">
+    <div class="wrap nw-grid">
+      <div class="nw-main">
+        <h2 class="nw-head"><span>{hi ? "कवरेज" : "Coverage"}</span></h2>
         {coverage.length === 0 ? (
-          <div class="notice" role="note"><Icon name="news" /><p>{hi ? "प्रेस कवरेज के लिंक जल्द जोड़े जाएँगे।" : "Links to press coverage will be added soon."}</p></div>
+          <p class="nw-empty">{hi ? "प्रेस कवरेज के लिंक जल्द जोड़े जाएँगे।" : "Links to press coverage will be added soon."}</p>
         ) : (
-          <ul class="press-list">
-            {coverage.map((c) => {
+          <ul class="nw-clips">
+            {coverage.map((c, i) => {
               const e = c.edition ? editionBySlug(c.edition) : null;
+              const cover = c.edition ? coverFor(c.edition) : undefined;
+              const Tag = c.url ? "a" : "div";
               return (
-                <li class:list={["press-item", { "is-slot": !c.url }]}>
-                  <span class="press-item__src">{c.outlet[lang]}</span>
-                  <h3>{c.url ? <a href={c.url} target="_blank" rel="noopener">{c.headline[lang]}<Icon name="ext" /></a> : c.headline[lang]}</h3>
-                  <span class="press-item__meta">
-                    {[
-                      c.date && formatDate(c.date, lang),
-                      e && <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city[lang]} {e.year}</a>,
-                      !c.url && <em>{hi ? "लिंक जल्द" : "link coming"}</em>,
-                    ].filter(Boolean).map((x, i) => <>{i > 0 && " · "}{x}</>)}
-                  </span>
+                <li class:list={["nw-clip", { "is-slot": !c.url }]} style={`--tilt:${[-1.6, 1.2, -0.8, 1.8][i % 4]}deg`}>
+                  <Tag class="nw-clip__in" {...(c.url ? { href: c.url, target: "_blank", rel: "noopener" } : {})}>
+                    <span class="nw-clip__pin" aria-hidden="true"></span>
+                    <span class="nw-clip__src">{c.url ? c.outlet[lang] : (hi ? "समाचार" : "News")}{c.date && ` · ${formatDate(c.date, lang)}`}</span>
+                    <h3 class="nw-clip__h">{c.headline[lang]}</h3>
+                    {cover && <span class="nw-clip__img" aria-hidden="true"><img src={cover.src} alt="" loading="lazy" decoding="async" /></span>}
+                    <span class="nw-clip__meta">
+                      {e && <span>{e.city[lang]} {e.year}</span>}
+                      {c.url ? <span class="nw-clip__go">{hi ? "पूरी ख़बर" : "Read the story"} <Icon name="ext" /></span> : <span class="nw-stamp">{hi ? "क्लिपिंग जल्द" : "Clipping coming"}</span>}
+                    </span>
+                  </Tag>
+                  {e && <a class="nw-clip__ed" href={localePath(lang, `/editions/${e.slug}/`)}>{hi ? `${e.city.hi} ${e.year} के बारे में` : `About ${e.city.en} ${e.year}`} →</a>}
                 </li>
               );
             })}
           </ul>
         )}
 
-        <h2 class="h2 h2--sm" style="margin-top:56px">{hi ? "तथ्य-पत्र" : "Fact sheet"}</h2>
-        <dl class="facts-sheet">
-          {facts.map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}
-          <dt>{hi ? "संस्करण" : "Editions"}</dt>
-          <dd>
-            {dated.map((e, i) => <>{i > 0 && " · "}<a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city[lang]} {e.year}</a></>)}
-          </dd>
-        </dl>
-        <p class="muted" style="font-size:.85rem">{hi ? `सबसे पुराना दर्ज संस्करण: ${first.city.hi}, ${formatRange(first, "hi")}।` : `Earliest edition on record here: ${first.city.en}, ${formatRange(first, "en")}.`}</p>
+        <h2 class="nw-head"><span>{hi ? "प्रेस किट" : "Press kit"}</span></h2>
+        <ul class="nw-kit">
+          {assets.map((a) => (
+            <li>
+              <a class="nw-kit__item" href={a.href} download>
+                <span class="nw-kit__prev" style={`background:${a.bg}`}><img src={a.href} alt="" loading="lazy" decoding="async" /></span>
+                <span class="nw-kit__name">{a.label}</span>
+                <span class="nw-kit__meta"><i>{a.type}</i>{a.size}<Icon name="download" /></span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <aside>
-        <div class="card">
-          <h3 class="card-title">{hi ? "मीडिया संपर्क" : "Media contact"}</h3>
-          <ul class="info">
-            <li><Icon name="mail" /><span><b>{hi ? "ईमेल" : "Email"}</b><a href={`mailto:${pressContact.email}?subject=${encodeURIComponent("Kitab Utsav: press")}`}>{pressContact.email}</a></span></li>
-            <li><Icon name="chat" /><span><b>{hi ? "फ़ोन" : "Phone"}</b>{org.phones.map((p, i) => <>{i > 0 && ", "}<a href={`tel:${p.tel}`}>{p.label}</a></>)}</span></li>
-          </ul>
-        </div>
-        <div class="card" style="margin-top:16px">
-          <h3 class="card-title">{hi ? "प्रेस किट" : "Press kit"}</h3>
-          <ul class="asset-list">
-            {assets.map((a) => <li><a href={a.href} download><Icon name="download" />{a.label}</a></li>)}
-          </ul>
-        </div>
+      <aside class="nw-side">
+        <section class="nw-glance" aria-labelledby="glance-h">
+          <h2 id="glance-h">{hi ? "एक नज़र में" : "At a glance"}</h2>
+          <dl>
+            {facts.map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}
+            <dt>{hi ? "संस्करण" : "Editions"}</dt>
+            <dd class="nw-glance__eds">{dated.map((e) => <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city[lang]} {e.year}</a>)}</dd>
+          </dl>
+          <p class="nw-glance__note">{hi ? `सबसे पुराना दर्ज संस्करण: ${first.city.hi}, ${formatRange(first, "hi")}।` : `Earliest edition on record here: ${first.city.en}, ${formatRange(first, "en")}.`}</p>
+        </section>
+        <section class="nw-desk" aria-labelledby="desk-h">
+          <h2 id="desk-h"><Icon name="news" />{hi ? "प्रेस डेस्क" : "Press desk"}</h2>
+          <p>{hi ? "इंटरव्यू, तस्वीरें या मान्यता के लिए लिखें या फ़ोन करें।" : "For interviews, photos or accreditation, write or call."}</p>
+          <a class="nw-desk__mail" href={`mailto:${pressContact.email}?subject=${encodeURIComponent("Kitab Utsav: press")}`}><Icon name="mail" />{pressContact.email}</a>
+          <div class="nw-desk__phones">{org.phones.map((p) => <a href={`tel:${p.tel}`}><Icon name="phone" />{p.label}</a>)}</div>
+        </section>
       </aside>
     </div>
   </section>

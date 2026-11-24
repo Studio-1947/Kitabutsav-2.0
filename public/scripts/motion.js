@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -161,7 +161,7 @@
 
   /* 6. Photo viewer: tap a gallery photo to see it full screen. Arrows, Esc and swipe work. */
   var grids = document.querySelectorAll(".gallery");
-  if (grids.length && window.HTMLDialogElement) {
+  if ((grids.length || document.querySelector("[data-albums]")) && window.HTMLDialogElement) {
     var t = hi
       ? { close: "बंद करें", prev: "पिछली तस्वीर", next: "अगली तस्वीर", of: " / " }
       : { close: "Close", prev: "Previous photo", next: "Next photo", of: " of " };
@@ -215,6 +215,10 @@
         root.classList.add("lb-open");
       });
     });
+    // Other parts of the page (the About albums) open the viewer with their own photo list.
+    window.__openPhotos = function (photos, idx) {
+      list = photos; show(idx, 0); dlg.showModal(); root.classList.add("lb-open");
+    };
     dlg.querySelector(".lb__close").addEventListener("click", function () { dlg.close(); });
     dlg.querySelector(".lb__prev").addEventListener("click", function () { show(at - 1, -1); });
     dlg.querySelector(".lb__next").addEventListener("click", function () { show(at + 1, 1); });
@@ -376,5 +380,172 @@
     window.addEventListener("load", build);
     window.addEventListener("resize", build);
     window.addEventListener("scroll", progress, { passive: true });
+  });
+  /* 15. About gallery as photo albums. An album (a stack of photos) opens its panel: a big
+         feature photo, caption and counter, arrows, and a strip of thumbnails. The feature opens
+         the full-screen viewer. #gallery-<edition> links open that album. */
+  document.querySelectorAll("[data-albums]").forEach(function (wrap) {
+    var tabs = Array.prototype.slice.call(wrap.querySelectorAll(".album"));
+    var panels = {};
+    wrap.querySelectorAll(".alb-panel").forEach(function (panel) {
+      var thumbs = Array.prototype.slice.call(panel.querySelectorAll(".alb-thumb"));
+      var feat = panel.querySelector(".alb-feature img"), cap = panel.querySelector(".alb-cap__text");
+      var count = panel.querySelector(".alb-cap__n"), credit = panel.querySelector(".alb-cap__credit");
+      var at = 0;
+      var data = thumbs.map(function (b) {
+        return { src: b.dataset.src, alt: b.dataset.cap, cap: b.dataset.cap, credit: b.dataset.credit || "", href: b.dataset.href || "" };
+      });
+      var go = function (i, dir) {
+        at = (i + thumbs.length) % thumbs.length;
+        var d = data[at];
+        feat.classList.remove("is-in", "from-l", "from-r");
+        void feat.offsetWidth;
+        feat.src = d.src; feat.alt = d.cap;
+        feat.classList.add("is-in", dir < 0 ? "from-l" : "from-r");
+        cap.textContent = d.cap;
+        count.textContent = (at + 1) + " / " + thumbs.length;
+        credit.textContent = "";
+        if (d.credit) {
+          var a = document.createElement(d.href ? "a" : "span");
+          a.textContent = d.credit;
+          if (d.href) { a.href = d.href; a.target = "_blank"; a.rel = "noopener"; }
+          credit.append(hi ? "फ़ोटो: " : "Photo: ", a);
+        }
+        thumbs.forEach(function (b, k) { b.setAttribute("aria-current", k === at ? "true" : "false"); });
+        var strip = thumbs[at].parentElement.parentElement, b = thumbs[at];
+        strip.scrollTo({ left: b.offsetLeft - strip.clientWidth / 2 + b.offsetWidth / 2, behavior: reduce ? "auto" : "smooth" });
+      };
+      thumbs.forEach(function (b, k) { b.addEventListener("click", function () { go(k, k < at ? -1 : 1); }); });
+      panel.querySelector(".alb-prev").addEventListener("click", function () { go(at - 1, -1); });
+      panel.querySelector(".alb-next").addEventListener("click", function () { go(at + 1, 1); });
+      panel.querySelector(".alb-feature").addEventListener("click", function () { if (window.__openPhotos) window.__openPhotos(data, at); });
+      panel.addEventListener("keydown", function (e) {
+        if (e.target.closest(".alb-strip, .alb-stage") && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+          e.preventDefault(); go(at + (e.key === "ArrowRight" ? 1 : -1), e.key === "ArrowRight" ? 1 : -1);
+        }
+      });
+      // swipe the feature photo on phones
+      var sx = null;
+      panel.querySelector(".alb-stage").addEventListener("pointerdown", function (e) { sx = e.clientX; });
+      panel.querySelector(".alb-stage").addEventListener("pointerup", function (e) {
+        if (sx === null) return; var dx = e.clientX - sx; sx = null;
+        if (Math.abs(dx) > 50) { e.preventDefault(); go(at + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); panel.dataset.swiped = "1"; }
+      });
+      panel.querySelector(".alb-feature").addEventListener("click", function (e) {
+        if (panel.dataset.swiped) { delete panel.dataset.swiped; e.stopImmediatePropagation(); }
+      }, true);
+      panels[panel.id] = panel;
+    });
+    var open = function (id, scroll) {
+      tabs.forEach(function (tab) {
+        var on = tab.getAttribute("aria-controls") === id;
+        tab.setAttribute("aria-selected", String(on));
+        tab.tabIndex = on ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !on;
+      });
+      if (scroll) document.getElementById(id).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    };
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { open(tab.getAttribute("aria-controls")); });
+      tab.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        e.preventDefault();
+        var n = tabs[(i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
+        n.focus(); open(n.getAttribute("aria-controls"));
+      });
+    });
+    var m = location.hash.match(/^#(?:gallery-)?([a-z]+-\d{4})$/);
+    if (m && panels["gp-" + m[1]]) { open("gp-" + m[1]); document.getElementById("gallery").scrollIntoView(); }
+  });
+  /* 16. On-this-page nav: the section in view is marked current, and a marker slides under it. */
+  document.querySelectorAll("[data-spy]").forEach(function (nav) {
+    var bar = nav.querySelector(".page-tabs__bar"), ind = nav.querySelector(".page-tabs__ind");
+    var links = Array.prototype.slice.call(nav.querySelectorAll("a[href^='#']"));
+    var secs = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+    var cur = -1;
+    var place = function () {
+      var a = links[cur];
+      if (!a) { bar.classList.remove("has-active"); return; }
+      ind.style.width = a.offsetWidth + "px";
+      ind.style.setProperty("--ind-x", a.offsetLeft + "px");
+      bar.classList.add("has-active");
+    };
+    var spy = function () {
+      var line = window.innerHeight * 0.35, k = -1;
+      secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top <= line) k = i; });
+      if (k === cur) return;
+      cur = k;
+      links.forEach(function (a, i) { if (i === k) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
+      place();
+    };
+    window.addEventListener("scroll", spy, { passive: true });
+    window.addEventListener("resize", place);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    spy();
+  });
+  /* 17. Events day planner: legend chips highlight one kind of session across the days; during
+         the festival, today's tab opens by itself, past sessions dim and a "now" line shows. */
+  document.querySelectorAll("[data-planner]").forEach(function (pl) {
+    var keys = pl.querySelectorAll(".ev-key");
+    keys.forEach(function (k) {
+      k.addEventListener("click", function () {
+        var on = k.getAttribute("aria-pressed") !== "true";
+        keys.forEach(function (o) { o.setAttribute("aria-pressed", String(o === k && on)); });
+        pl.dataset.focus = on ? k.dataset.kind : "";
+        pl.querySelectorAll(".ev-s").forEach(function (s) { s.classList.toggle("is-match", on && s.dataset.kind === pl.dataset.focus); });
+      });
+    });
+    var ist = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+    var part = function (n) { return (ist.find(function (x) { return x.type === n; }) || {}).value; };
+    var today = part("year") + "-" + part("month") + "-" + part("day");
+    var nowMin = parseInt(part("hour"), 10) % 24 * 60 + parseInt(part("minute"), 10);
+    var tab = pl.querySelector('.ev-day[data-date="' + today + '"]');
+    if (!tab) return;
+    tab.classList.add("is-today");
+    tab.click();
+    var panel = pl.querySelector('.ev-panel[data-date="' + today + '"]');
+    var mins = function (s) { var p = s.split(":"); return +p[0] * 60 + +p[1]; };
+    var placed = false;
+    panel.querySelectorAll(".ev-s").forEach(function (s) {
+      var end = s.dataset.end ? mins(s.dataset.end) : mins(s.dataset.start) + 90;
+      if (end <= nowMin) s.classList.add("is-past");
+      if (!placed && mins(s.dataset.start) > nowMin) {
+        var li = document.createElement("li");
+        li.className = "ev-now"; li.innerHTML = "<span>" + (hi ? "अभी" : "Now") + "</span>";
+        s.parentNode.insertBefore(li, s); placed = true;
+      }
+    });
+  });
+  /* 18. Partners page: city (map pins or chips) and kind filters; shelves with nothing left hide;
+         cards flip on hover (desktop) or tap (touch). */
+  document.querySelectorAll("[data-pfind2]").forEach(function (box) {
+    var state = { city: "", group: "" };
+    var cards = box.querySelectorAll(".pt-card"), shelves = box.querySelectorAll(".pt-shelf");
+    var pins = box.querySelectorAll(".pt-pin"), count = box.querySelector("[data-pcount]"), empty = box.querySelector("[data-pempty]");
+    var apply = function () {
+      var n = 0;
+      cards.forEach(function (c) {
+        var on = (!state.city || c.dataset.city.split(" ").indexOf(state.city) >= 0) && (!state.group || c.dataset.group === state.group);
+        c.hidden = !on; if (on) n++;
+        if (on && !reduce) { c.classList.remove("is-pop"); void c.offsetWidth; c.classList.add("is-pop"); }
+      });
+      shelves.forEach(function (s) { s.hidden = !s.querySelector(".pt-card:not([hidden])"); });
+      box.querySelectorAll(".pt-chip[data-city]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.city === state.city)); });
+      box.querySelectorAll(".pt-chip[data-group]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.group === state.group)); });
+      pins.forEach(function (p) { p.classList.toggle("is-on", p.dataset.city === state.city); p.classList.toggle("is-dim", !!state.city && p.dataset.city !== state.city); });
+      count.textContent = n; empty.hidden = n > 0;
+    };
+    box.querySelectorAll(".pt-chip[data-city]").forEach(function (b) { b.addEventListener("click", function () { state.city = b.dataset.city; apply(); }); });
+    box.querySelectorAll(".pt-chip[data-group]").forEach(function (b) { b.addEventListener("click", function () { state.group = b.dataset.group; apply(); }); });
+    pins.forEach(function (p) {
+      p.addEventListener("click", function () { state.city = state.city === p.dataset.city ? "" : p.dataset.city; apply(); });
+    });
+    cards.forEach(function (c) {
+      c.querySelector(".pt-card__in").addEventListener("click", function () { c.classList.toggle("is-flipped"); });
+    });
+  });
+  /* 19. Press masthead: today's date, in the page's language (the page itself is built ahead of time). */
+  document.querySelectorAll("[data-today]").forEach(function (el) {
+    el.textContent = new Intl.DateTimeFormat(hi ? "hi-IN" : "en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date());
   });
 })();
