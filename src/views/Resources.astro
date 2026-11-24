@@ -131,14 +131,10 @@ const withPhoto = allSpeakers.filter((sp) => sp.photo || sp.stagePhoto).length;
         <p class="au-count" aria-live="polite"><b data-au-count>{allSpeakers.length}</b> {hi ? `नाम · ${withPhoto} तस्वीर सहित` : `names · ${withPhoto} with photos`}</p>
       </div>
 
-      <nav class="au-index" aria-label={hi ? "अक्षर से जाएँ" : "Jump to a letter"}>
-        {groups.map((g) => <a href={`#au-${g.L}`} data-letter={g.L}>{g.L}</a>)}
-      </nav>
 
       <div class="au-groups">
         {groups.map((g) => (
-          <section class="au-group" id={`au-${g.L}`} data-group={g.L} aria-label={g.L}>
-            <h2 class="au-group__L" aria-hidden="true">{g.L}</h2>
+          <section class="au-group" data-group={g.L} aria-label={g.L}>
             <ul class="au-cards">
               {g.people.map((sp) => (
                 <li class="au-card" id={sp.slug} data-cities={tagsFor(sp).join(" ")} data-kinds={kindsOf(sp).join(" ")} data-search={`${sp.name.hi} ${sp.name.en} ${sp.role.hi} ${sp.role.en}`.toLowerCase()}>

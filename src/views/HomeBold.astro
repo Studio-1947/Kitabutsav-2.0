@@ -12,7 +12,7 @@ import Wave from "../components/Wave.astro";
 import { coverFor, focusOf } from "../data/gallery";
 import { bookSeatUrl, org } from "../site.config";
 import { editions, featuredEdition as fe, nextEdition, type L10n } from "../data/editions";
-import { allSpeakers, festivalTotals, tagline } from "../data/speakers";
+import { allSpeakers, tagline } from "../data/speakers";
 import { partners } from "../data/partners";
 import { formatRange, localePath, t, type Lang } from "../i18n";
 import { eventLd } from "../lib/schema";
@@ -172,9 +172,6 @@ const jsonLd = heroEv ? [heroEv] : [];
       <div class="mani__in">
         <p class="kick">{hi ? "राजकमल प्रकाशन समूह का घूमता पुस्तक उत्सव" : "Rajkamal Prakashan's travelling book festival"}</p>
         <h2 class="mega">{tagline[lang]}</h2>
-        <ul class="btotals">
-          {festivalTotals.map((x) => <li><b>{x.value}</b> {x.label[lang]}</li>)}
-        </ul>
         <a class="btn btn--ink" href={L("/about/")}>{hi ? "हमारी कहानी" : "Our story"}</a>
       </div>
     </section>
@@ -223,7 +220,7 @@ const jsonLd = heroEv ? [heroEv] : [];
             <li class="book" style={`--bh:${spine[i].h}px;--bw:${spine[i].w}px;--bg:var(--${spine[i].bg});--fg:var(--${spine[i].fg});--lean:${spine[i].lean}deg`}>
               <button type="button" class="book__spine" aria-expanded={i === 0 ? "true" : "false"} aria-controls={`bk-${p.slug}`}>
                 <span class="book__title">{p.name[lang]}</span>
-                <span class="book__mark" aria-hidden="true">कि</span>
+                <span class="book__mark" aria-hidden="true"></span>
               </button>
             </li>
           ))}

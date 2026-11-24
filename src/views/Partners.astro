@@ -3,8 +3,11 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
 import Icon from "../components/Icon.astro";
-import { indiaOutline } from "../data/india-outline";
+import Landmark from "../components/Landmark.astro";
 import { partners, groupLabel, groupOrder } from "../data/partners";
+import { editions } from "../data/editions";
+import { cityPhotos } from "../data/city-photos";
+import { localePath } from "../i18n";
 import { org } from "../site.config";
 import { t, type Lang } from "../i18n";
 
@@ -27,30 +30,41 @@ const orgLd = {
   itemListElement: partners.map((p, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Organization", name: p.name.en, ...(p.url ? { url: p.url } : {}) } })),
 };
 
-// Map: India's outline (src/data/india-outline.ts) and the partner cities, projected from
-// longitude/latitude (equirectangular, x scaled by cos 23°).
-const ll: Record<string, [number, number]> = {
-  bareilly: [79.43, 28.37], bhopal: [77.41, 23.26], jaipur: [75.79, 26.91], chandigarh: [76.78, 30.73], "new delhi": [77.21, 28.61],
-  indore: [75.86, 22.72], jalandhar: [75.58, 31.33], mumbai: [72.88, 19.08], patna: [85.14, 25.59], ranchi: [85.33, 23.34],
+// City map: the India district line-art from the 1.0 site (public/brand/india-districts.svg,
+// 1977 x 2313). Pin positions are in that drawing's own units: the 1.0 site's pins for Bhopal,
+// Chandigarh, Indore, Mumbai, Patna and Bareilly, and for the other partner cities a least-squares
+// fit from longitude/latitude to those pins (within 16 units, under 1% of the width).
+const MAP_W = 1977, MAP_H = 2313;
+const at: Record<string, [number, number]> = {
+  bareilly: [779, 746], bhopal: [660, 1073], jaipur: [570, 815], chandigarh: [643, 573], "new delhi": [658, 717],
+  indore: [567, 1088], jalandhar: [572, 524], mumbai: [369, 1298], patna: [1109, 979], ranchi: [1114, 1140],
 };
-const K = Math.cos((23 * Math.PI) / 180), W0 = 67.5, N0 = 37.6, S = 12;
-const proj = ([lon, lat]: [number, number]) => [((lon - W0) * K * S), ((N0 - lat) * S)] as const;
-// the islands reach 6.75°N, so the map runs a little further south than the mainland
-const mapW = Math.round((97.6 - W0) * K * S), mapH = Math.round((N0 - 6.4) * S);
-const outlinePath = indiaOutline
-  .map((ring) => "M" + ring.map((pt) => proj(pt).map((n) => n.toFixed(1)).join(" ")).join(" L") + " Z")
-  .join(" ");
 // "Bhopal & Jaipur" belongs to both cities.
 const cityKeys = (p: (typeof partners)[number]) => p.city.en.split(" & ").map((x) => x.toLowerCase());
+const cityHi: Record<string, string> = Object.fromEntries(partners.flatMap((p) => p.city.en.split(" & ").map((en, i) => [en.toLowerCase(), p.city.hi.split(" और ")[i]])));
+const cityEn: Record<string, string> = Object.fromEntries(partners.flatMap((p) => p.city.en.split(" & ").map((en) => [en.toLowerCase(), en])));
 const pins = cities.map(([key, name]) => {
-  const [x, y] = proj(ll[key] ?? [78, 22]);
-  return { key, name, x, y, n: partners.filter((p) => cityKeys(p).includes(key)).length };
-}).sort((a, b) => b.n - a.n);
-// labels that would collide go to the left
+  const [x, y] = at[key] ?? [700, 1000];
+  const list = partners.filter((p) => cityKeys(p).includes(key));
+  const ed = editions.filter((e) => e.city.en.toLowerCase() === key).sort((a, b) => b.year - a.year);
+  return { key, name, hiName: cityHi[key], enName: cityEn[key], x, y, n: list.length, list, edition: ed[0], photo: cityPhotos[key] };
+}).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name));
+// A dotted route through every pin, going round the centre so it never crosses itself.
+const cx = pins.reduce((s, p) => s + p.x, 0) / pins.length, cy = pins.reduce((s, p) => s + p.y, 0) / pins.length;
+const ring = [...pins].sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx));
+const route = ring.map((p, i) => {
+  const q = ring[(i + 1) % ring.length];
+  const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+  // bow each leg slightly outward from the centre
+  const ox = (mx - cx) * .12, oy = (my - cy) * .12;
+  return `${i ? "" : `M${p.x} ${p.y} `}Q${(mx + ox).toFixed(0)} ${(my + oy).toFixed(0)} ${q.x} ${q.y}`;
+}).join(" ");
+// Labels: most go right; a few go left so neighbours don't overlap.
 const leftLabel = new Set(["new delhi", "jalandhar", "jaipur", "mumbai", "indore"]);
+const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
 
-// Hero background: every logo, in three drifting rows.
-const wall = [0, 1, 2].map((r) => partners.filter((_, i) => i % 3 === r));
+// Hero: partner logos on two rings around the festival logo (8 inside, the rest outside).
+const rings = [partners.slice(0, 8), partners.slice(8)];
 const ways = hi
   ? ["आयोजन स्थल", "मीडिया साझेदार", "सांस्कृतिक संस्थान", "कॉलेज और विश्वविद्यालय", "किताबों की दुकान", "प्रायोजक"]
   : ["Venue", "Media partner", "Cultural institution", "College or university", "Bookstore", "Sponsor"];
@@ -59,12 +73,8 @@ const tones = ["yellow", "sky", "lime", "lilac", "saffron", "cream", "sand"];
 
 <Base lang={lang} route="/partners/" title={title} description={description} crumbs={crumbs} jsonLd={[orgLd]}>
   <section class="page-hero pt-hero">
-    <div class="pt-wall" aria-hidden="true">
-      {wall.map((row, r) => (
-        <div class={`pt-wall__row pt-wall__row--${r}`}>{[...row, ...row, ...row].map((p) => <span class="pt-wall__logo"><img src={p.logo} alt="" loading="lazy" decoding="async" /></span>)}</div>
-      ))}
-    </div>
     <div class="wrap pt-hero__in">
+      <div class="pt-hero__text">
       <Crumbs lang={lang} items={crumbs} />
       <p class="eyebrow">{label}</p>
       <h1>{hi ? <>साथ जुड़ें, <em>साथ पढ़ें</em></> : <>Come together, <em>read together</em></>}</h1>
@@ -78,41 +88,101 @@ const tones = ["yellow", "sky", "lime", "lilac", "saffron", "cream", "sand"];
         <li><b>{pins.length}</b>{hi ? "शहर" : "cities"}</li>
         <li><b>{groups.length}</b>{hi ? "श्रेणियाँ" : "kinds"}</li>
       </ul>
+      </div>
+      <div class="pt-orbit" aria-hidden="true">
+        <span class="pt-orbit__track pt-orbit__track--in"></span>
+        <span class="pt-orbit__track pt-orbit__track--out"></span>
+        {rings.map((ring, r) => (
+          <div class={`pt-orbit__ring pt-orbit__ring--${r ? "out" : "in"}`}>
+            {ring.map((p, i) => (
+              <span class="pt-orbit__item" style={`--a:${(360 / ring.length) * i + (r ? 18 : 0)}deg`}>
+                <span class="pt-orbit__logo"><img src={p.logo} alt="" loading="lazy" decoding="async" /></span>
+              </span>
+            ))}
+          </div>
+        ))}
+        <span class="pt-orbit__core"><img src="/brand/kitab-utsav-logo.svg" alt="" decoding="async" /></span>
+      </div>
     </div>
   </section>
 
   <section class="section pt-find" aria-labelledby="pt-map-h" data-pfind2>
-    <div class="wrap pt-find__in">
-      <div class="pt-map">
-        <svg viewBox={`-14 -14 ${mapW + 28} ${mapH + 28}`} role="group" aria-labelledby="pt-map-h">
-          <path class="pt-map__land" d={outlinePath} />
-          {pins.map((c) => (
-            <g class="pt-pin" data-city={c.key} transform={`translate(${c.x.toFixed(1)} ${c.y.toFixed(1)})`}>
-              <circle class="pt-pin__pulse" r={6 + c.n * 2.2} />
-              <circle class="pt-pin__dot" r={5 + c.n * 1.4} />
-              <text class="pt-pin__n" dy="0.35em">{c.n}</text>
-              <text class:list={["pt-pin__label", leftLabel.has(c.key) && "is-left"]} x={leftLabel.has(c.key) ? -(10 + c.n * 1.6) : 10 + c.n * 1.6} dy="0.35em">{c.name}</text>
-            </g>
-          ))}
-        </svg>
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">{hi ? "शहर दर शहर" : "City by city"}</p>
+          <h2 class="h2" id="pt-map-h">{hi ? "हर शहर के साथी" : "Partners in every city"}</h2>
+          <p class="lead">{hi ? "नक़्शे पर कोई शहर चुनिए और देखिए, वहाँ किसने साथ दिया।" : "Pick a city on the map to see who stood with us there."}</p>
+        </div>
       </div>
-      <div class="pt-filters">
-        <p class="eyebrow">{hi ? "शहर दर शहर" : "City by city"}</p>
-        <h2 class="h2" id="pt-map-h">{hi ? "हर शहर के साथी" : "Partners in every city"}</h2>
-        <p class="lead">{hi ? "नक़्शे पर कोई शहर चुनें, या नीचे से। श्रेणी से भी छाँट सकते हैं।" : "Pick a city on the map or below. You can narrow by kind too."}</p>
-        <div class="pt-chips" role="group" aria-label={hi ? "शहर" : "City"}>
-          <button type="button" class="pt-chip" data-city="" aria-pressed="true">{hi ? "सभी शहर" : "All cities"}</button>
-          {pins.map((c) => <button type="button" class="pt-chip" data-city={c.key} aria-pressed="false">{c.name}<span>{c.n}</span></button>)}
+      <div class="pc" data-pcity>
+        <div class="pc-map">
+          <div class="pc-map__frame">
+            <div class="pc-map__layer">
+              <span class="pc-map__land" aria-hidden="true"></span>
+              <svg class="pc-map__route" viewBox={`0 0 ${MAP_W} ${MAP_H}`} aria-hidden="true"><path d={route} /></svg>
+              {pins.map((c, i) => (
+                <button type="button" class:list={["pc-pin", { "is-on": i === 0, "is-left": leftLabel.has(c.key) }]} data-city={c.key} style={`left:${pct(c.x, MAP_W)};top:${pct(c.y, MAP_H)};--n:${c.n}`} aria-pressed={i === 0 ? "true" : "false"} aria-label={hi ? `${c.name}: ${c.n} साथी` : `${c.name}: ${c.n} partner${c.n > 1 ? "s" : ""}`}>
+                  <span class="pc-pin__dot" aria-hidden="true"></span>
+                  <span class="pc-pin__label" aria-hidden="true">{c.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <p class="pc-map__hint">{hi ? "शहर पर टैप करें" : "Tap a city to see its partners"}</p>
         </div>
-        <div class="pt-chips pt-chips--kind" role="group" aria-label={hi ? "श्रेणी" : "Kind"}>
-          <button type="button" class="pt-chip" data-group="" aria-pressed="true">{hi ? "सभी श्रेणियाँ" : "All kinds"}</button>
-          {groups.map(({ g, items }) => <button type="button" class="pt-chip" data-group={g} aria-pressed="false">{groupLabel[g][lang]}<span>{items.length}</span></button>)}
+
+        <div class="pc-side">
+          {pins.map((c, i) => (
+            <article class="pc-card" id={`pc-${c.key.replace(/\s+/g, "-")}`} data-city={c.key} hidden={i !== 0}>
+              <div class="pc-card__top">
+                {c.photo ? (
+                  <>
+                    <img src={c.photo.src} alt={c.photo.alt[lang]} loading="lazy" decoding="async" style={c.photo.focus ? `object-position:${c.photo.focus}` : undefined} />
+                  </>
+                ) : <span class="pc-card__art" aria-hidden="true" lang="hi">{c.hiName}</span>}
+                <div class="pc-card__names">
+                  <span class="pc-card__alt" lang={hi ? "en" : "hi"}>{hi ? c.enName : c.hiName}</span>
+                  <h3>{c.name}</h3>
+                </div>
+              </div>
+              <div class="pc-card__body">
+                <p class="pc-card__kick">{hi ? `${c.n} साथी` : `${c.n} partner${c.n > 1 ? "s" : ""}`}</p>
+                <ul class="pc-card__list">
+                  {c.list.map((p) => (
+                    <li>
+                      <span class="pc-card__logo"><img src={p.logo} alt="" loading="lazy" decoding="async" /></span>
+                      <span class="pc-card__who"><b>{p.name[lang]}</b><small>{p.kind[lang]}</small></span>
+                    </li>
+                  ))}
+                </ul>
+                <div class="pc-card__btns">
+                  {c.edition && <a class="pc-btn pc-btn--main" href={localePath(lang, `/editions/${c.edition.slug}/`)}>{hi ? `किताब उत्सव ${c.edition.city.hi} ${c.edition.year}` : `Kitab Utsav ${c.edition.city.en} ${c.edition.year}`} <Icon name="arrowRight" /></a>}
+                  <a class="pc-btn" href="#pt-shelves">{hi ? "सभी साथी देखें" : "See all partners"}</a>
+                </div>
+              </div>
+            </article>
+          ))}
+          <details class="pc-credits">
+            <summary>{hi ? "शहरों की तस्वीरों का श्रेय" : "City photo credits"}</summary>
+            <p>{pins.filter((c) => c.photo).map((c, i) => <>{i > 0 && " · "}{c.name}: <a href={c.photo!.source} target="_blank" rel="noopener license">{c.photo!.author}</a>, <a href={c.photo!.licenseUrl} target="_blank" rel="noopener license">{c.photo!.license}</a></>)}{hi ? "। स्रोत: विकिमीडिया कॉमन्स" : ". Source: Wikimedia Commons"}</p>
+          </details>
+          <div class="pc-chips" role="group" aria-label={hi ? "शहर चुनें" : "Choose a city"}>
+            {pins.map((c, i) => <button type="button" class="pc-chip" data-city={c.key} aria-pressed={i === 0 ? "true" : "false"}><i>{i + 1}</i>{c.name}</button>)}
+          </div>
         </div>
-        <p class="pt-count" aria-live="polite"><b data-pcount>{partners.length}</b> {hi ? "साथी दिख रहे हैं" : "partners shown"}</p>
       </div>
     </div>
 
-    <div class="wrap pt-shelves">
+    <div class="wrap pt-kinds">
+      <div class="pt-chips pt-chips--kind" role="group" aria-label={hi ? "श्रेणी" : "Kind"}>
+        <button type="button" class="pt-chip" data-group="" aria-pressed="true">{hi ? "सभी श्रेणियाँ" : "All kinds"}</button>
+        {groups.map(({ g, items }) => <button type="button" class="pt-chip" data-group={g} aria-pressed="false">{groupLabel[g][lang]}<span>{items.length}</span></button>)}
+      </div>
+      <p class="pt-count" aria-live="polite"><b data-pcount>{partners.length}</b> {hi ? "साथी दिख रहे हैं" : "partners shown"}</p>
+    </div>
+
+    <div class="wrap pt-shelves" id="pt-shelves">
       {groups.map(({ g, items }, gi) => (
         <section class="pt-shelf" data-shelf-group={g} aria-labelledby={`pg-${g}`} style={`--span:${Math.min(items.length, 5)}`}>
           <h3 class="pt-shelf__t" id={`pg-${g}`}>{groupLabel[g][lang]}<span>{items.length}</span></h3>
