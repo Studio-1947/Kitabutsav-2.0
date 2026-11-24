@@ -8,11 +8,10 @@ import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
 import Landmark from "../components/Landmark.astro";
 import Icon from "../components/Icon.astro";
-import GalleryGrid from "../components/GalleryGrid.astro";
 import { editions, nextEdition, startKey } from "../data/editions";
-import { galleryFor, hasRealPhotos, coverFor, focusOf } from "../data/gallery";
+import { galleryFor, coverFor, focusOf } from "../data/gallery";
 import { festivalTotals } from "../data/speakers";
-import { festivalSocial, org } from "../site.config";
+import { org } from "../site.config";
 import { formatRange, localePath, t, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
@@ -27,6 +26,7 @@ const description = hi
 const label = hi ? "किताब उत्सव के बारे में" : "About Kitab Utsav";
 const crumbs = [{ name: label, path: "/about/" }];
 const withPhotos = editions.filter((e) => galleryFor(e.slug).length);
+const totalPhotos = withPhotos.reduce((n, e) => n + galleryFor(e.slug).length, 0);
 const itemList = {
   "@type": "ItemList",
   name: hi ? "किताब उत्सव के संस्करण" : "Kitab Utsav editions",
@@ -85,8 +85,9 @@ const happens = hi
     </div>
   </section>
 
-  <nav class="page-tabs" aria-label={hi ? "इस पेज पर" : "On this page"}>
-    <div class="wrap">
+  <nav class="page-tabs page-tabs--float" aria-label={hi ? "इस पेज पर" : "On this page"} data-spy>
+    <div class="page-tabs__bar">
+      <span class="page-tabs__ind" aria-hidden="true"></span>
       {sections.map((x) => <a href={`#${x.id}`}>{x.label}</a>)}
     </div>
   </nav>
@@ -111,34 +112,34 @@ const happens = hi
         <article class="ab-ch">
           <figure class="ab-ch__img"><img src="/gallery/bhopal-2025/bhopal-2025-301.webp" alt={hi ? "भोपाल किताब उत्सव में एक लेखक" : "A writer speaking at Kitab Utsav in Bhopal"} loading="lazy" decoding="async" /></figure>
           <div class="ab-ch__text">
-          <span class="ab-ch__no" aria-hidden="true">01</span>
-          <h2>{hi ? "शुरुआत" : "How it began"}</h2>
-          <p>{hi
-            ? "किताब उत्सव की शुरुआत भोपाल में हुई, राजकमल प्रकाशन के स्थापना के 75वें वर्ष में। भोपाल और बनारस के बाद नवम्बर 2022 में पटना में नौ दिनों का उत्सव हुआ। फिर चंडीगढ़, लखनऊ, भोपाल, मुम्बई, पटना और इन्दौर, और अक्टूबर 2026 में बरेली।"
-            : "Kitab Utsav began in Bhopal in the 75th year of Rajkamal Prakashan. After Bhopal and Banaras came a nine-day edition in Patna in November 2022, then Chandigarh, Lucknow, Bhopal again, Mumbai, Patna and Indore, and in October 2026, Bareilly."}</p>
+            <span class="ab-ch__no" aria-hidden="true">01</span>
+            <h2>{hi ? "शुरुआत" : "How it began"}</h2>
+            <p>{hi
+              ? "किताब उत्सव की शुरुआत भोपाल में हुई, राजकमल प्रकाशन के स्थापना के 75वें वर्ष में। भोपाल और बनारस के बाद नवम्बर 2022 में पटना में नौ दिनों का उत्सव हुआ। फिर चंडीगढ़, लखनऊ, भोपाल, मुम्बई, पटना और इन्दौर, और अक्टूबर 2026 में बरेली।"
+              : "Kitab Utsav began in Bhopal in the 75th year of Rajkamal Prakashan. After Bhopal and Banaras came a nine-day edition in Patna in November 2022, then Chandigarh, Lucknow, Bhopal again, Mumbai, Patna and Indore, and in October 2026, Bareilly."}</p>
           </div>
         </article>
         <article class="ab-ch">
           <figure class="ab-ch__img"><img src="/gallery/bareilly-2026/bareilly-2026-028.webp" alt={hi ? "किताब उत्सव में पाठ-प्रस्तुति" : "A reading at Kitab Utsav"} loading="lazy" decoding="async" /></figure>
           <div class="ab-ch__text">
-          <span class="ab-ch__no" aria-hidden="true">02</span>
-          <h2>{hi ? "उत्सव में क्या होता है" : "What happens"}</h2>
-          <p>{hi ? "हर पड़ाव पर, आम तौर पर पाँच दिन, सुबह से रात तक:" : "At each stop, usually for five days, from morning to night:"}</p>
-          <ul class="ab-ch__tags">{happens.map((h) => <li>{h}</li>)}</ul>
+            <span class="ab-ch__no" aria-hidden="true">02</span>
+            <h2>{hi ? "उत्सव में क्या होता है" : "What happens"}</h2>
+            <p>{hi ? "हर पड़ाव पर, आम तौर पर पाँच दिन, सुबह से रात तक:" : "At each stop, usually for five days, from morning to night:"}</p>
+            <ul class="ab-ch__tags">{happens.map((h) => <li>{h}</li>)}</ul>
           </div>
         </article>
         <article class="ab-ch">
           <figure class="ab-ch__img"><img src="/gallery/bareilly-2026/bareilly-2026-015.webp" alt={hi ? "किताब उत्सव की पुस्तक प्रदर्शनी" : "The book exhibition at Kitab Utsav"} loading="lazy" decoding="async" /></figure>
           <div class="ab-ch__text">
-          <span class="ab-ch__no" aria-hidden="true">03</span>
-          <h2>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h2>
-          <p>{hi
-            ? "1947 में स्थापित, हिन्दी के प्रमुख प्रकाशन घरानों में। समूह में राजकमल प्रकाशन, राधाकृष्ण प्रकाशन, लोकभारती प्रकाशन और राजकमल उर्दू शामिल हैं; मुख्यालय दरियागंज, नई दिल्ली में, शाखाएँ पटना, प्रयागराज और मुम्बई में।"
-            : "Founded in 1947, one of the leading Hindi publishing houses. The group brings together Rajkamal Prakashan, Radhakrishna Prakashan, Lokbharti Prakashan and Rajkamal Urdu, with its head office in Daryaganj, New Delhi, and branches in Patna, Prayagraj and Mumbai."}</p>
-          <div class="ab-ch__links">
-            <a class="btn btn--ink btn--sm" href={org.url} target="_blank" rel="noopener">{s.nav.shop} <Icon name="arrowUpRight" size={16} /></a>
-            <a class="btn btn--line btn--sm" href={`mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`}>{hi ? "अपने शहर बुलाएँ" : "Bring it to your city"}</a>
-          </div>
+            <span class="ab-ch__no" aria-hidden="true">03</span>
+            <h2>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h2>
+            <p>{hi
+              ? "1947 में स्थापित, हिन्दी के प्रमुख प्रकाशन घरानों में। समूह में राजकमल प्रकाशन, राधाकृष्ण प्रकाशन, लोकभारती प्रकाशन और राजकमल उर्दू शामिल हैं; मुख्यालय दरियागंज, नई दिल्ली में, शाखाएँ पटना, प्रयागराज और मुम्बई में।"
+              : "Founded in 1947, one of the leading Hindi publishing houses. The group brings together Rajkamal Prakashan, Radhakrishna Prakashan, Lokbharti Prakashan and Rajkamal Urdu, with its head office in Daryaganj, New Delhi, and branches in Patna, Prayagraj and Mumbai."}</p>
+            <div class="ab-ch__links">
+              <a class="btn btn--ink btn--sm" href={org.url} target="_blank" rel="noopener">{s.nav.shop} <Icon name="arrowUpRight" size={16} /></a>
+              <a class="btn btn--line btn--sm" href={`mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`}>{hi ? "अपने शहर बुलाएँ" : "Bring it to your city"}</a>
+            </div>
           </div>
         </article>
       </div>
@@ -193,58 +194,68 @@ const happens = hi
     </div>
   </section>
 
-  <section class="section anchor" id="gallery" aria-labelledby="gallery-h">
+  <section class="section anchor ab-gallery" id="gallery" aria-labelledby="gallery-h">
     <div class="wrap">
       <div class="section-head">
         <div>
           <p class="eyebrow">{hi ? "गैलरी" : "Gallery"}</p>
           <h2 class="h2" id="gallery-h">{hi ? "शहर दर शहर, तस्वीरों में" : "City by city, in pictures"}</h2>
+          <p class="lead">{hi ? `${totalPhotos} तस्वीरें, ${withPhotos.length} संस्करण। कोई एल्बम खोलें; बड़ी तस्वीर पर टैप करें तो पूरी स्क्रीन पर।` : `${totalPhotos} photos from ${withPhotos.length} editions. Open an album; tap the big photo to see it full screen.`}</p>
         </div>
       </div>
-      {!hasRealPhotos && (
-        <div class="notice" role="note">
-          <p>
-            {hi ? "तस्वीरें जोड़ी जा रही हैं। तब तक उत्सव की झलकियाँ " : "Photos are being added. Until then, see festival moments on "}
-            <a href={festivalSocial[0].url} target="_blank" rel="noopener" style="text-decoration:underline">{festivalSocial[0].handle}</a>
-            {hi ? " पर देखें।" : "."}
-          </p>
+      <div class="albums-wrap" data-albums>
+        <div class="albums" role="tablist" aria-label={hi ? "एल्बम चुनें" : "Choose an album"}>
+          {withPhotos.map((e, i) => {
+            const pics = galleryFor(e.slug);
+            const cover = coverFor(e.slug)!;
+            const stack = [cover, ...pics.filter((p) => p.src !== cover.src)].slice(0, 3);
+            return (
+              <button type="button" class="album" role="tab" id={`gt-${e.slug}`} aria-controls={`gp-${e.slug}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+                <span class="album__stack" aria-hidden="true">
+                  {[...stack].reverse().map((p, k) => <span class={`album__p album__p--${stack.length - 1 - k}`}><img src={p.src} alt="" loading="lazy" decoding="async" /></span>)}
+                </span>
+                <span class="album__label"><b>{e.city[lang]}</b> {e.year}</span>
+                <span class="album__n">{hi ? `${pics.length} तस्वीरें` : `${pics.length} photos`}</span>
+              </button>
+            );
+          })}
         </div>
-      )}
-      <div data-gallery-tabs>
-        <div class="chips" role="tablist" aria-label={hi ? "संस्करण चुनें" : "Choose an edition"}>
-          {withPhotos.map((e, i) => (
-            <button type="button" class="chip" role="tab" id={`gt-${e.slug}`} aria-controls={`gp-${e.slug}`} aria-selected={i === 0 ? "true" : "false"} aria-pressed={i === 0 ? "true" : "false"}>
-              {coverFor(e.slug) && <img class="chip__thumb" src={coverFor(e.slug)!.src} alt="" loading="lazy" decoding="async" />}
-              {e.city[lang]} {e.year}
-            </button>
-          ))}
-        </div>
-        {withPhotos.map((e, i) => (
-          <div class="gallery-panel" role="tabpanel" id={`gp-${e.slug}`} aria-labelledby={`gt-${e.slug}`} hidden={i !== 0}>
-            <p class="gallery-panel__meta">
-              {formatRange(e, lang)}{e.venue && ` · ${e.venue[lang]}`}
-              <a class="link-more" href={localePath(lang, `/editions/${e.slug}/`)}>{s.exploreDetails}</a>
-            </p>
-            <GalleryGrid items={galleryFor(e.slug)} lang={lang} />
-          </div>
-        ))}
+        {withPhotos.map((e, i) => {
+          const pics = galleryFor(e.slug);
+          const first = pics[0];
+          return (
+            <div class="alb-panel" role="tabpanel" id={`gp-${e.slug}`} aria-labelledby={`gt-${e.slug}`} hidden={i !== 0}>
+              <div class="alb-head">
+                <p class="alb-head__t"><b>{hi ? `किताब उत्सव ${e.city.hi} ${e.year}` : `Kitab Utsav ${e.city.en} ${e.year}`}</b> · {formatRange(e, lang)}{e.venue && ` · ${e.venue[lang].split(",")[0]}`}</p>
+                <a class="link-more" href={localePath(lang, `/editions/${e.slug}/`)}>{s.exploreDetails}</a>
+              </div>
+              <div class="alb-stage" tabindex="-1">
+                <button type="button" class="alb-feature" aria-label={hi ? "पूरी स्क्रीन पर देखें" : "View full screen"}>
+                  <img src={first.src} alt={first.caption[lang]} decoding="async" loading="lazy" />
+                  <span class="alb-feature__zoom" aria-hidden="true"><Icon name="search" /></span>
+                </button>
+                <button type="button" class="alb-arrow alb-prev" aria-label={hi ? "पिछली तस्वीर" : "Previous photo"}><Icon name="arrowLeft" /></button>
+                <button type="button" class="alb-arrow alb-next" aria-label={hi ? "अगली तस्वीर" : "Next photo"}><Icon name="arrowRight" /></button>
+              </div>
+              <p class="alb-cap" aria-live="polite">
+                <span class="alb-cap__text">{first.caption[lang]}</span>
+                <span class="alb-cap__meta"><span class="alb-cap__credit">{first.credit && <>{hi ? "फ़ोटो: " : "Photo: "}{first.href ? <a href={first.href} target="_blank" rel="noopener">{first.credit}</a> : first.credit}</>}</span><span class="alb-cap__n">1 / {pics.length}</span></span>
+              </p>
+              <div class="alb-strip">
+                <ul>
+                  {pics.map((p, k) => (
+                    <li>
+                      <button type="button" class="alb-thumb" aria-label={`${k + 1}: ${p.caption[lang]}`} aria-current={k === 0 ? "true" : "false"} data-src={p.src} data-cap={p.caption[lang]} data-credit={p.credit ?? ""} data-href={p.href ?? ""}>
+                        <img src={p.src} alt="" loading="lazy" decoding="async" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   </section>
-  <script is:inline>
-    document.querySelectorAll("[data-gallery-tabs]").forEach(function (w) {
-      var tabs = w.querySelectorAll("[role=tab]");
-      var show = function (id) {
-        tabs.forEach(function (t) {
-          var on = t.getAttribute("aria-controls") === id;
-          t.setAttribute("aria-selected", String(on)); t.setAttribute("aria-pressed", String(on));
-          document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
-        });
-      };
-      tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.getAttribute("aria-controls")); }); });
-      // /about/#gallery-indore-2026 (and old /gallery/#indore-2026 links) open that edition.
-      var m = location.hash.match(/^#(?:gallery-)?([a-z]+-\d{4})$/);
-      if (m && document.getElementById("gp-" + m[1])) { show("gp-" + m[1]); document.getElementById("gallery").scrollIntoView(); }
-    });
-  </script>
 </Base>

@@ -11,6 +11,8 @@ import { isUpcoming, localePath } from "../i18n";
 import { formatDate, formatRange, formatTime, t, type Lang } from "../i18n";
 import { eventLd } from "../lib/schema";
 import { festivalSocial } from "../site.config";
+import { coverFor, focusOf } from "../data/gallery";
+import type { SessionKind } from "../data/programme";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -50,68 +52,99 @@ if (ev) {
   }
   jsonLd.push(ev);
 }
+
+// Colour per kind of session, and the kinds this programme uses (for the legend).
+const kindTone: Record<SessionKind, string> = {
+  exhibition: "sand", opening: "red", conversation: "blue", launch: "saffron",
+  discussion: "sky", reading: "lilac", poetry: "lime", performance: "navy",
+};
+const kinds = [...new Set(programme.days.flatMap((d) => d.sessions.map((x) => x.kind)))];
+const nx = nextEdition && nextEdition.slug !== e.slug ? nextEdition : null;
+const nxCover = nx ? coverFor(nx.slug) : undefined;
+const dated = !!(nx?.start && nx.end);
+const weekday = (iso: string) => new Intl.DateTimeFormat(hi ? "hi-IN" : "en-IN", { weekday: "short", timeZone: "Asia/Kolkata" }).format(new Date(`${iso}T12:00:00+05:30`));
+const dayNum = (iso: string) => String(Number(iso.slice(8, 10)));
+const month = (iso: string) => new Intl.DateTimeFormat(hi ? "hi-IN" : "en-IN", { month: "short", timeZone: "Asia/Kolkata" }).format(new Date(`${iso}T12:00:00+05:30`));
 ---
+
 <Base lang={lang} route="/programme/" title={title} description={description} crumbs={crumbs} jsonLd={jsonLd}>
-  <section class="page-hero">
-    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+  <section class="page-hero ev-hero">
+    <Clouds items={[{ x: "62%", y: "-10%", w: 240 }, { x: "90%", y: "50%", w: 170, flip: true }]} />
     <div class="wrap">
       <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{hi ? `${e.city.hi} · ${when}` : `${e.city.en} · ${when}`}</p>
-      <h1>{hi ? "आयोजन" : "Events"}</h1>
-      <p class="lead">
-        {hi
-          ? `${e.venue?.hi}। रोज़ ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")} तक। पुस्तक प्रदर्शनी पूरे दिन खुली रहेगी।`
-          : `${e.venue?.en}. Daily from ${formatTime(e.startTime!, "en")} to ${formatTime(e.endTime!, "en")}. The book exhibition is open all day.`}
-      </p>
+      <p class="eyebrow">{hi ? "आयोजन" : "Events"}</p>
+      <h1>{hi ? <>उत्सव का <em>दिन-वार</em> कार्यक्रम</> : <>The festival, <em>day by day</em></>}</h1>
+      {nx && (
+        <a class="ev-next" href={localePath(lang, `/editions/${nx.slug}/`)}>
+          <span class="ev-next__photo" aria-hidden="true">{nxCover && <img src={nxCover.src} alt="" decoding="async" style={`object-position:${focusOf(nxCover)}`} />}</span>
+          <span class="ev-next__body">
+            <span class="ev-next__kick"><i aria-hidden="true"></i>{hi ? "अगला पड़ाव" : "Next stop"}</span>
+            <b class="ev-next__city">{hi ? `किताब उत्सव ${nx.city.hi}` : `Kitab Utsav ${nx.city.en}`}</b>
+            <span class="ev-next__when">{formatRange(nx, lang)}{nx.venue ? ` · ${nx.venue[lang].split(",")[0]}` : (hi ? " · स्थान की घोषणा जल्द" : " · venue to be announced")}</span>
+            <span class="ev-next__note">{dated ? (hi ? "कार्यक्रम घोषणा के साथ यहीं आएगा।" : "Its programme will appear here once announced.") : (hi ? "तारीख़ें और कार्यक्रम घोषणा के साथ यहीं आएँगे।" : "Dates and programme will appear here once announced.")}</span>
+          </span>
+          <span class="ev-next__go" aria-hidden="true"><Icon name="arrowUpRight" /></span>
+        </a>
+      )}
+      <div class="ev-hero__ctas">
+        <a class="btn btn--red" href={festivalSocial[0].url} target="_blank" rel="noopener"><Icon name="Instagram" size={20} />{hi ? "ख़बर सबसे पहले पाएँ" : "Hear about it first"}</a>
+        {dated && <a class="btn btn--line btn--line-dark" href={`/ics/${nx!.slug}.ics`} download><Icon name="calendar" size={20} />{s.addToCal}</a>}
+      </div>
     </div>
   </section>
 
-  <section class="section" style="padding-top:28px">
+  <section class="section ev-plan" aria-labelledby="plan-h">
     <div class="wrap">
-      {!up && (
-        <div class="notice" role="note">
-          <Icon name="help" />
-          <p>
-            {hi
-              ? <>किताब उत्सव {e.city.hi} ({when}) पूरा हो चुका है। नीचे उसका दिन-वार ढाँचा है। {nextEdition ? <>अगला किताब उत्सव <a href={localePath(lang, `/editions/${nextEdition.slug}/`)}>{nextEdition.city.hi}, {formatRange(nextEdition, "hi")}</a> में होगा; उसका कार्यक्रम घोषणा के साथ यहीं आएगा;</> : "अगले उत्सव का कार्यक्रम घोषणा के साथ यहीं आएगा;"} <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a> या <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.hi} की झलकियाँ</a> देखें।</>
-              : <>Kitab Utsav {e.city.en} ({when}) has ended. Below is its day-wise outline. {nextEdition ? <>The next Kitab Utsav is in <a href={localePath(lang, `/editions/${nextEdition.slug}/`)}>{nextEdition.city.en}, {formatRange(nextEdition, "en")}</a>; its programme will appear here once announced;</> : "The next festival's programme will appear here once announced;"} <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a> or see the <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.en} recap</a>.</>}
-          </p>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">{up ? (hi ? "आगामी" : "Coming up") : (hi ? "पिछला कार्यक्रम" : "Last programme")}</p>
+          <h2 class="h2" id="plan-h">{hi ? `किताब उत्सव ${e.city.hi} ${e.year}` : `Kitab Utsav ${e.city.en} ${e.year}`}</h2>
+          <p class="lead">{e.venue?.[lang].split(",")[0]} · {when} · {hi ? `रोज़ ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")}` : `daily ${formatTime(e.startTime!, "en")} to ${formatTime(e.endTime!, "en")}`}</p>
         </div>
-      )}
-      {up && !programme.published && (
-        <div class="notice" role="note">
+      </div>
+      {(!up || !programme.published) && (
+        <p class="ev-note" role="note">
           <Icon name="help" />
-          <p>
-            {hi ? "सत्रों और वक्ताओं की घोषणा जल्द होगी। नीचे दिन-वार ढाँचा है; ताज़ा जानकारी के लिए " : "Sessions and speakers will be announced soon. Below is the day-wise outline; for the latest, follow "}
-            <a href={festivalSocial[0].url} target="_blank" rel="noopener" style="text-decoration:underline">{festivalSocial[0].handle}</a>
-            {hi ? " देखें।" : "."}
-          </p>
-        </div>
+          <span>
+            {!up
+              ? (hi ? <>यह उत्सव पूरा हो चुका है; नीचे उसका दिन-वार ढाँचा है। <a href={localePath(lang, `/editions/${e.slug}/`)}>{e.city.hi} की झलकियाँ देखें</a>।</> : <>This festival has ended; below is its day-wise outline. <a href={localePath(lang, `/editions/${e.slug}/`)}>See the {e.city.en} recap</a>.</>)
+              : (hi ? <>सत्रों और वक्ताओं की घोषणा जल्द होगी; ताज़ा जानकारी <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a> पर।</> : <>Sessions and speakers will be announced soon; for the latest, follow <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a>.</>)}
+          </span>
+        </p>
       )}
 
-      <div data-tabs>
-        <div class="day-tabs" role="tablist" aria-label={hi ? "दिन चुनें" : "Choose a day"}>
+      <div class="ev-planner" data-tabs data-planner>
+        <div class="ev-days" role="tablist" aria-label={hi ? "दिन चुनें" : "Choose a day"}>
           {programme.days.map((d, i) => (
-            <button type="button" class="day-tab" role="tab" id={`tab-${d.date}`} aria-controls={`day-${d.date}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
-              <small>{hi ? `दिन ${i + 1}` : `Day ${i + 1}`}</small>
-              <b>{formatDate(d.date, lang).replace(/ \d{4}$/, "")}</b>
+            <button type="button" class="ev-day" role="tab" id={`tab-${d.date}`} aria-controls={`day-${d.date}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1} data-date={d.date}>
+              <span class="ev-day__n">{hi ? `दिन ${i + 1}` : `Day ${i + 1}`}</span>
+              <b class="ev-day__d">{dayNum(d.date)}</b>
+              <span class="ev-day__m">{month(d.date)} · {weekday(d.date)}</span>
+              <span class="ev-day__count">{hi ? `${d.sessions.length} सत्र` : `${d.sessions.length} sessions`}</span>
             </button>
           ))}
         </div>
+
+        <div class="ev-legend" role="group" aria-label={hi ? "सत्र का प्रकार चुनें" : "Highlight a kind of session"}>
+          {kinds.map((k) => <button type="button" class="ev-key" data-kind={k} aria-pressed="false" style={`--tone:var(--${kindTone[k]})`}><i aria-hidden="true"></i>{sessionKindLabel[k][lang]}</button>)}
+        </div>
+
         {programme.days.map((d, i) => (
-          <section class="day-panel" id={`day-${d.date}`} role="tabpanel" aria-labelledby={`tab-${d.date}`}>
-            <h3>{hi ? `दिन ${i + 1}: ` : `Day ${i + 1}: `}{formatDate(d.date, lang, true)}</h3>
-            <ol class="sessions">
+          <section class="ev-panel" id={`day-${d.date}`} role="tabpanel" aria-labelledby={`tab-${d.date}`} data-date={d.date}>
+            <h3 class="sr">{hi ? `दिन ${i + 1}: ` : `Day ${i + 1}: `}{formatDate(d.date, lang, true)}</h3>
+            <ol class="ev-line">
               {d.sessions.map((x) => {
                 const tba = !x.speakers.length && x.kind !== "exhibition" && x.kind !== "opening" && x.kind !== "poetry";
                 return (
-                  <li class:list={["session", { "is-tba": tba }]}>
-                    <time datetime={`${d.date}T${x.time}`}>{formatTime(x.time, lang)}{x.end && ` - ${formatTime(x.end, lang)}`}</time>
-                    <div>
+                  <li class:list={["ev-s", `ev-s--${x.kind}`, { "is-tba": tba }]} data-kind={x.kind} data-start={x.time} data-end={x.end ?? ""} style={`--tone:var(--${kindTone[x.kind]})`}>
+                    <time class="ev-s__t" datetime={`${d.date}T${x.time}`}>{formatTime(x.time, lang)}{x.end && <small>{hi ? "से " : "to "}{formatTime(x.end, lang)}</small>}</time>
+                    <span class="ev-s__dot" aria-hidden="true"></span>
+                    <div class="ev-s__card">
+                      <span class="ev-s__kind">{sessionKindLabel[x.kind][lang]}</span>
                       <h4>{x.title[lang]}</h4>
-                      {x.speakers.length > 0 && <div class="who">{x.speakers.join(", ")}</div>}
+                      {x.speakers.length > 0 && <p class="ev-s__who">{x.speakers.join(", ")}</p>}
+                      {x.end && <p class="ev-s__who">{hi ? "पूरे दिन खुली" : "Open all day"}</p>}
                     </div>
-                    <span class="kind">{sessionKindLabel[x.kind][lang]}</span>
                   </li>
                 );
               })}
@@ -121,10 +154,11 @@ if (ev) {
       </div>
     </div>
   </section>
+
   {announced.length > 0 && (
-    <section class="section" aria-labelledby="speakers">
+    <section class="section ev-people" aria-labelledby="speakers">
       <div class="wrap">
-        <div class="section-head"><div><p class="eyebrow">{hi ? `किताब उत्सव ${e.city.hi} में मिलिए` : `Meet them in ${e.city.en}`}</p><h2 class="h2" id="speakers">{hi ? "अब तक घोषित वक्ता" : "Speakers announced so far"}</h2></div></div>
+        <div class="section-head"><div><p class="eyebrow">{hi ? `किताब उत्सव ${e.city.hi} में` : `At Kitab Utsav ${e.city.en}`}</p><h2 class="h2" id="speakers">{hi ? "मंच पर" : "On stage"}</h2></div></div>
         <div class="grid grid--3">{announced.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
       </div>
     </section>

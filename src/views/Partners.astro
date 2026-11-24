@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
 import Icon from "../components/Icon.astro";
-import PartnerLogo from "../components/PartnerLogo.astro";
+import { indiaOutline } from "../data/india-outline";
 import { partners, groupLabel, groupOrder } from "../data/partners";
 import { org } from "../site.config";
 import { t, type Lang } from "../i18n";
@@ -26,76 +26,129 @@ const orgLd = {
   name: title,
   itemListElement: partners.map((p, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Organization", name: p.name.en, ...(p.url ? { url: p.url } : {}) } })),
 };
+
+// Map: India's outline (src/data/india-outline.ts) and the partner cities, projected from
+// longitude/latitude (equirectangular, x scaled by cos 23°).
+const ll: Record<string, [number, number]> = {
+  bareilly: [79.43, 28.37], bhopal: [77.41, 23.26], jaipur: [75.79, 26.91], chandigarh: [76.78, 30.73], "new delhi": [77.21, 28.61],
+  indore: [75.86, 22.72], jalandhar: [75.58, 31.33], mumbai: [72.88, 19.08], patna: [85.14, 25.59], ranchi: [85.33, 23.34],
+};
+const K = Math.cos((23 * Math.PI) / 180), W0 = 67.5, N0 = 37.6, S = 12;
+const proj = ([lon, lat]: [number, number]) => [((lon - W0) * K * S), ((N0 - lat) * S)] as const;
+// the islands reach 6.75°N, so the map runs a little further south than the mainland
+const mapW = Math.round((97.6 - W0) * K * S), mapH = Math.round((N0 - 6.4) * S);
+const outlinePath = indiaOutline
+  .map((ring) => "M" + ring.map((pt) => proj(pt).map((n) => n.toFixed(1)).join(" ")).join(" L") + " Z")
+  .join(" ");
+// "Bhopal & Jaipur" belongs to both cities.
+const cityKeys = (p: (typeof partners)[number]) => p.city.en.split(" & ").map((x) => x.toLowerCase());
+const pins = cities.map(([key, name]) => {
+  const [x, y] = proj(ll[key] ?? [78, 22]);
+  return { key, name, x, y, n: partners.filter((p) => cityKeys(p).includes(key)).length };
+}).sort((a, b) => b.n - a.n);
+// labels that would collide go to the left
+const leftLabel = new Set(["new delhi", "jalandhar", "jaipur", "mumbai", "indore"]);
+
+// Hero background: every logo, in three drifting rows.
+const wall = [0, 1, 2].map((r) => partners.filter((_, i) => i % 3 === r));
+const ways = hi
+  ? ["आयोजन स्थल", "मीडिया साझेदार", "सांस्कृतिक संस्थान", "कॉलेज और विश्वविद्यालय", "किताबों की दुकान", "प्रायोजक"]
+  : ["Venue", "Media partner", "Cultural institution", "College or university", "Bookstore", "Sponsor"];
+const tones = ["yellow", "sky", "lime", "lilac", "saffron", "cream", "sand"];
 ---
+
 <Base lang={lang} route="/partners/" title={title} description={description} crumbs={crumbs} jsonLd={[orgLd]}>
-  <section class="page-hero">
-    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
-    <div class="wrap">
+  <section class="page-hero pt-hero">
+    <div class="pt-wall" aria-hidden="true">
+      {wall.map((row, r) => (
+        <div class={`pt-wall__row pt-wall__row--${r}`}>{[...row, ...row, ...row].map((p) => <span class="pt-wall__logo"><img src={p.logo} alt="" loading="lazy" decoding="async" /></span>)}</div>
+      ))}
+    </div>
+    <div class="wrap pt-hero__in">
       <Crumbs lang={lang} items={crumbs} />
       <p class="eyebrow">{label}</p>
       <h1>{hi ? <>साथ जुड़ें, <em>साथ पढ़ें</em></> : <>Come together, <em>read together</em></>}</h1>
       <p class="lead">
         {hi
-          ? `किताब उत्सव अकेले नहीं चलता। हर शहर में संस्थान, मंच, मीडिया, प्रकाशक और साहित्यिक समुदाय इसे पाठकों तक पहुँचाते हैं। अब तक ${partners.length} साथी।`
-          : `Kitab Utsav never travels alone. In every city, institutions, venues, media, publishers and literary communities help bring it to readers. ${partners.length} partners so far.`}
+          ? `किताब उत्सव अकेले नहीं चलता। हर शहर में संस्थान, मंच, मीडिया, प्रकाशक और साहित्यिक समुदाय इसे पाठकों तक पहुँचाते हैं।`
+          : `Kitab Utsav never travels alone. In every city, institutions, venues, media, publishers and literary communities help bring it to readers.`}
       </p>
+      <ul class="pt-stats">
+        <li><b>{partners.length}</b>{hi ? "साथी" : "partners"}</li>
+        <li><b>{pins.length}</b>{hi ? "शहर" : "cities"}</li>
+        <li><b>{groups.length}</b>{hi ? "श्रेणियाँ" : "kinds"}</li>
+      </ul>
     </div>
   </section>
 
-  <section class="section" style="padding-top:28px">
-    <div class="wrap">
-      <div class="pfilters" data-pfilters>
-        <label class="pfilter">
-          <span>{hi ? "शहर" : "City"}</span>
-          <select data-pf="city">
-            <option value="">{hi ? "सभी शहर" : "All cities"}</option>
-            {cities.map(([key, name]) => <option value={key}>{name}</option>)}
-          </select>
-        </label>
-        <label class="pfilter">
-          <span>{hi ? "श्रेणी" : "Type"}</span>
-          <select data-pf="group">
-            <option value="">{hi ? "सभी श्रेणियाँ" : "All types"}</option>
-            {groups.map(({ g }) => <option value={g}>{groupLabel[g][lang]}</option>)}
-          </select>
-        </label>
-        <p class="pfilters__count" aria-live="polite"><b data-pcount>{partners.length}</b> {hi ? "साथी" : "partners"}</p>
+  <section class="section pt-find" aria-labelledby="pt-map-h" data-pfind2>
+    <div class="wrap pt-find__in">
+      <div class="pt-map">
+        <svg viewBox={`-14 -14 ${mapW + 28} ${mapH + 28}`} role="group" aria-labelledby="pt-map-h">
+          <path class="pt-map__land" d={outlinePath} />
+          {pins.map((c) => (
+            <g class="pt-pin" data-city={c.key} transform={`translate(${c.x.toFixed(1)} ${c.y.toFixed(1)})`}>
+              <circle class="pt-pin__pulse" r={6 + c.n * 2.2} />
+              <circle class="pt-pin__dot" r={5 + c.n * 1.4} />
+              <text class="pt-pin__n" dy="0.35em">{c.n}</text>
+              <text class:list={["pt-pin__label", leftLabel.has(c.key) && "is-left"]} x={leftLabel.has(c.key) ? -(10 + c.n * 1.6) : 10 + c.n * 1.6} dy="0.35em">{c.name}</text>
+            </g>
+          ))}
+        </svg>
       </div>
+      <div class="pt-filters">
+        <p class="eyebrow">{hi ? "शहर दर शहर" : "City by city"}</p>
+        <h2 class="h2" id="pt-map-h">{hi ? "हर शहर के साथी" : "Partners in every city"}</h2>
+        <p class="lead">{hi ? "नक़्शे पर कोई शहर चुनें, या नीचे से। श्रेणी से भी छाँट सकते हैं।" : "Pick a city on the map or below. You can narrow by kind too."}</p>
+        <div class="pt-chips" role="group" aria-label={hi ? "शहर" : "City"}>
+          <button type="button" class="pt-chip" data-city="" aria-pressed="true">{hi ? "सभी शहर" : "All cities"}</button>
+          {pins.map((c) => <button type="button" class="pt-chip" data-city={c.key} aria-pressed="false">{c.name}<span>{c.n}</span></button>)}
+        </div>
+        <div class="pt-chips pt-chips--kind" role="group" aria-label={hi ? "श्रेणी" : "Kind"}>
+          <button type="button" class="pt-chip" data-group="" aria-pressed="true">{hi ? "सभी श्रेणियाँ" : "All kinds"}</button>
+          {groups.map(({ g, items }) => <button type="button" class="pt-chip" data-group={g} aria-pressed="false">{groupLabel[g][lang]}<span>{items.length}</span></button>)}
+        </div>
+        <p class="pt-count" aria-live="polite"><b data-pcount>{partners.length}</b> {hi ? "साथी दिख रहे हैं" : "partners shown"}</p>
+      </div>
+    </div>
 
-      <div class="partner-grid partner-grid--all" data-plist>
-        {groups.flatMap(({ items }) => items).map((p) => <PartnerLogo p={p} lang={lang} />)}
-      </div>
-      <p class="pfilters__empty" data-pempty hidden>{hi ? "इस चुनाव में कोई साथी नहीं।" : "No partners match this choice."}</p>
+    <div class="wrap pt-shelves">
+      {groups.map(({ g, items }, gi) => (
+        <section class="pt-shelf" data-shelf-group={g} aria-labelledby={`pg-${g}`} style={`--span:${Math.min(items.length, 5)}`}>
+          <h3 class="pt-shelf__t" id={`pg-${g}`}>{groupLabel[g][lang]}<span>{items.length}</span></h3>
+          <ul class="pt-cards">
+            {items.map((p) => (
+              <li class="pt-card" data-city={cityKeys(p).join(" ")} data-group={p.group} style={`--tone:var(--${tones[gi % tones.length]})`}>
+                <button type="button" class="pt-card__in" aria-label={`${p.name[lang]}, ${p.kind[lang]}, ${p.city[lang]}`}>
+                  <span class="pt-card__face pt-card__front"><img src={p.logo} alt="" loading="lazy" decoding="async" /></span>
+                  <span class="pt-card__face pt-card__back" aria-hidden="true">
+                    <b>{p.name[lang]}</b>
+                    <span>{p.kind[lang]}</span>
+                    <i>{p.city[lang]}</i>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+      <p class="pt-empty" data-pempty hidden>{hi ? "इस चुनाव में कोई साथी नहीं। कोई और शहर या श्रेणी चुनें।" : "No partners match this choice. Try another city or kind."}</p>
     </div>
   </section>
 
   <div class="wrap">
-    <div class="cta-band">
-      <Clouds items={[{ x: "55%", y: "-30%", w: 260 }, { x: "-6%", y: "50%", w: 200, flip: true }]} />
+    <div class="pt-join">
       <div>
+        <p class="eyebrow">{hi ? "साथ आइए" : "Join us"}</p>
         <h2>{hi ? "अपने शहर में किताब उत्सव के साथी बनें" : "Partner with Kitab Utsav in your city"}</h2>
-        <p>{hi ? "आयोजन स्थल, मीडिया, संस्थान या प्रायोजक के रूप में जुड़ने के लिए लिखें।" : "Write to us to join as a venue, media partner, institution or sponsor."}</p>
+        <p>{hi ? "अगला पड़ाव आपका शहर हो सकता है। इनमें से किसी भी रूप में जुड़ें:" : "Your city could be the next stop. Join in any of these ways:"}</p>
+        <ul class="pt-join__ways">{ways.map((w) => <li>{w}</li>)}</ul>
       </div>
-      <div class="btns">
-        <a class="btn btn--primary" href={mail}><Icon name="mail" />{hi ? "साझेदारी के लिए लिखें" : "Write to us"}</a>
-      </div>
+      <a class="pt-join__go" href={mail}>
+        <Icon name="mail" />
+        <span>{hi ? "साझेदारी के लिए लिखें" : "Write to us"}</span>
+        <small>{org.email}</small>
+      </a>
     </div>
   </div>
-  <script is:inline>
-    document.querySelectorAll("[data-pfilters]").forEach(function (bar) {
-      var list = document.querySelector("[data-plist]");
-      var empty = document.querySelector("[data-pempty]");
-      var count = bar.querySelector("[data-pcount]");
-      var sel = { city: bar.querySelector('[data-pf="city"]'), group: bar.querySelector('[data-pf="group"]') };
-      var apply = function () {
-        var c = sel.city.value, g = sel.group.value, n = 0;
-        list.querySelectorAll(".partner").forEach(function (p) {
-          var on = (!c || p.getAttribute("data-city").split(" & ").indexOf(c) >= 0) && (!g || p.getAttribute("data-group") === g);
-          p.hidden = !on; if (on) n++;
-        });
-        count.textContent = n; empty.hidden = n > 0;
-      };
-      sel.city.addEventListener("change", apply); sel.group.addEventListener("change", apply);
-    });
-  </script>
 </Base>
