@@ -1,9 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
-import SpeakerCard from "../components/SpeakerCard.astro";
-import { allSpeakers } from "../data/speakers";
-import { t, type Lang } from "../i18n";
+import Portrait from "../components/Portrait.astro";
+import Icon from "../components/Icon.astro";
+import { allSpeakers, type Speaker } from "../data/speakers";
+import { localePath, t, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -29,48 +30,134 @@ allSpeakers.forEach((sp) => {
   });
 });
 const cities = [...cityCount.entries()].sort((a, b) => b[1].n - a[1].n).map(([k, c]) => [k, c.label] as const);
-const names = [...allSpeakers, ...allSpeakers].map((sp) => sp.name.hi);
+
+// Crop of a festival photo onto a face (same as the home bookshelf).
+const photoStyle = (sp: { focus: string; zoom: number; shift?: string }) =>
+  `object-position:${sp.focus};transform-origin:${sp.focus};transform:${sp.shift ? `translate(${sp.shift.replace(" ", ", ")}) ` : ""}scale(${sp.zoom})`;
+
+// Kinds of work, read from the English role, for the role filter. A person can have several.
+const roleKinds = [
+  { key: "poet", re: /poet|shayar/i, label: { hi: "कवि-शायर", en: "Poets" } },
+  { key: "writer", re: /author|writer|novelist|essay|satirist|critic|historian|biograph|journalist|translator|playwright|thinker/i, label: { hi: "लेखक", en: "Writers" } },
+  { key: "stage", re: /actor|theatre|dastango/i, label: { hi: "रंगमंच", en: "Theatre" } },
+  { key: "film", re: /screen|director|film|cinemat|producer/i, label: { hi: "सिनेमा", en: "Film" } },
+  { key: "music", re: /singer|vocal|music|lyricist/i, label: { hi: "संगीत", en: "Music" } },
+];
+const kindsOf = (sp: Speaker) => roleKinds.filter((k) => k.re.test(sp.role.en)).map((k) => k.key);
+
+// A–Z (or क–ह): first letter of the name in this language; Hindi takes the first consonant or vowel.
+const letterOf = (sp: Speaker) => (hi ? [...sp.name.hi.replace(/^डॉ\.\s*/, "")][0] : sp.name.en.replace(/^Dr\.\s*/, "")[0].toUpperCase());
+const sorted = [...allSpeakers].sort((a, b) => a.name[lang].replace(/^(डॉ|Dr)\.\s*/, "").localeCompare(b.name[lang].replace(/^(डॉ|Dr)\.\s*/, ""), hi ? "hi" : "en"));
+const groups = [...new Set(sorted.map(letterOf))].map((L) => ({ L, people: sorted.filter((sp) => letterOf(sp) === L) }));
+const short = (a: NonNullable<Speaker["appearances"]>[number]) => `${a.city[lang]} ${a.year.slice(2)}`;
+
+const covers = ["gulzar", "javed-akhtar", "geetanjali-shree", "piyush-mishra", "raghubir-yadav", "alok-dhanwa", "mridula-garg"]
+  .map((slug) => allSpeakers.find((sp) => sp.slug === slug)).filter((sp): sp is Speaker => !!sp && !!sp.stagePhoto);
+const coverTones = ["navy", "saffron", "cream", "sky", "lime", "blue", "lilac"];
+const withPhoto = allSpeakers.filter((sp) => sp.photo || sp.stagePhoto).length;
 ---
+
 <Base lang={lang} route="/resources/" title={title} description={description} crumbs={crumbs}>
-  <section class="page-hero names-hero">
-    <div class="names-hero__cloud" aria-hidden="true" lang="hi">
-      {names.map((n, i) => <span class={`n${i % 5}`}>{n}</span>)}
-    </div>
-    <div class="wrap">
-      <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{hi ? "लेखक" : "Authors"}</p>
-      <h1>{hi ? <>मंच पर अब तक <em>कौन आया</em></> : <>Who has taken <em>the stage</em></>}</h1>
-      <p class="lead">
-        {hi
-          ? `किताब उत्सव के मंच पर आए लेखक, कवि और वक्ता, एक जगह। अभी ${allSpeakers.length} नाम दर्ज हैं; सूची हर संस्करण के साथ बढ़ रही है।`
-          : `The writers, poets and speakers who have shared the Kitab Utsav stage, in one place. ${allSpeakers.length} names are on record so far, with more added after every edition.`}
-      </p>
+  <section class="page-hero au-hero">
+    <div class="wrap au-hero__in">
+      <div>
+        <Crumbs lang={lang} items={crumbs} />
+        <p class="eyebrow">{hi ? "लेखक" : "Authors"}</p>
+        <h1>{hi ? <>मंच पर अब तक <em>कौन आया</em></> : <>Who has taken <em>the stage</em></>}</h1>
+        <p class="lead">
+          {hi
+            ? `किताब उत्सव के मंच पर आए लेखक, कवि और कलाकार, एक सूची-पत्र में। अभी ${allSpeakers.length} नाम दर्ज हैं; हर संस्करण के साथ सूची बढ़ रही है।`
+            : `The writers, poets and artists who have shared the Kitab Utsav stage, in one catalogue. ${allSpeakers.length} names on record so far, with more after every edition.`}
+        </p>
+      </div>
+      <div class="au-covers" aria-label={hi ? "प्रमुख नाम" : "Headliners"}>
+        {covers.map((sp, i) => (
+          <button type="button" class="au-cover" data-open={sp.slug} style={`--i:${i};--n:${covers.length};--tone:var(--${coverTones[i % coverTones.length]})`}>
+            <span class="au-cover__img"><img src={sp.stagePhoto!.src} alt="" loading={i < 3 ? "eager" : "lazy"} decoding="async" style={photoStyle(sp.stagePhoto!)} /></span>
+            <span class="au-cover__name">{sp.name[lang]}</span>
+          </button>
+        ))}
+      </div>
     </div>
   </section>
 
-  <section class="section" style="padding-top:28px">
+  <section class="section au-cat" data-catalogue>
     <div class="wrap">
-      <div class="chips" role="group" aria-label={hi ? "शहर से छाँटें" : "Filter by city"} data-filter>
-        <button type="button" class="chip" aria-pressed="true" data-city="">{hi ? "सभी" : "All"}</button>
-        {cities.map(([key, label]) => <button type="button" class="chip" aria-pressed="false" data-city={key}>{label}</button>)}
+      <div class="au-tools">
+        <label class="au-search">
+          <Icon name="search" />
+          <span class="sr">{hi ? "नाम खोजें" : "Search names"}</span>
+          <input type="search" data-au-search placeholder={hi ? "नाम या काम खोजें, जैसे: गुलज़ार, कवि" : "Search a name or role, e.g. Gulzar, poet"} autocomplete="off" />
+        </label>
+        <label class="au-select"><span class="sr">{hi ? "शहर" : "City"}</span>
+          <select data-au-city>
+            <option value="">{hi ? "सभी शहर" : "All cities"}</option>
+            {cities.map(([key, label]) => <option value={key}>{label}</option>)}
+          </select>
+        </label>
+        <div class="au-kinds" role="group" aria-label={hi ? "काम" : "Kind of work"}>
+          <button type="button" class="au-kind" data-kind="" aria-pressed="true">{hi ? "सभी" : "All"}</button>
+          {roleKinds.map((k) => <button type="button" class="au-kind" data-kind={k.key} aria-pressed="false">{k.label[lang]}</button>)}
+        </div>
+        <p class="au-count" aria-live="polite"><b data-au-count>{allSpeakers.length}</b> {hi ? `नाम · ${withPhoto} तस्वीर सहित` : `names · ${withPhoto} with photos`}</p>
       </div>
-      <div class="grid grid--3" data-filter-list>
-        {allSpeakers.map((sp) => <div data-cities={tagsFor(sp).join(" ")}><SpeakerCard s={sp} lang={lang} /></div>)}
+
+      <nav class="au-index" aria-label={hi ? "अक्षर से जाएँ" : "Jump to a letter"}>
+        {groups.map((g) => <a href={`#au-${g.L}`} data-letter={g.L}>{g.L}</a>)}
+      </nav>
+
+      <div class="au-groups">
+        {groups.map((g) => (
+          <section class="au-group" id={`au-${g.L}`} data-group={g.L} aria-label={g.L}>
+            <h2 class="au-group__L" aria-hidden="true">{g.L}</h2>
+            <ul class="au-cards">
+              {g.people.map((sp) => (
+                <li class="au-card" id={sp.slug} data-cities={tagsFor(sp).join(" ")} data-kinds={kindsOf(sp).join(" ")} data-search={`${sp.name.hi} ${sp.name.en} ${sp.role.hi} ${sp.role.en}`.toLowerCase()}>
+                  <button type="button" class="au-card__btn" data-open={sp.slug} aria-haspopup="dialog">
+                    <span class="au-card__pic">
+                      {sp.photo ? <img src={sp.photo} alt="" loading="lazy" decoding="async" />
+                        : sp.stagePhoto ? <img src={sp.stagePhoto.src} alt="" loading="lazy" decoding="async" style={photoStyle(sp.stagePhoto)} />
+                        : <Portrait s={sp} lang={lang} size="sm" />}
+                    </span>
+                    <span class="au-card__txt">
+                      <b class="au-card__name">{sp.name[lang]}</b>
+                      <span class="au-card__role">{sp.role[lang]}</span>
+                      {sp.appearances && sp.appearances.length > 0 && (
+                        <span class="au-card__stamps">{sp.appearances.slice(-3).map((a) => <i>{short(a)}</i>)}{sp.appearances.length > 3 && <i>+{sp.appearances.length - 3}</i>}</span>
+                      )}
+                    </span>
+                    {sp.bio && <span class="au-card__bio" title={hi ? "परिचय उपलब्ध" : "Bio available"}><Icon name="book" /></span>}
+                  </button>
+                  <div class="au-detail" hidden>
+                    <div class="au-detail__head">
+                      <span class="au-detail__pic">
+                        {sp.photo ? <img src={sp.photo} alt="" />
+                          : sp.stagePhoto ? <img src={sp.stagePhoto.src} alt="" style={photoStyle(sp.stagePhoto)} />
+                          : <Portrait s={sp} lang={lang} size="md" />}
+                      </span>
+                      <div>
+                        <h3>{sp.name[lang]}</h3>
+                        <p class="au-detail__alt" lang={hi ? "en" : "hi"}>{sp.name[hi ? "en" : "hi"]}</p>
+                        <p class="au-detail__role">{sp.role[lang]}</p>
+                      </div>
+                    </div>
+                    {sp.bio ? <p class="au-detail__bio">{sp.bio[lang]}</p> : <p class="au-detail__bio au-detail__bio--none">{hi ? "परिचय जल्द जोड़ा जाएगा।" : "A short bio will be added soon."}</p>}
+                    {sp.appearances && sp.appearances.length > 0 && (
+                      <>
+                        <p class="au-detail__kick">{hi ? "किताब उत्सव में" : "At Kitab Utsav"}</p>
+                        <ul class="au-detail__eds">
+                          {sp.appearances.map((a) => <li>{a.edition ? <a href={localePath(lang, `/editions/${a.edition}/`)}>{a.city[lang]} {a.year}</a> : <span>{a.city[lang]} {a.year}</span>}</li>)}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+        <p class="au-none" data-au-none hidden>{hi ? "इस खोज से कोई नाम नहीं मिला।" : "No names match this search."}</p>
       </div>
     </div>
   </section>
-  <script is:inline>
-    document.querySelectorAll("[data-filter]").forEach(function (bar) {
-      var list = bar.parentNode.querySelector("[data-filter-list]");
-      bar.addEventListener("click", function (e) {
-        var b = e.target.closest("[data-city]");
-        if (!b) return;
-        var c = b.getAttribute("data-city");
-        bar.querySelectorAll("[data-city]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-        list.querySelectorAll("[data-cities]").forEach(function (card) {
-          card.hidden = !!c && card.getAttribute("data-cities").split(" ").indexOf(c) < 0;
-        });
-      });
-    });
-  </script>
 </Base>

@@ -3,6 +3,8 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
 import { faq } from "../data/faq";
+import Icon from "../components/Icon.astro";
+import { org, festivalSocial } from "../site.config";
 import { t, type Lang } from "../i18n";
 import { faqLd } from "../lib/schema";
 
@@ -16,24 +18,69 @@ const description = hi
   ? "किताब उत्सव क्या है, अगला उत्सव कब और कहाँ है, किताबें कैसे मिलेंगी और अपने शहर में उत्सव कैसे बुलाएँ: सभी सवालों के जवाब।"
   : "What Kitab Utsav is, when and where the next edition is, buying books at the festival and bringing it to your city: answers in one place.";
 const crumbs = [{ name: s.nav.faq, path: "/faq/" }];
+const hello = hi
+  ? "नमस्ते! मैं किताब उत्सव की ओर से हूँ। नीचे से कोई सवाल चुनिए, या खोजिए।"
+  : "Hello! I'm here for Kitab Utsav. Pick a question below, or search for one.";
 ---
+
 <Base lang={lang} route="/faq/" title={title} description={description} crumbs={crumbs} jsonLd={[faqLd(items)]}>
-  <section class="page-hero">
-    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+  <section class="page-hero fq-hero">
+    <Clouds items={[{ x: "66%", y: "-10%", w: 240 }, { x: "90%", y: "50%", w: 170, flip: true }]} />
     <div class="wrap">
       <Crumbs lang={lang} items={crumbs} />
       <p class="eyebrow">{s.nav.faq}</p>
-      <h1>{hi ? "अक्सर पूछे जाने वाले सवाल" : "Frequently asked questions"}</h1>
+      <h1>{hi ? <>कुछ भी <em>पूछिए</em></> : <>Ask us <em>anything</em></>}</h1>
+      <p class="lead">{hi ? "किताब उत्सव के बारे में सबसे ज़्यादा पूछे जाने वाले सवाल, बातचीत के अंदाज़ में।" : "The questions people ask most about Kitab Utsav, answered like a conversation."}</p>
     </div>
   </section>
-  <section class="section" style="padding-top:28px">
-    <div class="wrap faq">
-      {items.map((f, i) => (
-        <details open={i < 2}>
-          <summary>{f.q}</summary>
-          <div class="answer"><p set:html={f.a} /></div>
-        </details>
-      ))}
+
+  <section class="section fq-section">
+    <div class="wrap">
+      <div class="fq-chat" data-faq-chat>
+        <header class="fq-chat__bar">
+          <span class="fq-av"><img src="/brand/kitab-utsav-logo.svg" alt="" width="40" height="40" /></span>
+          <span class="fq-chat__who"><b>{hi ? "किताब उत्सव" : "Kitab Utsav"}</b><small><i aria-hidden="true"></i>{hi ? "जवाब देने को तैयार" : "Here to help"}</small></span>
+          <button type="button" class="fq-chat__all" data-faq-all>{hi ? "सारे जवाब देखें" : "Show all answers"}</button>
+        </header>
+
+        <div class="fq-thread" data-faq-thread aria-live="polite">
+          <div class="fq-msg fq-msg--bot"><span class="fq-av fq-av--sm" aria-hidden="true"><img src="/brand/kitab-utsav-logo.svg" alt="" /></span><p class="fq-bubble">{hello}</p></div>
+          <!-- Every question and answer, in the page for search engines and for visitors without JavaScript.
+               With JavaScript the list is hidden and each answer arrives as a chat message. -->
+          <dl class="fq-list" data-faq-list>
+            {items.map((f, i) => (
+              <div class="fq-pair" id={`q${i + 1}`}>
+                <dt class="fq-msg fq-msg--me"><span class="fq-bubble">{f.q}</span></dt>
+                <dd class="fq-msg fq-msg--bot"><span class="fq-av fq-av--sm" aria-hidden="true"><img src="/brand/kitab-utsav-logo.svg" alt="" /></span><span class="fq-bubble" set:html={f.a} /></dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div class="fq-ask">
+          <label class="fq-search">
+            <Icon name="search" />
+            <span class="sr">{hi ? "सवाल खोजें" : "Search questions"}</span>
+            <input type="search" data-faq-search placeholder={hi ? "सवाल खोजें, जैसे: किताबें, प्रवेश, शहर" : "Search, e.g. books, entry, cities"} autocomplete="off" />
+          </label>
+          <div class="fq-chips" role="group" aria-label={hi ? "सवाल" : "Questions"}>
+            {items.map((f, i) => <button type="button" class="fq-chip" data-q={i}>{f.q}</button>)}
+          </div>
+          <p class="fq-none" data-faq-none hidden>{hi ? "इससे मिलता सवाल नहीं मिला। नीचे हमसे सीधे पूछिए।" : "No matching question. Ask us directly below."}</p>
+        </div>
+      </div>
+
+      <div class="fq-more">
+        <div>
+          <h2>{hi ? "अब भी कोई सवाल?" : "Still curious?"}</h2>
+          <p>{hi ? "हमें लिखिए, फ़ोन कीजिए या Instagram पर संदेश भेजिए।" : "Write, call or send us a message on Instagram."}</p>
+        </div>
+        <div class="fq-more__btns">
+          <a href={`mailto:${org.email}?subject=${encodeURIComponent(hi ? "किताब उत्सव: सवाल" : "Kitab Utsav: a question")}`}><Icon name="mail" />{hi ? "ईमेल" : "Email"}</a>
+          <a href={`tel:${org.phones[0].tel}`}><Icon name="phone" />{org.phones[0].label}</a>
+          <a href={festivalSocial[0].url} target="_blank" rel="noopener"><Icon name="Instagram" />{festivalSocial[0].handle}</a>
+        </div>
+      </div>
     </div>
   </section>
 </Base>

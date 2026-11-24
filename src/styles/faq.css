@@ -1,0 +1,82 @@
+/*
+ * FAQ page as a chat (src/views/Faq.astro, motion.js section 20), Hindi and English.
+ * Without JavaScript the full list of questions and answers shows as a static conversation.
+ */
+
+.fq-chat { max-width: 880px; margin: 0 auto; overflow: hidden; border-radius: 28px; background: #fff; box-shadow: 0 18px 40px rgba(7, 28, 73, .14); }
+.fq-chat__bar { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: var(--navy); color: var(--cream); }
+.fq-av { flex: none; display: grid; place-items: center; width: 46px; height: 46px; padding: 4px; border-radius: 50%; background: #fff; }
+.fq-av img { width: 100%; height: 100%; object-fit: contain; }
+.fq-av--sm { width: 34px; height: 34px; padding: 3px; box-shadow: 0 2px 6px rgba(7, 28, 73, .15); }
+.fq-chat__who { display: grid; gap: 2px; }
+.fq-chat__who b { font: 800 1.1rem/1.1 var(--display); }
+.fq-chat__who small { display: flex; align-items: center; gap: 6px; font-size: .8rem; opacity: .8; }
+.fq-chat__who small i { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 3px rgba(217, 242, 107, .25); }
+.fq-chat__all { margin-left: auto; padding: 9px 14px; border: 2px solid rgba(251, 240, 217, .4); border-radius: 999px; background: none; color: var(--cream); font: 600 .85rem/1 var(--display); cursor: pointer; transition: background .2s, color .2s; }
+.fq-chat__all:hover { background: var(--cream); color: var(--navy); }
+.fq-chat:not(.is-chat) .fq-chat__all { display: none; }
+
+/* Thread */
+.fq-thread { display: grid; align-content: start; gap: 12px; padding: 22px 20px; background: var(--cream) radial-gradient(rgba(11, 46, 99, .06) 1px, transparent 1.5px) 0 0 / 18px 18px; }
+.fq-chat.is-chat .fq-thread { min-height: 300px; max-height: min(62vh, 620px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.fq-list { display: grid; gap: 12px; margin: 0; }
+.fq-pair { display: grid; gap: 12px; }
+.fq-msg { display: flex; align-items: flex-end; gap: 8px; margin: 0; }
+.fq-msg--me { justify-content: flex-end; }
+.fq-bubble { max-width: min(78%, 560px); margin: 0; padding: 12px 16px; border-radius: 20px; font-size: 1rem; line-height: 1.55; }
+.fq-msg--bot .fq-bubble { border-bottom-left-radius: 6px; background: #fff; color: var(--navy); box-shadow: 0 2px 8px rgba(7, 28, 73, .08); }
+.fq-msg--me .fq-bubble { border-bottom-right-radius: 6px; background: var(--navy); color: var(--cream); font: 600 1rem/1.4 var(--display); }
+.fq-bubble a { color: var(--red); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.fq-msg.is-new { animation: fq-in .35s cubic-bezier(.34, 1.56, .64, 1); }
+.fq-msg--me.is-new { transform-origin: 100% 100%; }
+.fq-msg--bot.is-new { transform-origin: 0 100%; }
+@keyframes fq-in { from { opacity: 0; transform: scale(.85) translateY(8px); } }
+.fq-typing .fq-bubble { display: flex; gap: 5px; padding: 14px 16px; }
+.fq-typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--navy); opacity: .35; animation: fq-dot 1s ease-in-out infinite; }
+.fq-typing i:nth-child(2) { animation-delay: .15s; }
+.fq-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes fq-dot { 30% { opacity: 1; transform: translateY(-4px); } }
+
+/* Ask: search + question chips */
+.fq-ask { padding: 16px 18px 20px; border-top: 1px solid rgba(11, 46, 99, .1); }
+.fq-chat:not(.is-chat) .fq-ask { display: none; }
+.fq-search { display: flex; align-items: center; gap: 10px; padding: 0 16px; border: 2px solid rgba(11, 46, 99, .15); border-radius: 999px; background: #fff; color: var(--navy); transition: border-color .2s; }
+.fq-search:focus-within { border-color: var(--navy); }
+.fq-search svg { flex: none; width: 20px; height: 20px; opacity: .6; }
+.fq-search input { flex: 1; min-width: 0; height: 46px; border: 0; outline: 0; background: none; color: var(--navy); font: 500 1rem/1 var(--text, inherit); }
+.fq-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.fq-chip { padding: 10px 14px; border: 2px solid var(--navy); border-radius: 18px 18px 18px 6px; background: #fff; color: var(--navy); font: 600 .92rem/1.25 var(--display); text-align: left; cursor: pointer; transition: background .2s, color .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+.fq-chip:hover { background: var(--yellow); transform: translateY(-2px); }
+.fq-chip:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+.fq-chip.is-asked { border-color: rgba(11, 46, 99, .2); color: rgba(11, 46, 99, .55); }
+.fq-chip[hidden] { display: none; }
+.fq-none { margin: 12px 0 0; color: var(--ku-muted); }
+
+/* Still curious */
+.fq-more { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 30px; max-width: 880px; margin: 26px auto 0; padding: 22px 26px; border-radius: var(--r-lg); background: var(--yellow); color: var(--navy); }
+.fq-more h2 { margin: 0 0 4px; font: 800 clamp(1.4rem, 2.4vw, 1.9rem)/1.1 var(--display); text-transform: uppercase; color: var(--navy); }
+.fq-more p { margin: 0; }
+.fq-more__btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.fq-more__btns a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--navy); color: var(--cream); text-decoration: none; font: 600 .9rem/1 var(--display); transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), background .2s; }
+.fq-more__btns a:hover { transform: translateY(-3px); background: var(--red); }
+.fq-more__btns svg { width: 18px; height: 18px; }
+
+/* Phones: full-width chat like a messaging app. */
+@media (max-width: 720px) {
+  .fq-chat { margin-inline: calc(-1 * clamp(4px, 2vw, 16px)); border-radius: 22px; }
+  .fq-chat__bar { padding: 12px 14px; }
+  .fq-av { width: 40px; height: 40px; }
+  .fq-chat__all { padding: 8px 10px; font-size: .78rem; }
+  .fq-thread { padding: 16px 12px; }
+  .fq-chat.is-chat .fq-thread { max-height: 58vh; }
+  .fq-bubble { max-width: 86%; font-size: .95rem; }
+  .fq-ask { padding: 12px 12px 16px; }
+  .fq-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -12px; padding: 2px 12px; }
+  .fq-chips::-webkit-scrollbar { display: none; }
+  .fq-chip { flex: none; max-width: 78vw; white-space: normal; }
+  .fq-more { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fq-msg.is-new, .fq-typing i { animation: none; }
+  .fq-chip, .fq-more__btns a { transition: none; }
+}

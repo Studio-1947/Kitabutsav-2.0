@@ -27,71 +27,109 @@ const crumbs = [{ name: s.nav.visit, path: "/visit/" }];
 const up = ready;
 const ev = up ? eventLd(e, lang, Astro.site!, "/og/kitab-utsav.jpg") : null;
 const embed = `https://www.google.com/maps?q=${encodeURIComponent(e.mapQuery ?? e.city.en)}&output=embed`;
+
+// A decorative stamp grid for the pass (same pattern every build for the same edition).
+const stamp = (() => {
+  let h = 17; const cells: [number, number][] = [];
+  for (const ch of e.slug) h = (h * 31 + ch.charCodeAt(0)) % 99991;
+  for (let y = 0; y < 9; y++) for (let x = 0; x < 9; x++) {
+    h = (h * 1103 + 12345) % 99991;
+    const corner = (x < 3 && y < 3) || (x > 5 && y < 3) || (x < 3 && y > 5);
+    if (corner ? (x % 2 === 0 || y % 2 === 0) && !(x === 1 && y === 1) && !(x === 7 && y === 1) && !(x === 1 && y === 7) : h % 3 === 0) cells.push([x, y]);
+  }
+  return cells;
+})();
+const tips = hi
+  ? [
+      { icon: "clock", t: "समय", d: `पाँचों दिन ${formatTime(e.startTime!, "hi")} से ${formatTime(e.endTime!, "hi")} तक खुला।` },
+      { icon: "list", t: "कार्यक्रम", d: "सत्रों का दिन-वार समय कार्यक्रम पेज पर।", href: localePath("hi", "/programme/") },
+      { icon: "book", t: "पुस्तक प्रदर्शनी", d: "राजकमल समूह की किताबें, पूरे दिन।" },
+      { icon: "ticket", t: "प्रवेश", d: "प्रवेश और पंजीकरण की ताज़ा जानकारी Instagram पर।", href: festivalSocial[0].url },
+    ]
+  : [
+      { icon: "clock", t: "Hours", d: `Open all five days, ${formatTime(e.startTime!, "en")} to ${formatTime(e.endTime!, "en")}.` },
+      { icon: "list", t: "Programme", d: "Day-by-day session times are on the programme page.", href: localePath("en", "/programme/") },
+      { icon: "book", t: "Book exhibition", d: "Books from the Rajkamal group, all day." },
+      { icon: "ticket", t: "Entry", d: "Latest on entry and registration on Instagram.", href: festivalSocial[0].url },
+    ];
 ---
+
 <Base lang={lang} route="/visit/" title={title} description={description} crumbs={crumbs} jsonLd={ev ? [ev] : []}>
-  <section class="page-hero">
-    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
+  <section class="page-hero vs-hero">
+    <Clouds items={[{ x: "66%", y: "-10%", w: 240 }, { x: "90%", y: "50%", w: 170, flip: true }]} />
     <div class="wrap">
       <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{hi ? `${e.city.hi} · ${when}` : `${e.city.en} · ${when}`}</p>
-      <h1>{hi ? "उत्सव तक कैसे पहुँचें" : "Plan your visit"}</h1>
+      <p class="eyebrow">{s.nav.visit}</p>
+      <h1>{hi ? <>उत्सव तक <em>कैसे पहुँचें</em></> : <>Plan your <em>visit</em></>}</h1>
+      {!up && n && (
+        <a class="vs-next" href={localePath(lang, `/editions/${n.slug}/`)}>
+          <i aria-hidden="true"></i>
+          <span>{hi ? <><b>अगला पड़ाव: {n.city.hi}, {formatRange(n, "hi")}।</b> स्थान और समय की घोषणा जल्द; तब तक नीचे पिछले संस्करण (किताब उत्सव {e.city.hi}) की जानकारी है।</> : <><b>Next stop: {n.city.en}, {formatRange(n, "en")}.</b> Venue and timings coming soon; until then, below are the details of the last edition (Kitab Utsav {e.city.en}).</>}</span>
+          <Icon name="arrowRight" />
+        </a>
+      )}
     </div>
   </section>
-  <section class="section" style="padding-top:28px">
-    {!up && (
-      <div class="wrap">
-        <div class="notice" role="note">
-          <Icon name="help" />
-          <p>
-            {n
-              ? (hi
-                ? <>अगला किताब उत्सव <a href={localePath(lang, `/editions/${n.slug}/`)}>{n.city.hi} में, {formatRange(n, "hi")}</a> होगा। स्थान और समय की घोषणा जल्द होगी; तब तक नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a>।</>
-                : <>The next Kitab Utsav is <a href={localePath(lang, `/editions/${n.slug}/`)}>in {n.city.en}, {formatRange(n, "en")}</a>. Venue and timings will be announced soon; until then, below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). <a href={festivalSocial[0].url} target="_blank" rel="noopener">Follow us on Instagram to hear first</a>.</>)
-              : (hi
-                ? <>नीचे हाल के संस्करण (किताब उत्सव {e.city.hi}, {when}) की जानकारी है। अगले शहर और स्थान की घोषणा जल्द होगी; <a href={festivalSocial[0].url} target="_blank" rel="noopener">ख़बर पाने के लिए Instagram पर जुड़ें</a>।</>
-                : <>Below are the details of the most recent edition (Kitab Utsav {e.city.en}, {when}). The next city and venue will be announced soon; <a href={festivalSocial[0].url} target="_blank" rel="noopener">follow us on Instagram to hear first</a>.</>)}
-          </p>
-        </div>
-      </div>
-    )}
-    <div class="wrap detail-grid">
-      <div>
-        <iframe class="map-frame" src={embed} title={hi ? `${e.venue?.hi} का नक्शा` : `Map of ${e.venue?.en}`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <div class="prose" style="margin-top:28px">
-          <h2>{hi ? "ध्यान रखें" : "Good to know"}</h2>
-          <ul>
-            {hi ? (
-              <>
-                <li>उत्सव पाँचों दिन {formatTime(e.startTime!, "hi")} से {formatTime(e.endTime!, "hi")} तक खुला रहेगा।</li>
-                <li>सत्रों का दिन-वार समय <a href={localePath("hi", "/programme/")}>कार्यक्रम</a> पेज पर देखें।</li>
-                <li>पुस्तक प्रदर्शनी पूरे दिन खुली रहेगी।</li>
-                <li>प्रवेश और पंजीकरण की ताज़ा जानकारी <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a> पर मिलेगी।</li>
-              </>
-            ) : (
-              <>
-                <li>The festival is open all five days from {formatTime(e.startTime!, "en")} to {formatTime(e.endTime!, "en")}.</li>
-                <li>Session timings for each day are on the <a href="/en/programme/">programme</a> page.</li>
-                <li>The book exhibition is open all day.</li>
-                <li>For the latest on entry and registration, follow <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a>.</li>
-              </>
-            )}
-          </ul>
-        </div>
-      </div>
-      <aside>
-        <div class="card">
-          <ul class="info">
-            <li><Icon name="calendar" /><span><b>{s.dates}</b>{when}</span></li>
-            <li><Icon name="clock" /><span><b>{s.time}</b>{s.daily}, {formatTime(e.startTime!, lang)} {hi ? "से" : "to"} {formatTime(e.endTime!, lang)}</span></li>
-            <li><Icon name="pin" /><span><b>{s.venue}</b>{e.venue?.[lang]}</span></li>
-            <li><Icon name="chat" /><span><b>{hi ? "संपर्क" : "Contact"}</b><a href={`tel:${org.phones[0].tel}`}>{org.phones[0].label}</a>, <a href={`tel:${org.phones[1].tel}`}>{org.phones[1].label}</a><br /><a href={`mailto:${org.email}`}>{org.email}</a></span></li>
-          </ul>
-          <div class="btns">
-            <a class="btn btn--primary" href={mapsUrl(e.mapQuery!)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>
-            {up && <a class="btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>}
+
+  <section class="section vs-main">
+    <div class="wrap vs-grid">
+      <article class="vs-pass" aria-label={hi ? "प्रवेश पास" : "Entry pass"}>
+        <div class="vs-pass__body">
+          <p class="vs-pass__kick">{hi ? "किताब उत्सव · प्रवेश पास" : "Kitab Utsav · Entry pass"}{!up && <span class="vs-pass__past">{hi ? "पिछला संस्करण" : "Last edition"}</span>}</p>
+          <h2 class="vs-pass__city">{e.city[lang]} <span>{e.year}</span></h2>
+          <dl class="vs-pass__rows">
+            <div><dt><Icon name="calendar" />{s.dates}</dt><dd>{when}</dd></div>
+            <div><dt><Icon name="clock" />{s.time}</dt><dd>{s.daily}, {formatTime(e.startTime!, lang)} {hi ? "से" : "to"} {formatTime(e.endTime!, lang)}</dd></div>
+            <div class="vs-pass__venue"><dt><Icon name="pin" />{s.venue}</dt><dd>{e.venue?.[lang]}</dd></div>
+          </dl>
+          <div class="vs-pass__foot">
+            <svg class="vs-pass__stamp" viewBox="0 0 9 9" aria-hidden="true">{stamp.map(([x, y]) => <rect x={x} y={y} width="1" height="1" />)}</svg>
+            <p>{hi ? "प्रवेश और पंजीकरण की ताज़ा जानकारी" : "Latest on entry and registration"} <a href={festivalSocial[0].url} target="_blank" rel="noopener">{festivalSocial[0].handle}</a></p>
           </div>
         </div>
-      </aside>
+        <div class="vs-pass__stubs">
+          <a class="vs-stub" href={mapsUrl(e.mapQuery!)} target="_blank" rel="noopener"><Icon name="arrowUpRight" /><span>{s.directions}</span></a>
+          {up ? (
+            <a class="vs-stub" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" /><span>{s.addToCal}</span></a>
+          ) : (
+            <a class="vs-stub" href={localePath(lang, `/editions/${e.slug}/`)}><Icon name="camera" /><span>{hi ? "झलकियाँ" : "Highlights"}</span></a>
+          )}
+        </div>
+      </article>
+
+      <figure class="vs-map">
+        <iframe src={embed} title={hi ? `${e.venue?.hi} का नक्शा` : `Map of ${e.venue?.en}`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <figcaption><span class="vs-map__pin" aria-hidden="true"><Icon name="pin" /></span>{e.venue?.[lang].split(",")[0]}</figcaption>
+      </figure>
+    </div>
+
+    <div class="wrap">
+      <h2 class="vs-h">{hi ? "ध्यान रखें" : "Good to know"}</h2>
+      <ul class="vs-tips">
+        {tips.map((x, i) => {
+          const Tag = x.href ? "a" : "div";
+          return (
+            <li style={`--tone:var(--${["yellow", "sky", "lime", "lilac"][i]})`}>
+              <Tag class="vs-tip" {...(x.href ? { href: x.href, ...(x.href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {}) } : {})}>
+                <span class="vs-tip__icon"><Icon name={x.icon} /></span>
+                <b>{x.t}</b>
+                <span>{x.d}</span>
+                {x.href && <Icon name="arrowRight" class="vs-tip__go" />}
+              </Tag>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div class="vs-help">
+        <h2>{hi ? "कोई सवाल?" : "Need help?"}</h2>
+        <div class="vs-help__btns">
+          <a href={`tel:${org.phones[0].tel}`}><Icon name="phone" /><span><small>{hi ? "फ़ोन" : "Call"}</small>{org.phones[0].label}</span></a>
+          <a href={`tel:${org.phones[1].tel}`}><Icon name="phone" /><span><small>{hi ? "मोबाइल" : "Mobile"}</small>{org.phones[1].label}</span></a>
+          <a href={`mailto:${org.email}?subject=${encodeURIComponent("Kitab Utsav")}`}><Icon name="mail" /><span><small>{hi ? "ईमेल" : "Email"}</small>{org.email}</span></a>
+          <a href={festivalSocial[0].url} target="_blank" rel="noopener"><Icon name="Instagram" /><span><small>Instagram</small>{festivalSocial[0].handle}</span></a>
+        </div>
+      </div>
     </div>
   </section>
 </Base>

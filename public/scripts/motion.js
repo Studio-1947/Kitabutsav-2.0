@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".au-group", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -547,5 +547,118 @@
   /* 19. Press masthead: today's date, in the page's language (the page itself is built ahead of time). */
   document.querySelectorAll("[data-today]").forEach(function (el) {
     el.textContent = new Intl.DateTimeFormat(hi ? "hi-IN" : "en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date());
+  });
+  /* 20. FAQ as a chat: a question chip posts the question as the visitor's message, shows a
+         typing indicator, then the answer from the page's own list. Search filters the chips.
+         #q3-style links open that answer straight away. */
+  document.querySelectorAll("[data-faq-chat]").forEach(function (chat) {
+    var list = chat.querySelector("[data-faq-list]"), thread = chat.querySelector("[data-faq-thread]");
+    var pairs = Array.prototype.slice.call(list.querySelectorAll(".fq-pair"));
+    var chips = Array.prototype.slice.call(chat.querySelectorAll(".fq-chip"));
+    var search = chat.querySelector("[data-faq-search]"), none = chat.querySelector("[data-faq-none]");
+    chat.classList.add("is-chat");
+    list.hidden = true;
+    var busy = Promise.resolve();
+    var scroll = function () { thread.scrollTo({ top: thread.scrollHeight, behavior: reduce ? "auto" : "smooth" }); };
+    var post = function (i, quick) {
+      var pair = pairs[i]; if (!pair) return;
+      chips[i].classList.add("is-asked");
+      busy = busy.then(function () {
+        return new Promise(function (done) {
+          var me = pair.querySelector("dt").cloneNode(true);
+          var me2 = document.createElement("div"); me2.className = me.className + " is-new"; me2.innerHTML = me.innerHTML;
+          thread.appendChild(me2); scroll();
+          var typing = document.createElement("div");
+          typing.className = "fq-msg fq-msg--bot fq-typing";
+          typing.innerHTML = pair.querySelector("dd .fq-av").outerHTML + '<span class="fq-bubble"><i></i><i></i><i></i></span>';
+          typing.setAttribute("aria-hidden", "true");
+          var wait = quick || reduce ? 0 : 650 + Math.min(900, pair.querySelector("dd").textContent.length * 3);
+          setTimeout(function () {
+            thread.appendChild(typing); scroll();
+            setTimeout(function () {
+              typing.remove();
+              var ans = document.createElement("div"); ans.className = "fq-msg fq-msg--bot is-new";
+              ans.innerHTML = pair.querySelector("dd").innerHTML;
+              thread.appendChild(ans); scroll(); done();
+            }, wait);
+          }, quick || reduce ? 0 : 250);
+        });
+      });
+    };
+    chips.forEach(function (c, i) { c.addEventListener("click", function () { post(i); }); });
+    chat.querySelector("[data-faq-all]").addEventListener("click", function () { pairs.forEach(function (_, i) { if (!chips[i].classList.contains("is-asked")) post(i, true); }); });
+    search.addEventListener("input", function () {
+      var q = search.value.trim().toLowerCase(), n = 0;
+      chips.forEach(function (c, i) {
+        var hay = (c.textContent + " " + pairs[i].querySelector("dd").textContent).toLowerCase();
+        var on = !q || hay.indexOf(q) >= 0; c.hidden = !on; if (on) n++;
+      });
+      none.hidden = n > 0;
+    });
+    search.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      var first = chips.filter(function (c) { return !c.hidden; })[0];
+      if (first) { e.preventDefault(); first.click(); }
+    });
+    var m = location.hash.match(/^#q(\d+)$/);
+    if (m) post(parseInt(m[1], 10) - 1, true);
+  });
+  /* 21. Authors catalogue: search, city and kind filters, the A–Z bar, and a side panel
+         (a sheet from the bottom on phones) with the author's bio and editions. /resources/#slug
+         opens that author. */
+  document.querySelectorAll("[data-catalogue]").forEach(function (cat) {
+    var cards = Array.prototype.slice.call(cat.querySelectorAll(".au-card"));
+    var groups = Array.prototype.slice.call(cat.querySelectorAll(".au-group"));
+    var search = cat.querySelector("[data-au-search]"), city = cat.querySelector("[data-au-city]");
+    var kinds = cat.querySelectorAll(".au-kind"), count = cat.querySelector("[data-au-count]"), none = cat.querySelector("[data-au-none]");
+    var kind = "";
+    var apply = function () {
+      var q = search.value.trim().toLowerCase(), c = city.value, n = 0;
+      cards.forEach(function (el) {
+        var on = (!q || el.dataset.search.indexOf(q) >= 0) && (!c || el.dataset.cities.split(" ").indexOf(c) >= 0) && (!kind || el.dataset.kinds.split(" ").indexOf(kind) >= 0);
+        el.hidden = !on; if (on) n++;
+      });
+      groups.forEach(function (g) {
+        var any = !!g.querySelector(".au-card:not([hidden])");
+        g.hidden = !any;
+        var link = cat.querySelector('.au-index a[data-letter="' + g.dataset.group + '"]');
+        if (link) link.classList.toggle("is-off", !any);
+      });
+      count.textContent = n; none.hidden = n > 0;
+    };
+    search.addEventListener("input", apply);
+    city.addEventListener("change", apply);
+    kinds.forEach(function (b) {
+      b.addEventListener("click", function () {
+        kind = b.dataset.kind;
+        kinds.forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+        apply();
+      });
+    });
+
+    // Side panel
+    var dlg = document.createElement("dialog");
+    dlg.className = "au-panel";
+    dlg.innerHTML = '<button type="button" class="au-panel__x" aria-label="' + (hi ? "बंद करें" : "Close") + '">&times;</button><div class="au-panel__body"></div>';
+    document.body.appendChild(dlg);
+    var body = dlg.querySelector(".au-panel__body");
+    var open = function (slug) {
+      var card = document.getElementById(slug);
+      if (!card || !card.classList.contains("au-card")) return;
+      body.innerHTML = card.querySelector(".au-detail").innerHTML;
+      dlg.setAttribute("aria-label", card.querySelector(".au-card__name").textContent);
+      if (!dlg.open) dlg.showModal();
+      root.classList.add("lb-open");
+    };
+    dlg.addEventListener("close", function () { root.classList.remove("lb-open"); });
+    dlg.querySelector(".au-panel__x").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+    document.querySelectorAll("[data-open]").forEach(function (b) {
+      b.addEventListener("click", function () { open(b.dataset.open); });
+    });
+    var m = location.hash.slice(1);
+    if (m && document.getElementById(m) && document.getElementById(m).classList.contains("au-card")) {
+      window.addEventListener("load", function () { open(m); });
+    }
   });
 })();
