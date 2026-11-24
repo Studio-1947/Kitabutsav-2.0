@@ -1,0 +1,162 @@
+/*
+ * Touch and phone layer. Loaded last.
+ *
+ * Every :hover rule on the site now sits behind @media (hover: hover), so phones never get a
+ * "stuck" hover look after a tap. What hover used to do is re-thought here for touch:
+ *  1. Press feedback: anything tappable visibly presses in under the finger (:active).
+ *  2. Centre stage: the card passing through the middle of the screen gets the look it used to
+ *     get on hover (photo zooms or colours in, a ticket stub tears, a card straightens).
+ *     motion.js section 23 adds .is-center; inside sideways scrollers, the card in the middle.
+ *  3. Tap instead of hover: things that revealed on hover now show by default or open on tap.
+ * Plus phone fixes: tap targets of 44px or more, no text under 12px, and the long ticket list
+ * turned into a swipeable deck.
+ */
+
+/* ---------- 1. Press feedback ---------- */
+@media (hover: none) {
+  .btn, .ed-btn, .pchip, .pt-chip, .ev-key, .au-kind, .fq-chip, .chip, .fpill, .pill,
+  .ecard, .tix__card, .fmt, .book__spine, .stop__card, .album, .alb-thumb, .ev-day, .ev-next,
+  .nw-clip__in, .nw-kit__item, .vs-tip, .vs-stub, .vs-help__btns a, .vs-next, .pt-card__in,
+  .pt-join__go, .au-card__btn, .au-star, .ed-face, .ed-film__ph, .ed-route__stop, .ed-card,
+  .fend, .fcover__nav a, .fcover__icons a, .fq-more__btns a, .nw-desk__mail, .ab-collage__p,
+  .ab-stats.totals li, .btotals li, .ed-stats li, .au-facts li, .alb-arrow, .lb__btn, .more {
+    -webkit-tap-highlight-color: transparent;
+    transition-property: transform, scale, translate, rotate, background-color, color, box-shadow, opacity, border-color;
+  }
+  .btn:active, .ed-btn:active, .pchip:active, .pt-chip:active, .ev-key:active, .au-kind:active,
+  .fq-chip:active, .chip:active, .fpill:active, .pill:active, .more:active,
+  .fcover__icons a:active, .fq-more__btns a:active, .vs-help__btns a:active, .nw-desk__mail:active,
+  .alb-arrow:active, .lb__btn:active { scale: .94; transition-duration: .1s; }
+  .ecard:active, .tix__card:active, .fmt:active, .stop__card:active, .album:active, .ev-day:active,
+  .ev-next:active, .nw-clip__in:active, .nw-kit__item:active, .vs-tip:active, .vs-next:active,
+  .pt-join__go:active, .au-card__btn:active, .ed-face:active, .ed-film__ph:active, .ed-route__stop:active,
+  .ed-card:active, .fend:active, .au-star:active { scale: .97; transition-duration: .12s; }
+  .fcover__nav a:active { color: var(--yellow); border-color: var(--yellow); }
+  .fend:active::before { transform: scaleX(1); }
+  .vs-stub:active { background: var(--red); }
+  /* Stickers and stats straighten and pop when tapped (they used to on hover). */
+  .ab-stats.totals li:active, .btotals li:active, .ed-stats li:active, .au-facts li:active { rotate: 0deg; scale: 1.1; transition-duration: .15s; }
+}
+
+/* ---------- 2. Centre stage (the card in the middle of the screen) ---------- */
+@media (hover: none) {
+  /* Home: edition cards and tickets */
+  .ecard .tile__photo { transition: transform 1.2s cubic-bezier(.22, 1, .36, 1); }
+  .ecard.is-center .tile__photo { transform: scale(1.08); }
+  .tix__card { transition: transform .6s cubic-bezier(.34, 1.56, .64, 1), box-shadow .4s, scale .12s; }
+  .tix__item.is-center .tix__card { transform: rotate(0deg); box-shadow: 0 16px 0 rgba(7, 28, 73, .14); }
+  .tix__item.is-center .tix__photo img { transform: scale(1.07); }
+  /* What happens: photo eases in, sticker straightens */
+  .fmt.is-center .fmt__img { transform: scale(1.08); }
+  .fmt.is-center .fmt__t.bsticker { transform: rotate(0) scale(1.05); }
+  /* About: chapter photos and route postcards */
+  .ab-ch.is-center .ab-ch__img img { transform: scale(1.06); }
+  .stop.is-center .stop__card { box-shadow: 0 18px 32px rgba(7, 28, 73, .2); }
+  .stop.is-center .stop__photo img { transform: scale(1.06); }
+  /* Events: the session in the middle lifts out of the timeline */
+  .ev-s.is-center .ev-s__card { transform: translateX(4px); box-shadow: 0 10px 22px rgba(7, 28, 73, .12); }
+  /* Press: clipping photos develop from black-and-white to colour as they pass the middle */
+  .nw-clip__img img { transition: filter 1s ease; }
+  .nw-clip.is-center .nw-clip__img img { filter: none; }
+  .nw-clip.is-center .nw-clip__in { rotate: 0deg; }
+  /* Visit: the pass straightens once it is in the middle */
+  .vs-pass.is-center { rotate: 0deg; }
+  /* Edition pages: the photo in the middle of the filmstrip and the postcard in the middle of the
+     "other editions" row stand up straight and lift */
+  .ed-film li { transition: rotate .5s cubic-bezier(.34, 1.56, .64, 1); }
+  .ed-film li.is-center { rotate: 0deg; }
+  .ed-film li.is-center .ed-film__ph { transform: translateY(-6px); box-shadow: 0 18px 30px rgba(7, 28, 73, .22); }
+  .ed-cards li.is-center .ed-card { transform: translateY(-4px); box-shadow: 0 14px 26px rgba(7, 28, 73, .15); }
+  /* About albums: the open album shows its stack fanned out (on desktop that was hover) */
+  .album[aria-selected="true"] .album__p--1 { transform: rotate(-12deg) translate(-18px, 4px); }
+  .album[aria-selected="true"] .album__p--2 { transform: rotate(11deg) translate(18px, 4px); }
+  /* Partners: logos in the marquee are plain; the flip-card hint tells people to tap */
+}
+
+/* ---------- 3. Tap instead of hover ---------- */
+@media (hover: none) {
+  /* Footer nav arrows, album zoom badges, ticket "Read the story" hints: always visible */
+  .fcover__nav a svg { opacity: 1; transform: none; }
+  .alb-feature__zoom { opacity: 1; transform: none; }
+  /* Heading words hop when tapped (motion.js adds .hop) */
+  .split .w { -webkit-tap-highlight-color: transparent; }
+  /* Partner flip cards: a small corner hint says "tap" */
+  .pt-card__front::after { content: "↻"; position: absolute; right: 10px; bottom: 8px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(11, 46, 99, .08); color: var(--navy); font: 700 .8rem/1 system-ui, sans-serif; }
+  /* Paper planes fly off when tapped (motion.js adds .fly, then opens the mail) */
+  .btn--plane.fly .plane, .pt-join__go.fly svg { animation: plane-fly .55s cubic-bezier(.5, 0, .3, 1) forwards; }
+  /* About collage: the tapped photo comes to the front, straight */
+  .ab-collage__p { transition: rotate .45s cubic-bezier(.34, 1.56, .64, 1), scale .45s cubic-bezier(.34, 1.56, .64, 1); }
+  .ab-collage__p.is-front { z-index: 5; rotate: 0deg; scale: 1.05; }
+  /* The footer wordmark letters hop on tap */
+  .fword__g.hop { animation: word-hop .6s cubic-bezier(.34, 1.56, .64, 1); }
+}
+
+/* ---------- 4. Phone sizes: tap targets and type ---------- */
+@media (max-width: 720px) {
+  /* Text links get a 44px tap area without changing how they look. */
+  .under, .link-more, .book__more, .nw-clip__ed, .ed-venue__shop, .fcover__lines a,
+  .foot__bottom a, .tix__go, .ag__go, .speaker__at a, .nw-glance__eds a, .fq-bubble a, .ev-note a,
+  .pfind__hint a, .vs-pass__foot a {
+    display: inline-flex; align-items: center; min-height: 44px;
+  }
+  /* Breadcrumbs stay inline; vertical padding widens the tap area without moving the line. */
+  .crumbs a { display: inline-block; padding-block: 11px; margin-block: -11px; }
+  .fcover__lines { line-height: 1.2; }
+  .fcover__lines a { min-height: 40px; }
+  .link-more { padding-block: 6px; }
+  .nw-glance__eds a { min-height: 36px; padding-inline: 12px; }
+  .au-index a { min-width: 44px; height: 44px; }
+  .fq-chat__all { min-height: 40px; }
+  .ev-day__count, .ev-s__kind, .tix__kick, .nw-clip__src, .nw-stamp, .ed-venue__k, .book__kick,
+  .book__mark, .au-card__stamps i, .tile__yr, .speaker__at a, .nw-glance dt, .vs-help__btns small,
+  .ed-strip__facts b, .stop__year i, .ed-tag { font-size: max(12px, 1em); }
+  .au-card__stamps i, .tile__yr, .ev-s__kind, .tix__kick, .nw-stamp { font-size: 12px; }
+  .book__mark { font-size: 12px; }
+  .ecard .tile__yr { font-size: 12px; }
+  .nw-kit__meta i { font-size: 12px; }
+  .book__at a, .book__at span { min-height: 40px; display: inline-flex; align-items: center; }
+  .page-tabs--float .page-tabs__bar a { min-height: 44px; display: inline-flex; align-items: center; }
+  .nw-glance__eds a { min-height: 40px; display: inline-flex; align-items: center; }
+  .nw-desk__phones a { min-height: 44px; }
+
+  /* Home hero: a confident city name on phones; the small lines stay readable. */
+  .hero__lockup { font-size: clamp(3.6rem, 19vw, 5.2rem); }
+  :lang(en) .hero__lockup { font-size: clamp(3.4rem, 17vw, 4.8rem); }
+  .hero__lockup .hero__brand { font-size: max(.26em, 15px); }
+  .hero__when, :lang(en) .hero__when { position: static; margin-top: .3em; font-size: max(.22em, 15px); }
+  .bhero .hero__ctas { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .bhero .hero__ctas .btn { justify-content: center; }
+
+  /* Home "When & where": five tall tickets become a swipeable deck with a counter and dots. */
+  .tix { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(-1 * clamp(16px, 4vw, 48px)); padding: 14px clamp(16px, 4vw, 48px) 18px; overscroll-behavior-x: contain; }
+  .tix::-webkit-scrollbar { display: none; }
+  .tix .tix__item { flex: 0 0 86%; scroll-snap-align: center; }
+  .tix .tix__item .tix__card { height: 100%; }
+  .deck-dots { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 4px 0 0; }
+  .deck-dots button { width: 10px; height: 10px; padding: 0; border: 0; border-radius: 999px; background: rgba(11, 46, 99, .25); transition: width .3s, background .3s; position: relative; }
+  .deck-dots button::after { content: ""; position: absolute; inset: -17px -8px; }
+  .deck-dots button[aria-current="true"] { width: 28px; background: var(--navy); }
+  .deck-count { margin: 6px 0 0; text-align: center; color: var(--navy); font: 700 .85rem/1 var(--display); }
+}
+@media (min-width: 721px) { .deck-dots, .deck-count { display: none; } }
+
+/* ---------- 5. Mobile tab bar ---------- */
+@media (max-width: 720px) {
+  /* Labels under the icons were 10px; 11px reads better and still fits five tabs. */
+  .mobile-tab { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tix__card, .ed-film li, .nw-clip__img img, .ecard .tile__photo { transition: none !important; }
+}
+
+/* ---------- 6. Tab bar hides over the footer (motion.js section 24) ---------- */
+@media (max-width: 720px) {
+  /* The body kept 92px free at the bottom for the bar; the bar is gone over the footer, so the
+     footer's last line can sit near the edge instead, clear of the home indicator. */
+  html body { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .mobile-tabbar.at-footer { transform: translateY(calc(100% + 30px)) !important; pointer-events: none; }
+}
+@media (min-width: 721px) and (max-width: 1199px) {
+  .mobile-tabbar.at-footer { transform: translate(-50%, calc(100% + 30px)) !important; pointer-events: none; }
+}

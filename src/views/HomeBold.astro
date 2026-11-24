@@ -183,7 +183,7 @@ const jsonLd = heroEv ? [heroEv] : [];
     <section class="agenda">
       <Wave seed={2} />
       <h2 class="big">{hi ? "कब, कहाँ" : "When & where"}</h2>
-      <ol class="tix">
+      <ol class="tix" data-deck aria-label={hi ? "संस्करण, खिसकाकर देखें" : "Editions, swipe to browse"}>
         {byDate.slice(0, 5).map((e, i) => {
           const live = nextEdition?.slug === e.slug;
           const cover = coverFor(e.slug);

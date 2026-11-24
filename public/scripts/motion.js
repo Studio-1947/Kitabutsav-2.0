@@ -753,4 +753,118 @@
       cat.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     });
   });
+  /* 23. Touch layer. Phones can't hover, so what hover did is re-thought (see touch.css):
+         - centre stage: the card passing the middle of the screen (or of a sideways strip) gets
+           .is-center, which carries the old hover look;
+         - the home ticket list becomes a swipeable deck with dots and a counter;
+         - heading words and the footer wordmark hop when tapped;
+         - "write to us" paper planes fly off when tapped, then the mail opens;
+         - the manifesto's floating letters drift with scroll instead of the mouse;
+         - the About collage brings a tapped photo to the front;
+         - a light tap of vibration on toggles, where the phone supports it. */
+  var touch = window.matchMedia("(hover: none)").matches;
+  if (touch) {
+    var buzz = function () { if (navigator.vibrate && !reduce) navigator.vibrate(8); };
+
+    // Centre stage, vertical: a thin band across the middle of the screen.
+    if ("IntersectionObserver" in window) {
+      var midIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { en.target.classList.toggle("is-center", en.isIntersecting); });
+      }, { rootMargin: "-42% 0px -42% 0px" });
+      document.querySelectorAll(".ecard, .fmt, .ab-ch, .stop, .ev-s, .nw-clip, .vs-pass").forEach(function (el) { midIO.observe(el); });
+
+      // Centre stage, sideways strips (and the ticket deck when it scrolls sideways).
+      var stripMid = function (strip, items, onChange) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            en.target.classList.toggle("is-center", en.isIntersecting);
+            if (en.isIntersecting && onChange) onChange(items.indexOf(en.target));
+          });
+        }, { root: strip, rootMargin: "0px -40% 0px -40%" });
+        items.forEach(function (el) { io.observe(el); });
+      };
+      document.querySelectorAll(".ed-film, .ed-cards").forEach(function (strip) {
+        stripMid(strip, Array.prototype.slice.call(strip.querySelectorAll("li")));
+      });
+
+      // Ticket deck: dots, counter, swipe. Only when the list actually scrolls sideways (phones).
+      document.querySelectorAll("[data-deck]").forEach(function (deck) {
+        var items = Array.prototype.slice.call(deck.querySelectorAll(":scope > li"));
+        if (deck.scrollWidth <= deck.clientWidth + 4) { items.forEach(function (el) { midIO.observe(el); }); return; }
+        var dots = document.createElement("div"); dots.className = "deck-dots";
+        var count = document.createElement("p"); count.className = "deck-count"; count.setAttribute("aria-live", "polite");
+        items.forEach(function (li, i) {
+          var b = document.createElement("button"); b.type = "button";
+          b.setAttribute("aria-label", (hi ? "टिकट " : "Ticket ") + (i + 1));
+          b.addEventListener("click", function () { li.scrollIntoView({ behavior: reduce ? "auto" : "smooth", inline: "center", block: "nearest" }); });
+          dots.appendChild(b);
+        });
+        deck.after(dots); dots.after(count);
+        var setCur = function (k) {
+          if (k < 0) return;
+          dots.querySelectorAll("button").forEach(function (b, i) { if (i === k) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
+          count.textContent = (k + 1) + " / " + items.length;
+        };
+        setCur(0);
+        stripMid(deck, items, setCur);
+      });
+    }
+
+    // Heading words and footer wordmark letters hop on tap.
+    document.addEventListener("pointerdown", function (e) {
+      var w = e.target.closest(".split .w, .fword.is-in .fword__g");
+      if (!w || reduce) return;
+      w.classList.remove("hop"); void w.offsetWidth; w.classList.add("hop");
+      setTimeout(function () { w.classList.remove("hop"); }, 650);
+    }, { passive: true });
+
+    // Paper planes take off before the mail app opens.
+    document.querySelectorAll(".btn--plane, .pt-join__go").forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        if (reduce || a.classList.contains("fly")) return;
+        e.preventDefault(); buzz();
+        a.classList.add("fly");
+        setTimeout(function () { a.classList.remove("fly"); window.location.href = a.href; }, 520);
+      });
+    });
+
+    // Manifesto letters follow scroll position instead of the mouse.
+    var mani = document.querySelector(".mani");
+    if (mani && !reduce) {
+      var maniTick = 0;
+      var maniMove = function () {
+        maniTick = 0;
+        var r = mani.getBoundingClientRect(), vh = window.innerHeight;
+        var p = Math.max(-1, Math.min(1, ((r.top + r.height / 2) - vh / 2) / vh));
+        mani.style.setProperty("--mx", (p * .9).toFixed(3));
+        mani.style.setProperty("--my", (p * .7).toFixed(3));
+      };
+      window.addEventListener("scroll", function () { if (!maniTick) maniTick = requestAnimationFrame(maniMove); }, { passive: true });
+      maniMove();
+    }
+
+    // About collage: tap a photo to bring it to the front.
+    document.querySelectorAll(".ab-collage").forEach(function (col) {
+      col.style.pointerEvents = "auto";
+      col.querySelectorAll(".ab-collage__p").forEach(function (ph) {
+        ph.addEventListener("click", function () {
+          col.querySelectorAll(".ab-collage__p").forEach(function (o) { o.classList.toggle("is-front", o === ph); });
+          buzz();
+        });
+      });
+    });
+
+    // A light buzz on toggles.
+    document.addEventListener("click", function (e) {
+      if (e.target.closest(".book__spine, .pt-card__in, .album, .pchip, .pt-chip, .ev-key, .ev-day, .au-kind, .fq-chip, .au-star, .alb-thumb")) buzz();
+    });
+  }
+  /* 24. The bottom tab bar steps aside while the footer is on screen: the footer has the same
+         links (and more), and the bar would cover its last lines. It slides back on scrolling up. */
+  var tabbar = document.querySelector(".mobile-tabbar"), foot = document.querySelector("footer.foot");
+  if (tabbar && foot && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (en) {
+      tabbar.classList.toggle("at-footer", en[0].isIntersecting);
+    }, { rootMargin: "0px 0px -12% 0px" }).observe(foot);
+  }
 })();

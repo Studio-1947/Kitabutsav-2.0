@@ -6,7 +6,7 @@
 
 /* Next-stop banner */
 .vs-next { display: flex; align-items: center; gap: 14px; max-width: 820px; margin-top: 24px; padding: 14px 18px; border-radius: var(--r-md); background: var(--yellow); color: var(--navy); text-decoration: none; transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
-.vs-next:hover { transform: translateY(-3px); }
+@media (hover: hover) { .vs-next:hover { transform: translateY(-3px); } }
 .vs-next > i { position: relative; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
 .vs-next > i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--red); animation: live-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite; }
 .vs-next span { line-height: 1.45; }
@@ -15,7 +15,7 @@
 /* Pass + map */
 .vs-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(18px, 3vw, 36px); align-items: stretch; }
 .vs-pass { position: relative; display: grid; grid-template-columns: 1fr auto; filter: drop-shadow(0 14px 22px rgba(7, 28, 73, .16)); rotate: -1deg; transition: rotate .45s cubic-bezier(.34, 1.56, .64, 1); }
-.vs-pass:hover { rotate: 0deg; }
+@media (hover: hover) { .vs-pass:hover { rotate: 0deg; } }
 .vs-pass__body { position: relative; display: grid; align-content: start; gap: 6px; padding: clamp(24px, 3vw, 36px); border-radius: 26px 0 0 26px; background: #fff; color: var(--navy);
   /* notches on the tear line */
   -webkit-mask: radial-gradient(circle at 100% 0, transparent 16px, #000 16.5px) top / 100% 51% no-repeat, radial-gradient(circle at 100% 100%, transparent 16px, #000 16.5px) bottom / 100% 51% no-repeat;
@@ -39,7 +39,8 @@
 .vs-stub { display: grid; place-items: center; align-content: center; gap: 8px; width: clamp(110px, 11vw, 140px); padding: 16px 10px; color: var(--cream); text-align: center; text-decoration: none; font: 700 .88rem/1.2 var(--display); transform-origin: 0 50%; transition: background .25s, transform .45s cubic-bezier(.34, 1.56, .64, 1); }
 .vs-stub + .vs-stub { border-top: 3px dashed rgba(251, 240, 217, .35); }
 .vs-stub svg { width: 30px; height: 30px; color: var(--yellow); }
-.vs-stub:hover, .vs-stub:focus-visible { background: var(--red); transform: rotate(4deg) translateX(4px); }
+.vs-stub:focus-visible { background: var(--red); transform: rotate(4deg) translateX(4px); }
+@media (hover: hover) { .vs-stub:hover { background: var(--red); transform: rotate(4deg) translateX(4px); } }
 .vs-stub:focus-visible { outline: 3px solid var(--yellow); outline-offset: -3px; }
 
 .vs-map { position: relative; min-height: 360px; margin: 0; overflow: hidden; border: 8px solid #fff; border-radius: 26px; background: var(--sky); box-shadow: 0 14px 28px rgba(7, 28, 73, .14); rotate: 1deg; }
@@ -54,20 +55,22 @@
 .vs-h { margin: clamp(40px, 5vw, 64px) 0 18px; color: var(--navy); font: 800 clamp(1.6rem, 3vw, 2.4rem)/1.1 var(--display); text-transform: uppercase; }
 .vs-tips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
 .vs-tip { position: relative; display: grid; align-content: start; gap: 6px; height: 100%; padding: 20px; border-radius: var(--r-lg); background: #fff; color: var(--navy); text-decoration: none; transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s; }
-a.vs-tip:hover, a.vs-tip:focus-visible { transform: translateY(-5px) rotate(-1deg); box-shadow: 0 14px 26px rgba(7, 28, 73, .14); }
+a.vs-tip:focus-visible { transform: translateY(-5px) rotate(-1deg); box-shadow: 0 14px 26px rgba(7, 28, 73, .14); }
+@media (hover: hover) { a.vs-tip:hover { transform: translateY(-5px) rotate(-1deg); box-shadow: 0 14px 26px rgba(7, 28, 73, .14); } }
 .vs-tip__icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 6px; border-radius: 16px; background: var(--tone); }
 .vs-tip__icon svg { width: 26px; height: 26px; }
 .vs-tip b { font: 800 1.2rem/1.2 var(--display); }
 .vs-tip span:not(.vs-tip__icon) { line-height: 1.5; opacity: .85; }
 .vs-tip__go { position: absolute; top: 20px; right: 20px; width: 20px; height: 20px; color: var(--red); transition: transform .3s; }
-a.vs-tip:hover .vs-tip__go { transform: translateX(4px); }
+@media (hover: hover) { a.vs-tip:hover .vs-tip__go { transform: translateX(4px); } }
 
 /* Need help? */
 .vs-help { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 20px 30px; margin-top: 18px; padding: clamp(20px, 3vw, 30px); border-radius: var(--r-lg); background: var(--navy); color: var(--cream); }
 .vs-help h2 { margin: 0; color: var(--yellow); font: 800 clamp(1.5rem, 2.6vw, 2rem)/1.1 var(--display); text-transform: uppercase; }
 .vs-help__btns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .vs-help__btns a { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 12px 14px; border-radius: 16px; background: rgba(255, 255, 255, .08); color: var(--cream); text-decoration: none; font: 600 .9rem/1.25 var(--display); transition: background .2s, transform .3s cubic-bezier(.34, 1.56, .64, 1); }
-.vs-help__btns a:hover, .vs-help__btns a:focus-visible { background: var(--yellow); color: var(--navy); transform: translateY(-3px); }
+.vs-help__btns a:focus-visible { background: var(--yellow); color: var(--navy); transform: translateY(-3px); }
+@media (hover: hover) { .vs-help__btns a:hover { background: var(--yellow); color: var(--navy); transform: translateY(-3px); } }
 .vs-help__btns svg { flex: none; width: 22px; height: 22px; }
 .vs-help__btns span { display: grid; min-width: 0; overflow-wrap: anywhere; }
 .vs-help__btns small { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
