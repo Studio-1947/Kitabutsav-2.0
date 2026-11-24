@@ -1,7 +1,12 @@
 ---
-/** Site footer: big stacked nav, contact card, full-width Book my seat bar. Hover shows the Hindi letters (letters.js). */
+/**
+ * Site footer, "closing chapter": a big Book my seat call for the next edition (with a live
+ * countdown once its dates are set), then a back-cover panel with the page links, contact and a
+ * giant किताब उत्सव wordmark whose letters fill in as it scrolls into view.
+ * The Hindi letters that swirl round the cursor (letters.js) still target `.foot`.
+ */
 import Icon from "./Icon.astro";
-import { t, localePath, type Lang } from "../i18n";
+import { t, localePath, formatRange, type Lang } from "../i18n";
 import { org, festivalSocial, bookSeatUrl } from "../site.config";
 import { nextEdition, featuredEdition } from "../data/editions";
 
@@ -10,34 +15,68 @@ const { lang } = Astro.props;
 const s = t(lang);
 const hi = lang === "hi";
 const L = (p: string) => localePath(lang, p);
-const seat = bookSeatUrl ?? L(`/editions/${(nextEdition ?? featuredEdition).slug}/`);
+const e = nextEdition ?? featuredEdition;
+const seat = bookSeatUrl ?? L(`/editions/${e.slug}/`);
 const invite = `mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`;
+const dated = !!(nextEdition?.start && nextEdition.end);
+const startIso = dated ? `${nextEdition!.start}T${nextEdition!.startTime ?? "11:00"}:00+05:30` : "";
+const endIso = dated ? `${nextEdition!.end}T${nextEdition!.endTime ?? "20:00"}:00+05:30` : "";
+
+const links = [
+  { href: L("/about/"), label: hi ? "परिचय" : "About" },
+  { href: L("/programme/"), label: s.nav.programme },
+  { href: L("/resources/"), label: hi ? "लेखक" : "Authors" },
+  { href: L("/partners/"), label: s.nav.partners },
+  { href: L("/press/"), label: hi ? "मीडिया" : "Press" },
+  { href: L("/visit/"), label: s.nav.visit },
+  { href: L("/faq/"), label: s.nav.faq },
+];
+// The wordmark, one akshara per span so each can fill in on its own (conjuncts kept whole).
+const word = hi ? ["कि", "ता", "ब", " ", "उ", "त्स", "व"] : [..."KITAB UTSAV"];
 ---
-<footer class="foot">
-  <nav class="foot__nav" aria-label={hi ? "फ़ुटर" : "Footer"}>
-    <a href={L("/about/")}>{hi ? "परिचय" : "About"}</a>
-    <a href={L("/programme/")}>{s.nav.programme}</a>
-    <a href={L("/resources/")}>{hi ? "लेखक" : "Authors"}</a>
-    <a href={L("/partners/")}>{s.nav.partners}</a>
-    <a href={L("/press/")}>{hi ? "मीडिया" : "Press"}</a>
-    <a href={L("/visit/")}>{s.nav.visit}</a>
-    <a href={L("/faq/")}>{s.nav.faq}</a>
-  </nav>
-  <div class="foot__card">
-    <h3>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h3>
-    <p>{org.address.streetAddress}<br />{org.address.addressLocality} {org.address.postalCode}</p>
-    <div class="foot__pills">
-      <a class="pill pill--cream" href={`mailto:${org.email}?subject=${encodeURIComponent("Kitab Utsav")}`}>{org.email} ↗</a>
-      <a class="pill pill--cream" href={`tel:${org.phones[0].tel}`}>{org.phones[0].label} ↗</a>
-      {festivalSocial.map((x) => <a class="pill pill--cream" href={x.url} target="_blank" rel="noopener">{x.name} ↗</a>)}
+<footer class="foot foot--chapter">
+  <a class="fend" href={seat}>
+    <span class="fend__top">
+      <span class="fend__kick">{nextEdition ? (hi ? "अगला पड़ाव" : "Next stop") : (hi ? "पिछला पड़ाव" : "Last stop")}</span>
+      <span class="fend__where">{hi ? `किताब उत्सव ${e.city.hi}` : `Kitab Utsav ${e.city.en}`} · {formatRange(e, lang)}</span>
+    </span>
+    <span class="fend__cta">{s.bookSeat}</span>
+    {dated ? (
+      <span class="fend__count" data-countdown data-start={startIso} data-end={endIso} aria-label={hi ? "उत्सव शुरू होने में" : "Time until the festival opens"}>
+        <span><b data-unit="d">00</b><small>{s.days}</small></span>
+        <span><b data-unit="h">00</b><small>{s.hours}</small></span>
+        <span><b data-unit="m">00</b><small>{s.minutes}</small></span>
+      </span>
+    ) : (
+      <span class="fend__soon">{hi ? "तारीख़ें जल्द" : "Dates soon"}</span>
+    )}
+    <span class="fend__arrow" aria-hidden="true"><Icon name="arrowUpRight" /></span>
+  </a>
+
+  <div class="fcover">
+    <nav class="fcover__nav" aria-label={hi ? "फ़ुटर" : "Footer"}>
+      {links.map((l) => <a href={l.href}><span>{l.label}</span><Icon name="arrowRight" /></a>)}
+    </nav>
+    <div class="fcover__contact">
+      <h3>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h3>
+      <p>{org.address.streetAddress}<br />{org.address.addressLocality} {org.address.postalCode}</p>
+      <ul class="fcover__icons">
+        <li><a href={`mailto:${org.email}?subject=${encodeURIComponent("Kitab Utsav")}`} aria-label={`${hi ? "ईमेल" : "Email"}: ${org.email}`} title={org.email}><Icon name="mail" /></a></li>
+        <li><a href={`tel:${org.phones[0].tel}`} aria-label={`${hi ? "फ़ोन" : "Phone"}: ${org.phones[0].label}`} title={org.phones[0].label}><Icon name="phone" /></a></li>
+        {festivalSocial.map((x) => <li><a href={x.url} target="_blank" rel="noopener" aria-label={`${x.name} ${x.handle}`} title={x.handle}><Icon name={x.name} /></a></li>)}
+      </ul>
+      <p class="fcover__lines"><a href={`mailto:${org.email}`}>{org.email}</a><br /><a href={`tel:${org.phones[0].tel}`}>{org.phones[0].label}</a></p>
+      <div class="fcover__pills">
+        <a class="fpill" href={invite}>{hi ? "किताब उत्सव बुलाएँ" : "Invite Kitab Utsav"}</a>
+        <a class="fpill" href={org.url} target="_blank" rel="noopener">{s.nav.shop} ↗</a>
+        {dated && <a class="fpill" href={`/ics/${nextEdition!.slug}.ics`} download>{s.addToCal}</a>}
+      </div>
     </div>
-    <div class="foot__pills">
-      <a class="pill pill--line" href={invite}>{hi ? "किताब उत्सव बुलाएँ" : "Invite Kitab Utsav"}</a>
-      <a class="pill pill--line" href={org.url} target="_blank" rel="noopener">{s.nav.shop} ↗</a>
-      {nextEdition?.start && nextEdition.end && <a class="pill pill--line" href={`/ics/${nextEdition.slug}.ics`} download>{s.addToCal}</a>}
-    </div>
+    <p class="fword" aria-hidden="true" lang={hi ? "hi" : "en"}>
+      {word.map((g, i) => (g === " " ? <span class="fword__gap"> </span> : <span class="fword__g" style={`--gi:${i}`}>{g}</span>))}
+    </p>
   </div>
-  <a class="foot__book" href={seat}><span>{s.bookSeat}</span><Icon name="arrowUpRight" class="foot__arrow" /></a>
+
   <div class="foot__bottom">
     <p>{s.copyright}</p>
     <p>{s.designedBy} <a href="https://1947.io" target="_blank" rel="noopener">Studio 1947</a></p>

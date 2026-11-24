@@ -135,24 +135,8 @@
   .invite p { margin: 0; max-width: 560px; font-weight: 500; }
 
   .bpartners { padding: clamp(70px, 8vw, 120px) clamp(16px, 4vw, 48px); background: var(--navy); }
-  .logos { list-style: none; margin: 0 auto; padding: 0; max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-  .logos li { display: grid; place-items: center; height: 104px; padding: 16px 22px; border-radius: var(--r-md); background: var(--cream); }
-  .logos img { max-height: 64px; width: auto; object-fit: contain; mix-blend-mode: multiply; }
 
   /* footer */
-  .foot { display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--g); padding: var(--g); padding-top: clamp(40px, 6vw, 80px); }
-  .foot__nav { display: grid; align-content: start; padding: clamp(24px, 4vw, 44px); border-radius: var(--r-lg); background: var(--cream); }
-  .foot__nav a { text-decoration: none; font-size: clamp(2rem, 4.6vw, 4rem); line-height: 1.15; }
-  .foot__nav a:hover { color: var(--red); }
-  .foot__card { padding: clamp(24px, 4vw, 44px); border-radius: var(--r-lg); background: var(--ink); color: var(--cream); }
-  .foot__card h3 { margin: 0 0 10px; font: 700 clamp(1.5rem, 2.6vw, 2.2rem)/1 var(--display); text-transform: uppercase; color: var(--yellow); }
-  .foot__pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-  .foot__pills .pill { color: var(--ink); }
-  .foot__book { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: clamp(22px, 3vw, 34px) clamp(26px, 4vw, 56px); border-radius: var(--r-lg); background: var(--yellow); text-decoration: none; font-size: clamp(1.8rem, 5.4vw, 5rem); line-height: 1; transition: background .2s; }
-  .foot__book i { font-style: normal; transition: transform .3s; }
-  .foot__book:hover { background: var(--cream); }
-  .foot__book:hover i { transform: translateX(10px); }
-  .foot__note { grid-column: 1 / -1; margin: 6px 8px 10px; font-weight: 500; font-size: .85rem; color: var(--cream); }
 
   /* Hindi letters orbiting the cursor over the footer (public/scripts/letters.js) */
   .cursor-letters { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
@@ -164,7 +148,6 @@
   @media (max-width: 900px) {
     .bhero { min-height: 0; padding-bottom: 0; }
     .hero__blob { position: relative; right: auto; width: 112%; margin: 12px -8% -5px auto; align-self: flex-end; }
-    .foot { grid-template-columns: 1fr; }
   }
   .pill--lang { justify-content: center; width: 52px; height: 52px; padding: 0; background: #f6eedd; color: var(--ink); }
   .pill--lang:hover { background: var(--yellow); }
@@ -183,9 +166,6 @@
     .cap .btn { min-height: 46px; }
     .tile { border-radius: var(--r-lg); }
     .tile__yr { right: 50%; transform: translateX(50%); bottom: 12px; font-size: .75rem; }
-    .logos { grid-template-columns: repeat(2, 1fr); }
-    .logos li { height: 84px; }
-    .foot__book { border-radius: var(--r-lg); }
   }
   @media (prefers-reduced-motion: reduce) { .btn, .tile { transition: none; } }
 
@@ -196,7 +176,6 @@
 .foot__bottom { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; margin: 4px 8px 10px; color: var(--cream); font-size: .85rem; font-weight: 500; }
 .foot__bottom p { margin: 0; }
 .foot__bottom a { text-decoration: underline; text-underline-offset: 3px; }
-.foot__card .foot__pills + .foot__pills { margin-top: 10px; }
 .skip-link { background: var(--ink); }
 
 /* Mobile tab bar (rk-chrome.css) recoloured for the theme */
@@ -310,12 +289,8 @@
 .info svg, .facts svg { color: var(--red); }
 
 /* fixes */
-.foot__pills .pill--line { color: var(--cream); }
-.foot__pills .pill--line:hover { color: var(--ink); }
 .is-inner .clouds { display: none; }
 .is-inner main > .wrap { margin-block: var(--g); }
-.foot__arrow { flex: none; width: .8em; height: .8em; transition: transform .3s; }
-.foot__book:hover .foot__arrow { transform: translate(6px, -6px); }
 .top__book svg, .btn svg { transition: transform .25s; }
 .top__book:hover svg, .btn:hover svg, .ag__go:hover svg { transform: translate(2px, -2px); }
 

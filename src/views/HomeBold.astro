@@ -56,6 +56,17 @@ const floaters = ([
   ["थ", 72, 6, 2.6, -1.7, 6.8, "navy"],
 ] as const).map(([g, x, y, s, d, b, c]) => ({ g, x, y, s, d, b, c }));
 
+/** Zoom a speaker photo onto the face, then slide it by `shift` so the face sits mid-frame. */
+const photoStyle = (sp: { focus: string; zoom: number; shift?: string }) =>
+  `object-position:${sp.focus};transform-origin:${sp.focus};transform:${sp.shift ? `translate(${sp.shift.replace(" ", ", ")}) ` : ""}scale(${sp.zoom})`;
+
+// Partners: two logo rows for the marquee, and the cities they come from, for the city chips.
+const logoRows = [partners.filter((_, i) => i % 2 === 0), partners.filter((_, i) => i % 2 === 1)];
+const cityKey = (en: string) => en.toLowerCase().replace(/[^a-z]+/g, "-");
+const partnerCities = [...new Map(partners.map((p) => [cityKey(p.city.en), p.city])).entries()]
+  .map(([key, name]) => ({ key, name, count: partners.filter((p) => cityKey(p.city.en) === key).length }))
+  .sort((a, b) => b.count - a.count || a.name.en.localeCompare(b.name.en));
+
 // Book spines for the headline names: height, width, colours and a slight lean, varied like a real shelf.
 const spine = [
   { h: 360, w: 96, bg: "navy", fg: "yellow", lean: 0 },
@@ -227,7 +238,7 @@ const jsonLd = heroEv ? [heroEv] : [];
             <div class="book__page book__page--l">
               <figure class="book__photo" aria-hidden="true">
                 {p.stagePhoto ? (
-                  <img src={p.stagePhoto.src} alt="" loading="lazy" decoding="async" style={`object-position:${p.stagePhoto.focus};transform-origin:${p.stagePhoto.focus};transform:scale(${p.stagePhoto.zoom})`} />
+                  <img src={p.stagePhoto.src} alt="" loading="lazy" decoding="async" style={photoStyle(p.stagePhoto)} />
                 ) : (
                   <span class="book__ini" lang="hi">{[...new Intl.Segmenter("hi", { granularity: "grapheme" }).segment(p.name.hi)][0]?.segment}</span>
                 )}
@@ -290,9 +301,31 @@ const jsonLd = heroEv ? [heroEv] : [];
     <!-- PARTNERS -->
     <section class="bpartners">
       <h2 class="big big--light">{hi ? "साथ चलने वाले" : "Our partners"}</h2>
-      <ul class="logos">
-        {partners.slice(0, 12).map((p) => <li><img src={p.logo} alt={p.name[lang]} /></li>)}
-      </ul>
+      <div class="marquee marquee--logos" aria-hidden="true">
+        {logoRows.map((row) => (
+          <div class="marquee__row">{[...row, ...row].map((p) => <span class="plogo"><img src={p.logo} alt="" loading="lazy" decoding="async" /></span>)}</div>
+        ))}
+      </div>
+      <div class="pfind" data-pfind>
+        <div class="pfind__chips" role="group" aria-label={hi ? "शहर चुनें" : "Choose a city"}>
+          <button type="button" class="pchip" data-city="all" aria-pressed="true">{hi ? "सभी शहर" : "All cities"}</button>
+          {partnerCities.map((c) => (
+            <button type="button" class="pchip" data-city={c.key} aria-pressed="false">{c.name[lang]} <span class="pchip__n">{c.count}</span></button>
+          ))}
+        </div>
+        <p class="pfind__hint" data-pfind-hint>{hi ? "किसी शहर को चुनें और देखें, वहाँ किसने साथ दिया" : "Pick a city to see who stood with us there"}</p>
+        <ul class="pcards" aria-live="polite">
+          {partners.map((p) => (
+            <li class="pcard" data-city={cityKey(p.city.en)} hidden>
+              <span class="pcard__logo"><img src={p.logo} alt="" loading="lazy" decoding="async" /></span>
+              <b class="pcard__name">{p.name[lang]}</b>
+              <span class="pcard__kind">{p.kind[lang]}</span>
+              <span class="pcard__city">{p.city[lang]}</span>
+            </li>
+          ))}
+        </ul>
+        <ul class="sr">{partners.map((p) => <li>{p.name[lang]}, {p.city[lang]}</li>)}</ul>
+      </div>
       <a class="under under--light" href={L("/partners/")}>{hi ? `सभी ${partners.length} साथी` : `All ${partners.length} partners`}</a>
     </section>
 </Base>

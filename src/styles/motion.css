@@ -297,15 +297,52 @@ html.lb-open { overflow: hidden; }
 @keyframes plane-idle { 50% { transform: translate(1px, -3px) rotate(-6deg); } }
 @keyframes plane-fly { 45% { transform: translate(60px, -46px) rotate(-18deg) scale(.6); opacity: 0; } 46% { transform: translate(-40px, 24px) scale(.6); opacity: 0; } 100% { transform: none; opacity: 1; } }
 
-/* Partners: logos bob gently, lift on hover. */
-.logos li { transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); animation: logo-bob 5s ease-in-out infinite alternate; }
-.logos li:nth-child(3n + 1) { animation-delay: -1.7s; }
-.logos li:nth-child(3n + 2) { animation-delay: -3.4s; }
-@keyframes logo-bob { to { translate: 0 -5px; } }
-.logos li:hover { transform: translateY(-6px) rotate(-2deg) scale(1.05); }
+/* 12. Partners: logo marquee (two rows, opposite directions) and city chips that bring that city's
+       partners forward as cards. The marquee eases to a stop while a city is picked. */
+.marquee--logos { margin-bottom: 40px; }
+.plogo { flex: none; display: grid; place-items: center; width: clamp(150px, 15vw, 200px); height: clamp(84px, 8vw, 104px); margin-right: 14px; padding: 14px 22px; border-radius: var(--r-md); background: var(--cream); transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+/* Explicit caps: a percentage height inside the box would not hold the logo in. */
+.plogo img { display: block; width: auto; height: auto; max-width: 100%; max-height: clamp(56px, 5.4vw, 74px); object-fit: contain; mix-blend-mode: multiply; }
+.marquee--logos:hover .plogo:hover { transform: translateY(-4px) rotate(-2deg) scale(1.05); }
+.marquee--logos.is-paused .plogo { opacity: .45; transition: opacity .4s; }
+.pfind { max-width: 1120px; margin: 0 auto; text-align: center; }
+.pfind__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.pchip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 2px solid rgba(255, 253, 248, .35); border-radius: 999px; background: transparent; color: var(--cream); font: 600 .95rem/1 var(--display); cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+.pchip:hover { border-color: var(--cream); transform: translateY(-2px); }
+.pchip[aria-pressed="true"] { border-color: var(--yellow); background: var(--yellow); color: var(--navy); }
+.pchip__n { display: grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: rgba(255, 253, 248, .16); font-size: .75rem; }
+.pchip[aria-pressed="true"] .pchip__n { background: var(--navy); color: var(--yellow); }
+.pchip:focus-visible { outline: 3px solid var(--saffron); outline-offset: 3px; }
+.pfind__hint { margin: 24px 0 0; color: var(--cream); opacity: .75; font: 500 1rem/1.4 var(--display); }
+.pcards { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 26px 0 0; padding: 0; list-style: none; perspective: 1000px; }
+.pcards:not(:has(.pcard:not([hidden]))) { margin: 0; }
+.pcard { display: grid; justify-items: center; gap: 4px; width: min(250px, 100%); padding: 18px 18px 20px; border-radius: var(--r-lg); background: var(--cream); color: var(--navy); text-align: center; transform-origin: 50% 0; }
+.pcard[hidden] { display: none; }
+.pcard.is-in { animation: pcard-in .6s cubic-bezier(.22, 1, .36, 1) calc(var(--ci, 0) * 90ms) both; }
+@keyframes pcard-in { from { opacity: 0; transform: rotateX(-80deg) translateY(-10px); } }
+.pcard__logo { display: grid; place-items: center; width: 100%; height: 92px; margin-bottom: 8px; padding: 10px; border-radius: var(--r-md); background: #fff; }
+.pcard__logo img { display: block; width: auto; height: auto; max-width: 100%; max-height: 72px; object-fit: contain; }
+.pcard__name { font: 700 1.05rem/1.25 var(--display); }
+.pcard__kind { font-size: .88rem; opacity: .8; }
+.pcard__city { margin-top: 6px; padding: 4px 10px; border-radius: 999px; background: var(--navy); color: var(--cream); font: 600 .75rem/1.2 var(--display); }
+/* Phones: chips scroll sideways in one row; cards stack two across. */
+@media (max-width: 720px) {
+  .pfind__chips { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)); padding: 4px clamp(16px, 4vw, 48px); }
+  .pfind__chips::-webkit-scrollbar { display: none; }
+  .pchip { flex: none; }
+  .pcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .pcard { width: auto; padding: 12px 12px 14px; }
+  .pcard__logo { height: 70px; }
+  .pcard__logo img { max-height: 52px; }
+  .pcard__name { font-size: .92rem; }
+  .pcard__kind { font-size: .78rem; }
+  .plogo { width: 132px; height: 76px; margin-right: 10px; padding: 10px 14px; }
+  .plogo img { max-height: 54px; }
+}
+@media (prefers-reduced-motion: reduce) { .pcard.is-in { animation: none; } }
 .btn, .more { transition: translate .3s cubic-bezier(.22, 1, .36, 1), background .2s, color .2s, border-color .2s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .mani__blob, .mani__letters span, .tix__dot::after, .plane, .logos li { animation: none !important; }
+  .mani__blob, .mani__letters span, .tix__dot::after, .plane { animation: none !important; }
   .split .w.hop { animation: none; }
 }

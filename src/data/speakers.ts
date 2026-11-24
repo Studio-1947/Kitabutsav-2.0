@@ -17,8 +17,12 @@ export interface Speaker {
   name: L10n;
   role: L10n;
   bio?: L10n;
-  /** A festival photo they appear in, cropped onto them: `focus` is the face (CSS position), `zoom` how close. */
-  stagePhoto?: { src: string; focus: string; zoom: number };
+  /**
+   * A photo of them, cropped onto them: `focus` is the face (CSS position), `zoom` how close.
+   * `shift` then slides the photo so the face sits in the middle of the frame, as far as the
+   * photo allows without showing a blank edge (worked out from the photo's size).
+   */
+  stagePhoto?: { src: string; focus: string; zoom: number; shift?: string };
   /** Main edition for this listing. Derived from the latest linked appearance when omitted. */
   edition?: string;
   photo?: string;
@@ -255,14 +259,14 @@ const headliners: Record<string, Pick<Speaker, "bio" | "stagePhoto">> = {
       hi: "कवि, गीतकार और पटकथा लेखक। सलीम ख़ान के साथ 'ज़ंजीर', 'दीवार' और 'शोले' लिखीं; कविता-संग्रह 'लावा' के लिए साहित्य अकादेमी पुरस्कार (2013)। पद्मभूषण (2007)।",
       en: "Poet, lyricist and screenwriter. With Salim Khan he wrote 'Zanjeer', 'Deewaar' and 'Sholay'; his poetry collection 'Lava' won the Sahitya Akademi Award (2013). Padma Bhushan (2007).",
     },
-    stagePhoto: { src: "/gallery/mumbai-2026/mumbai-2026-214.webp", focus: "27% 27%", zoom: 1.9 },
+    stagePhoto: { src: "/gallery/mumbai-2026/mumbai-2026-214.webp", focus: "27% 25.7%", zoom: 2.8, shift: "23.0% 19.3%" },
   },
   "geetanjali-shree": {
     bio: {
       hi: "हिन्दी उपन्यासकार और कथाकार। 'रेत समाधि' के डेज़ी रॉकवेल द्वारा किए अनुवाद 'टूम ऑफ़ सैंड' को 2022 का अंतरराष्ट्रीय बुकर पुरस्कार मिला, किसी भारतीय भाषा से अनूदित पहली किताब को। अन्य उपन्यासों में 'माई' और 'हमारा शहर उस बरस'।",
       en: "Hindi novelist and story writer. 'Ret Samadhi', in Daisy Rockwell's translation 'Tomb of Sand', won the 2022 International Booker Prize, the first book translated from an Indian language to do so. Her other novels include 'Mai' and 'Hamara Shahar Us Baras'.",
     },
-    stagePhoto: { src: "/gallery/indore-2026/indore-2026-082.webp", focus: "71% 36%", zoom: 2.2 },
+    stagePhoto: { src: "/gallery/indore-2026/indore-2026-082.webp", focus: "72.2% 30.3%", zoom: 3.1, shift: "-22.2% 19.7%" },
   },
   "piyush-mishra": {
     bio: {
@@ -277,7 +281,7 @@ const headliners: Record<string, Pick<Speaker, "bio" | "stagePhoto">> = {
       hi: "अभिनेता, संगीतकार और रंगकर्मी; राष्ट्रीय नाट्य विद्यालय से प्रशिक्षित। 'मैसी साहब' और 'सलाम बॉम्बे' से 'पीपली लाइव' और 'पंचायत' तक, चार दशकों से मंच और परदे पर।",
       en: "Actor, musician and theatre artist, trained at the National School of Drama. From 'Massey Sahib' and 'Salaam Bombay!' to 'Peepli Live' and 'Panchayat', four decades on stage and screen.",
     },
-    stagePhoto: { src: "/gallery/bareilly-2026/bareilly-2026-004.webp", focus: "50% 30%", zoom: 1.7 },
+    stagePhoto: { src: "/gallery/bareilly-2026/bareilly-2026-004.webp", focus: "36% 27.6%", zoom: 2.6, shift: "14.0% 17.4%" },
   },
   "alok-dhanwa": {
     bio: {
@@ -292,7 +296,7 @@ const headliners: Record<string, Pick<Speaker, "bio" | "stagePhoto">> = {
       hi: "हिन्दी उपन्यासकार, कथाकार और निबन्धकार। उपन्यासों में 'उसके हिस्से की धूप', 'चितकोबरा' और 'कठगुलाब'; 'मिलजुल मन' के लिए साहित्य अकादेमी पुरस्कार (2013)।",
       en: "Hindi novelist, story writer and essayist. Her novels include 'Uske Hisse ki Dhoop', 'Chittakobra' and 'Kathgulab'; 'Miljul Man' won the Sahitya Akademi Award (2013).",
     },
-    stagePhoto: { src: "/gallery/bareilly-2025/bareilly-2025-230.webp", focus: "75% 40%", zoom: 2.3 },
+    stagePhoto: { src: "/gallery/bareilly-2025/bareilly-2025-230.webp", focus: "76.5% 37.9%", zoom: 3.2, shift: "-26.5% 12.1%" },
   },
 };
 

@@ -6,10 +6,11 @@
 import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
-import EditionCard from "../components/EditionCard.astro";
+import Landmark from "../components/Landmark.astro";
+import Icon from "../components/Icon.astro";
 import GalleryGrid from "../components/GalleryGrid.astro";
-import { editions } from "../data/editions";
-import { galleryFor, hasRealPhotos } from "../data/gallery";
+import { editions, nextEdition, startKey } from "../data/editions";
+import { galleryFor, hasRealPhotos, coverFor, focusOf } from "../data/gallery";
 import { festivalTotals } from "../data/speakers";
 import { festivalSocial, org } from "../site.config";
 import { formatRange, localePath, t, type Lang } from "../i18n";
@@ -25,7 +26,6 @@ const description = hi
   : "Kitab Utsav is Rajkamal Prakashan Samuh's travelling Hindi book festival. How it began, every edition so far (cities, dates, venues) and photos from each stop.";
 const label = hi ? "किताब उत्सव के बारे में" : "About Kitab Utsav";
 const crumbs = [{ name: label, path: "/about/" }];
-const byYear = [...new Set(editions.map((e) => e.year))].sort((a, b) => b - a);
 const withPhotos = editions.filter((e) => galleryFor(e.slug).length);
 const itemList = {
   "@type": "ItemList",
@@ -42,17 +42,46 @@ const sections = [
   { id: "editions", label: hi ? "संस्करण" : "Editions" },
   { id: "gallery", label: hi ? "गैलरी" : "Gallery" },
 ];
+
+// The route: every edition, oldest first, laid out as a snake (3 across on desktop, 2 on tablets,
+// 1 on phones). Each stop gets its grid position for each layout so rows can run back and forth.
+const route = [...editions].sort((a, b) => startKey(a).localeCompare(startKey(b)));
+const place = (i: number, cols: number) => {
+  const row = Math.floor(i / cols), k = i % cols;
+  return { r: row + 1, c: (row % 2 ? cols - 1 - k : k) + 1 };
+};
+const stopStyle = (i: number) => {
+  const a = place(i, 3), b = place(i, 2);
+  return `--r3:${a.r};--c3:${a.c};--r2:${b.r};--c2:${b.c}`;
+};
+
+// Hero collage and chapter photos (festival photos from the gallery).
+const collage = [
+  { src: "/gallery/bareilly-2026/bareilly-2026-004.webp", tilt: -5 },
+  { src: "/gallery/mumbai-2026/mumbai-2026-191.webp", tilt: 4 },
+  { src: "/gallery/patna-2026/patna-2026-150.webp", tilt: -2 },
+];
+const happens = hi
+  ? ["लेखकों से बातचीत", "पाठक-लेखक संवाद", "कहानी, कविता, गद्य का पाठ", "समकालीन सवालों पर चर्चा", "नई किताबों के लोकार्पण", "दास्तानगोई और लोक-प्रस्तुतियाँ", "काव्य संध्या", "किताबों की प्रदर्शनी"]
+  : ["Conversations with writers", "Open reader Q&A", "Readings of fiction, poetry and prose", "Discussions on the questions of our time", "Book launches", "Dastangoi and folk performances", "Poetry evenings", "A book exhibition"];
 ---
+
 <Base lang={lang} route="/about/" title={title} description={description} crumbs={crumbs} jsonLd={[itemList]}>
-  <section class="page-hero">
-    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
-    <div class="wrap">
-      <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{label}</p>
-      <h1>{hi ? <>किताबें जहाँ <em>पाठकों से मिलती हैं</em></> : <>Where books <em>meet their readers</em></>}</h1>
-      <ul class="totals" aria-label={hi ? "अब तक" : "So far"}>
-        {festivalTotals.map((x) => <li><b>{x.value}</b>{x.label[lang]}</li>)}
-      </ul>
+  <section class="page-hero ab-hero">
+    <Clouds items={[{ x: "46%", y: "-12%", w: 220 }, { x: "-6%", y: "70%", w: 180, flip: true }]} />
+    <div class="wrap ab-hero__in">
+      <div class="ab-hero__text">
+        <Crumbs lang={lang} items={crumbs} />
+        <p class="eyebrow">{label}</p>
+        <h1>{hi ? <>किताबें जहाँ <em>पाठकों से मिलती हैं</em></> : <>Where books <em>meet their readers</em></>}</h1>
+        <p class="lead">{hi ? "राजकमल प्रकाशन समूह का घूमता पुस्तक उत्सव, शहर दर शहर, बातचीत दर बातचीत।" : "Rajkamal Prakashan Samuh's travelling book festival, city by city, conversation by conversation."}</p>
+        <ul class="totals ab-stats" aria-label={hi ? "अब तक" : "So far"}>
+          {festivalTotals.map((x, i) => <li style={`--tilt:${[-3, 2, -1.5, 3][i % 4]}deg`}><b>{x.value}</b>{x.label[lang]}</li>)}
+        </ul>
+      </div>
+      <div class="ab-collage" aria-hidden="true">
+        {collage.map((c, i) => <span class={`ab-collage__p ab-collage__p--${i}`} style={`--tilt:${c.tilt}deg`}><img src={c.src} alt="" decoding="async" loading={i === 0 ? "eager" : "lazy"} /></span>)}
+      </div>
     </div>
   </section>
 
@@ -62,69 +91,105 @@ const sections = [
     </div>
   </nav>
 
-  <section class="section anchor" id="story" style="padding-top:40px" aria-label={sections[0].label}>
-    <div class="wrap prose">
-      {hi ? (
-        <>
-          <p>किताब उत्सव किताबों, पाठकों और लेखकों के संवाद का उत्सव है, जिसे राजकमल प्रकाशन समूह शहर-शहर ले जाता है। इसका नारा है: साथ जुड़ें, साथ पढ़ें। पाँच वर्षों में यह सात राज्यों के ग्यारह शहरों में सोलह बार आयोजित हो चुका है। इसका विचार सीधा है: किताबें और उन्हें लिखने वाले ख़ुद पाठकों के शहर तक पहुँचें। हर पड़ाव पर, आम तौर पर पाँच दिनों तक, सुबह से रात तक पाठ, बातचीत, चर्चा और लोकार्पण के सत्र चलते हैं और साथ में किताबों की प्रदर्शनी लगती है।</p>
-          <h2>शुरुआत</h2>
-          <p>किताब उत्सव की शुरुआत भोपाल में हुई, राजकमल प्रकाशन के स्थापना के 75वें वर्ष में। भोपाल और बनारस के बाद नवम्बर 2022 में पटना में नौ दिनों का उत्सव हुआ। फिर चंडीगढ़ (फ़रवरी 2023), लखनऊ (जनवरी 2024), भोपाल (सितम्बर 2025, शहर में तीसरा आयोजन), मुम्बई (फ़रवरी 2026), पटना (अप्रैल 2026) और इन्दौर (सितम्बर 2026) में उत्सव हुए। अक्टूबर 2026 में यह बरेली लौटा।</p>
-          <h2>उत्सव में क्या होता है</h2>
-          <ul>
-            <li>लेखकों से बातचीत और पाठक-लेखक संवाद</li>
-            <li>कहानी, कविता और गद्य का पाठ</li>
-            <li>किताबों और समकालीन सवालों पर चर्चा</li>
-            <li>नई किताबों के लोकार्पण</li>
-            <li>दास्तानगोई, लोक-प्रस्तुतियाँ और काव्य संध्या</li>
-            <li>राजकमल, राधाकृष्ण, लोकभारती और राजकमल उर्दू की किताबों की प्रदर्शनी</li>
-          </ul>
-          <h2>राजकमल प्रकाशन समूह</h2>
-          <p>1947 में स्थापित राजकमल प्रकाशन हिन्दी के प्रमुख प्रकाशन घरानों में है। समूह में राजकमल प्रकाशन, राधाकृष्ण प्रकाशन, लोकभारती प्रकाशन और राजकमल उर्दू शामिल हैं। मुख्यालय नई दिल्ली के दरियागंज में है और पटना, प्रयागराज व मुम्बई में शाखाएँ हैं।</p>
-          <p>समूह की किताबें ऑनलाइन <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a> पर उपलब्ध हैं। अपने शहर में किताब उत्सव के लिए <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a> पर लिखें, या नीचे <a href="#editions">अब तक के संस्करण</a> देखें।</p>
-        </>
-      ) : (
-        <>
-          <p>Kitab Utsav is a festival of conversation between books, readers and writers, taken from city to city by Rajkamal Prakashan Samuh under the line "saath judein, saath padhein" (come together, read together). In five years it has held sixteen editions in eleven cities across seven states. The idea is simple: bring books, and the people who write them, to readers in their own city. At each stop, usually for five days, sessions of readings, conversations, discussions and book launches run from morning to night alongside an exhibition of books.</p>
-          <h2>How it began</h2>
-          <p>Kitab Utsav began in Bhopal in the 75th year of Rajkamal Prakashan. After Bhopal and Banaras came a nine-day edition in Patna in November 2022, followed by Chandigarh (February 2023), Lucknow (January 2024), Bhopal again (September 2025, the city's third), Mumbai (February 2026), Patna (April 2026) and Indore (September 2026). In October 2026 it returned to Bareilly.</p>
-          <h2>What happens at the festival</h2>
-          <ul>
-            <li>Conversations with writers and open reader Q&amp;A</li>
-            <li>Readings of fiction, poetry and prose</li>
-            <li>Discussions on books and the questions of our time</li>
-            <li>Launches of new books</li>
-            <li>Dastangoi, folk performances and poetry evenings</li>
-            <li>An exhibition of books from Rajkamal, Radhakrishna, Lokbharti and Rajkamal Urdu</li>
-          </ul>
-          <h2>Rajkamal Prakashan Samuh</h2>
-          <p>Founded in 1947, Rajkamal Prakashan is one of the leading Hindi publishing houses. The group includes Rajkamal Prakashan, Radhakrishna Prakashan, Lokbharti Prakashan and Rajkamal Urdu, with its head office in Daryaganj, New Delhi, and branches in Patna, Prayagraj and Mumbai.</p>
-          <p>The group's books are available online at <a href={org.url} target="_blank" rel="noopener">rajkamalprakashan.com</a>. To bring Kitab Utsav to your city, write to <a href={`mailto:${org.email}?subject=Kitab%20Utsav`}>{org.email}</a>, or browse the <a href="#editions">editions so far</a> below.</p>
-        </>
-      )}
+  <section class="section anchor ab-story" id="story" aria-label={sections[0].label}>
+    <div class="wrap">
+      <div class="ab-lede">
+        <p class="ab-intro">
+          {hi
+            ? <>किताब उत्सव किताबों, पाठकों और लेखकों के संवाद का उत्सव है, जिसे राजकमल प्रकाशन समूह शहर-शहर ले जाता है। पाँच वर्षों में <mark>सात राज्यों के ग्यारह शहरों में सोलह बार</mark>। विचार सीधा है: किताबें और उन्हें लिखने वाले, ख़ुद पाठकों के शहर तक पहुँचें।</>
+            : <>Kitab Utsav is a festival of conversation between books, readers and writers, taken from city to city by Rajkamal Prakashan Samuh. In five years, <mark>sixteen editions in eleven cities across seven states</mark>. The idea is simple: bring books, and the people who write them, to readers in their own city.</>}
+        </p>
+        {/* the highlighted sentence above, as figures; the sentence stays for screen readers */}
+        <ul class="ab-figures" aria-hidden="true">
+          <li><b data-count>5</b><span>{hi ? "वर्ष" : "years"}</span></li>
+          <li><b data-count>16</b><span>{hi ? "संस्करण" : "editions"}</span></li>
+          <li><b data-count>11</b><span>{hi ? "शहर" : "cities"}</span></li>
+          <li><b data-count>7</b><span>{hi ? "राज्य" : "states"}</span></li>
+        </ul>
+      </div>
+      <div class="ab-chapters">
+        <article class="ab-ch">
+          <figure class="ab-ch__img"><img src="/gallery/bhopal-2025/bhopal-2025-301.webp" alt={hi ? "भोपाल किताब उत्सव में एक लेखक" : "A writer speaking at Kitab Utsav in Bhopal"} loading="lazy" decoding="async" /></figure>
+          <div class="ab-ch__text">
+          <span class="ab-ch__no" aria-hidden="true">01</span>
+          <h2>{hi ? "शुरुआत" : "How it began"}</h2>
+          <p>{hi
+            ? "किताब उत्सव की शुरुआत भोपाल में हुई, राजकमल प्रकाशन के स्थापना के 75वें वर्ष में। भोपाल और बनारस के बाद नवम्बर 2022 में पटना में नौ दिनों का उत्सव हुआ। फिर चंडीगढ़, लखनऊ, भोपाल, मुम्बई, पटना और इन्दौर, और अक्टूबर 2026 में बरेली।"
+            : "Kitab Utsav began in Bhopal in the 75th year of Rajkamal Prakashan. After Bhopal and Banaras came a nine-day edition in Patna in November 2022, then Chandigarh, Lucknow, Bhopal again, Mumbai, Patna and Indore, and in October 2026, Bareilly."}</p>
+          </div>
+        </article>
+        <article class="ab-ch">
+          <figure class="ab-ch__img"><img src="/gallery/bareilly-2026/bareilly-2026-028.webp" alt={hi ? "किताब उत्सव में पाठ-प्रस्तुति" : "A reading at Kitab Utsav"} loading="lazy" decoding="async" /></figure>
+          <div class="ab-ch__text">
+          <span class="ab-ch__no" aria-hidden="true">02</span>
+          <h2>{hi ? "उत्सव में क्या होता है" : "What happens"}</h2>
+          <p>{hi ? "हर पड़ाव पर, आम तौर पर पाँच दिन, सुबह से रात तक:" : "At each stop, usually for five days, from morning to night:"}</p>
+          <ul class="ab-ch__tags">{happens.map((h) => <li>{h}</li>)}</ul>
+          </div>
+        </article>
+        <article class="ab-ch">
+          <figure class="ab-ch__img"><img src="/gallery/bareilly-2026/bareilly-2026-015.webp" alt={hi ? "किताब उत्सव की पुस्तक प्रदर्शनी" : "The book exhibition at Kitab Utsav"} loading="lazy" decoding="async" /></figure>
+          <div class="ab-ch__text">
+          <span class="ab-ch__no" aria-hidden="true">03</span>
+          <h2>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</h2>
+          <p>{hi
+            ? "1947 में स्थापित, हिन्दी के प्रमुख प्रकाशन घरानों में। समूह में राजकमल प्रकाशन, राधाकृष्ण प्रकाशन, लोकभारती प्रकाशन और राजकमल उर्दू शामिल हैं; मुख्यालय दरियागंज, नई दिल्ली में, शाखाएँ पटना, प्रयागराज और मुम्बई में।"
+            : "Founded in 1947, one of the leading Hindi publishing houses. The group brings together Rajkamal Prakashan, Radhakrishna Prakashan, Lokbharti Prakashan and Rajkamal Urdu, with its head office in Daryaganj, New Delhi, and branches in Patna, Prayagraj and Mumbai."}</p>
+          <div class="ab-ch__links">
+            <a class="btn btn--ink btn--sm" href={org.url} target="_blank" rel="noopener">{s.nav.shop} <Icon name="arrowUpRight" size={16} /></a>
+            <a class="btn btn--line btn--sm" href={`mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`}>{hi ? "अपने शहर बुलाएँ" : "Bring it to your city"}</a>
+          </div>
+          </div>
+        </article>
+      </div>
     </div>
   </section>
 
-  <section class="section anchor" id="editions" aria-labelledby="editions-h">
+  <section class="section anchor ab-route" id="editions" aria-labelledby="editions-h">
     <div class="wrap">
       <div class="section-head">
         <div>
           <p class="eyebrow">{hi ? "शहर दर शहर" : "City by city"}</p>
-          <h2 class="h2" id="editions-h">{hi ? "अब तक के संस्करण" : "Editions so far"}</h2>
-          <p class="lead">
-            {hi
-              ? "नीचे वे संस्करण हैं जिनकी पूरी जानकारी उपलब्ध है। किसी शहर पर क्लिक करें: तारीख़ें, स्थान, वक्ता और तस्वीरें।"
-              : "Below are the editions with full details on record. Open a city for its dates, venue, speakers and photos."}
-          </p>
+          <h2 class="h2" id="editions-h">{hi ? "अब तक का सफ़र" : "The journey so far"}</h2>
+          <p class="lead">{hi ? "पटना 2022 से आगे, हर पड़ाव। किसी शहर को खोलें: तारीख़ें, स्थान, वक्ता और तस्वीरें।" : "Every stop since Patna 2022. Open a city for its dates, venue, speakers and photos."}</p>
         </div>
       </div>
-      {byYear.map((y) => (
-        <div class="year-block">
-          <h3 class="year-block__y">{y}</h3>
-          <div class="grid grid--3">
-            {editions.filter((e) => e.year === y).map((e) => <EditionCard e={e} lang={lang} />)}
-          </div>
-        </div>
-      ))}
+      <div class="route" data-route>
+        <svg class="route__line" aria-hidden="true"><path class="route__track" /><path class="route__ink" /></svg>
+        <ol class="route__stops">
+          {route.map((e, i) => {
+            const cover = coverFor(e.slug);
+            const live = nextEdition?.slug === e.slug;
+            return (
+              <li class:list={["stop", live && "is-live"]} style={stopStyle(i)}>
+                <a class="stop__card" href={localePath(lang, `/editions/${e.slug}/`)}>
+                  <span class="stop__pin" aria-hidden="true">{i + 1}</span>
+                  <span class="stop__photo" aria-hidden="true">
+                    {cover ? <img src={cover.src} alt="" loading="lazy" decoding="async" style={`object-position:${focusOf(cover)}`} /> : <Landmark slug={e.slug} class="stop__art" />}
+                  </span>
+                  <span class="stop__body">
+                    <span class="stop__year">{e.year}{live && <i>{hi ? "आगामी" : "Upcoming"}</i>}</span>
+                    <b class="stop__city">{e.city[lang]}</b>
+                    <span class="stop__when">{formatRange(e, lang)}</span>
+                    {e.venue && <span class="stop__venue">{e.venue[lang].split(",")[0]}</span>}
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+          <li class="stop stop--invite" style={stopStyle(route.length)}>
+            <a class="stop__card" href={`mailto:${org.email}?subject=${encodeURIComponent(hi ? "हमारे शहर में किताब उत्सव" : "Kitab Utsav in our city")}`}>
+              <span class="stop__pin" aria-hidden="true">?</span>
+              <span class="stop__body">
+                <span class="stop__year">{hi ? "अगला पड़ाव" : "Next stop"}</span>
+                <b class="stop__city">{hi ? "आपका शहर?" : "Your city?"}</b>
+                <span class="stop__when">{hi ? "संस्थान, कॉलेज या साहित्यिक समूह हैं? हमें लिखें, उत्सव आपके शहर आ सकता है।" : "An institution, college or literary group? Write to us and the festival could come to your city."}</span>
+                <span class="btn btn--ink btn--sm stop__go">{hi ? "हमें लिखें" : "Write to us"} <Icon name="arrowUpRight" size={16} /></span>
+              </span>
+            </a>
+          </li>
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -149,6 +214,7 @@ const sections = [
         <div class="chips" role="tablist" aria-label={hi ? "संस्करण चुनें" : "Choose an edition"}>
           {withPhotos.map((e, i) => (
             <button type="button" class="chip" role="tab" id={`gt-${e.slug}`} aria-controls={`gp-${e.slug}`} aria-selected={i === 0 ? "true" : "false"} aria-pressed={i === 0 ? "true" : "false"}>
+              {coverFor(e.slug) && <img class="chip__thumb" src={coverFor(e.slug)!.src} alt="" loading="lazy" decoding="async" />}
               {e.city[lang]} {e.year}
             </button>
           ))}
