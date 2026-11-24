@@ -25,7 +25,7 @@
   /* 1. Scroll reveal: things fade up as they enter, siblings one after another. */
   var REVEAL = [
     ".section-head", ".stack .ecard", ".mani__in > *", ".btotals li", ".big", ".tix__item", ".names .kick",
-    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".gallery__item", ".speaker",
+    ".shelf__books", ".names .marquee", ".fmt", ".invite", ".pfind", ".fend", ".fcover", ".ab-intro", ".ab-ch", ".ev-next", ".ev-day", ".pt-map", ".pt-shelf", ".pt-join", ".nw-clip", ".nw-kit li", ".nw-glance", ".nw-desk", ".vs-tips li", ".vs-help", ".au-group", ".ed-lead", ".ed-side", ".ed-faces li", ".ed-route", ".ed-cards li", ".gallery__item", ".speaker",
     ".edition-card", ".prose > *", ".totals li", ".infobox", ".partner", ".press-item", ".faq-item",
     ".year-block", ".day-panel", ".notice",
   ].join(",");
@@ -161,7 +161,7 @@
 
   /* 6. Photo viewer: tap a gallery photo to see it full screen. Arrows, Esc and swipe work. */
   var grids = document.querySelectorAll(".gallery");
-  if ((grids.length || document.querySelector("[data-albums]")) && window.HTMLDialogElement) {
+  if ((grids.length || document.querySelector("[data-albums], [data-filmstrip]")) && window.HTMLDialogElement) {
     var t = hi
       ? { close: "बंद करें", prev: "पिछली तस्वीर", next: "अगली तस्वीर", of: " / " }
       : { close: "Close", prev: "Previous photo", next: "Next photo", of: " of " };
@@ -547,5 +547,210 @@
   /* 19. Press masthead: today's date, in the page's language (the page itself is built ahead of time). */
   document.querySelectorAll("[data-today]").forEach(function (el) {
     el.textContent = new Intl.DateTimeFormat(hi ? "hi-IN" : "en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date());
+  });
+  /* 20. FAQ as a chat: a question chip posts the question as the visitor's message, shows a
+         typing indicator, then the answer from the page's own list. Search filters the chips.
+         #q3-style links open that answer straight away. */
+  document.querySelectorAll("[data-faq-chat]").forEach(function (chat) {
+    var list = chat.querySelector("[data-faq-list]"), thread = chat.querySelector("[data-faq-thread]");
+    var pairs = Array.prototype.slice.call(list.querySelectorAll(".fq-pair"));
+    var chips = Array.prototype.slice.call(chat.querySelectorAll(".fq-chip"));
+    var search = chat.querySelector("[data-faq-search]"), none = chat.querySelector("[data-faq-none]");
+    chat.classList.add("is-chat");
+    list.hidden = true;
+    var busy = Promise.resolve();
+    var scroll = function () { thread.scrollTo({ top: thread.scrollHeight, behavior: reduce ? "auto" : "smooth" }); };
+    var post = function (i, quick) {
+      var pair = pairs[i]; if (!pair) return;
+      chips[i].classList.add("is-asked");
+      busy = busy.then(function () {
+        return new Promise(function (done) {
+          var me = pair.querySelector("dt").cloneNode(true);
+          var me2 = document.createElement("div"); me2.className = me.className + " is-new"; me2.innerHTML = me.innerHTML;
+          thread.appendChild(me2); scroll();
+          var typing = document.createElement("div");
+          typing.className = "fq-msg fq-msg--bot fq-typing";
+          typing.innerHTML = pair.querySelector("dd .fq-av").outerHTML + '<span class="fq-bubble"><i></i><i></i><i></i></span>';
+          typing.setAttribute("aria-hidden", "true");
+          var wait = quick || reduce ? 0 : 650 + Math.min(900, pair.querySelector("dd").textContent.length * 3);
+          setTimeout(function () {
+            thread.appendChild(typing); scroll();
+            setTimeout(function () {
+              typing.remove();
+              var ans = document.createElement("div"); ans.className = "fq-msg fq-msg--bot is-new";
+              ans.innerHTML = pair.querySelector("dd").innerHTML;
+              thread.appendChild(ans); scroll(); done();
+            }, wait);
+          }, quick || reduce ? 0 : 250);
+        });
+      });
+    };
+    chips.forEach(function (c, i) { c.addEventListener("click", function () { post(i); }); });
+    chat.querySelector("[data-faq-all]").addEventListener("click", function () { pairs.forEach(function (_, i) { if (!chips[i].classList.contains("is-asked")) post(i, true); }); });
+    search.addEventListener("input", function () {
+      var q = search.value.trim().toLowerCase(), n = 0;
+      chips.forEach(function (c, i) {
+        var hay = (c.textContent + " " + pairs[i].querySelector("dd").textContent).toLowerCase();
+        var on = !q || hay.indexOf(q) >= 0; c.hidden = !on; if (on) n++;
+      });
+      none.hidden = n > 0;
+    });
+    search.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      var first = chips.filter(function (c) { return !c.hidden; })[0];
+      if (first) { e.preventDefault(); first.click(); }
+    });
+    var m = location.hash.match(/^#q(\d+)$/);
+    if (m) post(parseInt(m[1], 10) - 1, true);
+  });
+  /* 21. Authors catalogue: search, city and kind filters, the A–Z bar, and a side panel
+         (a sheet from the bottom on phones) with the author's bio and editions. /resources/#slug
+         opens that author. */
+  document.querySelectorAll("[data-catalogue]").forEach(function (cat) {
+    var cards = Array.prototype.slice.call(cat.querySelectorAll(".au-card"));
+    var groups = Array.prototype.slice.call(cat.querySelectorAll(".au-group"));
+    var search = cat.querySelector("[data-au-search]"), city = cat.querySelector("[data-au-city]");
+    var kinds = cat.querySelectorAll(".au-kind"), count = cat.querySelector("[data-au-count]"), none = cat.querySelector("[data-au-none]");
+    var kind = "";
+    var apply = function () {
+      var q = search.value.trim().toLowerCase(), c = city.value, n = 0;
+      cards.forEach(function (el) {
+        var on = (!q || el.dataset.search.indexOf(q) >= 0) && (!c || el.dataset.cities.split(" ").indexOf(c) >= 0) && (!kind || el.dataset.kinds.split(" ").indexOf(kind) >= 0);
+        el.hidden = !on; if (on) n++;
+      });
+      groups.forEach(function (g) {
+        var any = !!g.querySelector(".au-card:not([hidden])");
+        g.hidden = !any;
+        var link = cat.querySelector('.au-index a[data-letter="' + g.dataset.group + '"]');
+        if (link) link.classList.toggle("is-off", !any);
+      });
+      count.textContent = n; none.hidden = n > 0;
+    };
+    search.addEventListener("input", apply);
+    city.addEventListener("change", apply);
+    kinds.forEach(function (b) {
+      b.addEventListener("click", function () {
+        kind = b.dataset.kind;
+        kinds.forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+        apply();
+      });
+    });
+
+    // Side panel
+    var dlg = document.createElement("dialog");
+    dlg.className = "au-panel";
+    dlg.innerHTML = '<button type="button" class="au-panel__x" aria-label="' + (hi ? "बंद करें" : "Close") + '">&times;</button><div class="au-panel__body"></div>';
+    document.body.appendChild(dlg);
+    var body = dlg.querySelector(".au-panel__body");
+    var open = function (slug) {
+      var card = document.getElementById(slug);
+      if (!card || !card.classList.contains("au-card")) return;
+      body.innerHTML = card.querySelector(".au-detail").innerHTML;
+      dlg.setAttribute("aria-label", card.querySelector(".au-card__name").textContent);
+      if (!dlg.open) dlg.showModal();
+      root.classList.add("lb-open");
+    };
+    dlg.addEventListener("close", function () { root.classList.remove("lb-open"); });
+    dlg.querySelector(".au-panel__x").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+    document.querySelectorAll("[data-open]").forEach(function (b) {
+      b.addEventListener("click", function () { open(b.dataset.open); });
+    });
+    var m = location.hash.slice(1);
+    if (m && document.getElementById(m) && document.getElementById(m).classList.contains("au-card")) {
+      window.addEventListener("load", function () { open(m); });
+    }
+  });
+  /* 22. Edition filmstrip: a photo opens the full-screen viewer with the strip's photos. */
+  document.querySelectorAll("[data-filmstrip]").forEach(function (strip) {
+    var btns = Array.prototype.slice.call(strip.querySelectorAll(".ed-film__ph"));
+    var data = btns.map(function (b) { return { src: b.dataset.src, alt: b.dataset.cap, cap: b.dataset.cap, credit: b.dataset.credit, href: b.dataset.href }; });
+    btns.forEach(function (b, i) { b.addEventListener("click", function () { if (window.__openPhotos) window.__openPhotos(data, i); }); });
+  });
+  /* 22. Authors hero: a spotlight stage. One headliner stands in the light at a time and the
+         stage moves on every few seconds (not for reduced motion). It holds still while the mouse
+         or keyboard focus is on it, or when it is off screen. Thumbnails pick a headliner (arrow
+         keys move along them), a swipe on phones goes to the next one, and the featured portrait
+         opens the side panel (section 21). The beam and confetti lean toward the mouse. The
+         "Jump to" chips set the catalogue's kind filter and scroll down to it. */
+  document.querySelectorAll("[data-au-stage]").forEach(function (stage) {
+    var spots = Array.prototype.slice.call(stage.querySelectorAll(".au-spot"));
+    var stars = Array.prototype.slice.call(stage.querySelectorAll(".au-star"));
+    if (!spots.length) return;
+    var cur = 0, timer = 0, dwell = 5000, held = false, visible = true;
+    stage.style.setProperty("--dwell", dwell + "ms");
+    var show = function (i) {
+      i = (i + spots.length) % spots.length;
+      if (i === cur) return;
+      spots.forEach(function (sp, k) { sp.classList.toggle("is-out", k === cur); });
+      spots[cur].classList.remove("is-on");
+      spots[cur].setAttribute("aria-hidden", "true"); spots[cur].tabIndex = -1;
+      spots[i].classList.remove("is-out"); spots[i].classList.add("is-on");
+      spots[i].removeAttribute("aria-hidden"); spots[i].removeAttribute("tabindex");
+      stars.forEach(function (b, k) { b.setAttribute("aria-pressed", String(k === i)); });
+      cur = i;
+      play();
+    };
+    var play = function () {
+      clearTimeout(timer);
+      if (reduce) return;
+      stage.classList.remove("is-playing");
+      if (held || !visible) { stage.classList.add("is-paused"); return; }
+      stage.classList.remove("is-paused");
+      void stage.offsetWidth; // restart the progress bar
+      stage.classList.add("is-playing");
+      timer = setTimeout(function () { show(cur + 1); }, dwell);
+    };
+    var hold = function (on) { held = on; play(); };
+    stage.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") hold(true); });
+    stage.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") hold(false); });
+    stage.addEventListener("focusin", function () { hold(true); });
+    stage.addEventListener("focusout", function (e) { if (!stage.contains(e.relatedTarget)) hold(false); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) { visible = en[0].isIntersecting; play(); }, { threshold: 0.3 }).observe(stage);
+    }
+    document.addEventListener("visibilitychange", function () { visible = !document.hidden; play(); });
+
+    stars.forEach(function (b, k) {
+      b.addEventListener("click", function () { show(k); });
+      b.addEventListener("keydown", function (e) {
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var n = (k + d + stars.length) % stars.length;
+        stars[n].focus(); stars[n].scrollIntoView({ block: "nearest", inline: "nearest" });
+        show(n);
+      });
+    });
+
+    var x0 = null;
+    stage.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      if (x0 === null || !e.target.closest(".au-stage__spots")) { x0 = null; return; }
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+
+    if (finePointer && !reduce) {
+      var hero = stage.closest("section") || stage;
+      hero.addEventListener("pointermove", function (e) {
+        var r = stage.getBoundingClientRect();
+        var mx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+        var my = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+        stage.style.setProperty("--mx", mx.toFixed(3));
+        stage.style.setProperty("--my", my.toFixed(3));
+      });
+      hero.addEventListener("pointerleave", function () { stage.style.setProperty("--mx", 0); stage.style.setProperty("--my", 0); });
+    }
+    play();
+  });
+  document.querySelectorAll("[data-jump]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var cat = document.querySelector("[data-catalogue]");
+      var chip = cat && cat.querySelector('.au-kind[data-kind="' + b.dataset.jump + '"]');
+      if (!chip) return;
+      chip.click();
+      cat.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    });
   });
 })();

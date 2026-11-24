@@ -1,0 +1,103 @@
+/*
+ * Visit page, "festival entry pass" (src/views/Visit.astro), Hindi and English.
+ * A next-stop banner, the visit details as an entry pass with tear-off stubs, a framed map with a
+ * bouncing pin, "Good to know" tiles and a "Need help?" strip.
+ */
+
+/* Next-stop banner */
+.vs-next { display: flex; align-items: center; gap: 14px; max-width: 820px; margin-top: 24px; padding: 14px 18px; border-radius: var(--r-md); background: var(--yellow); color: var(--navy); text-decoration: none; transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+.vs-next:hover { transform: translateY(-3px); }
+.vs-next > i { position: relative; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+.vs-next > i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--red); animation: live-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite; }
+.vs-next span { line-height: 1.45; }
+.vs-next svg { flex: none; width: 22px; height: 22px; margin-left: auto; }
+
+/* Pass + map */
+.vs-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(18px, 3vw, 36px); align-items: stretch; }
+.vs-pass { position: relative; display: grid; grid-template-columns: 1fr auto; filter: drop-shadow(0 14px 22px rgba(7, 28, 73, .16)); rotate: -1deg; transition: rotate .45s cubic-bezier(.34, 1.56, .64, 1); }
+.vs-pass:hover { rotate: 0deg; }
+.vs-pass__body { position: relative; display: grid; align-content: start; gap: 6px; padding: clamp(24px, 3vw, 36px); border-radius: 26px 0 0 26px; background: #fff; color: var(--navy);
+  /* notches on the tear line */
+  -webkit-mask: radial-gradient(circle at 100% 0, transparent 16px, #000 16.5px) top / 100% 51% no-repeat, radial-gradient(circle at 100% 100%, transparent 16px, #000 16.5px) bottom / 100% 51% no-repeat;
+  mask: radial-gradient(circle at 100% 0, transparent 16px, #000 16.5px) top / 100% 51% no-repeat, radial-gradient(circle at 100% 100%, transparent 16px, #000 16.5px) bottom / 100% 51% no-repeat; }
+.vs-pass__kick { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0; color: var(--red); font: 700 .78rem/1 var(--display); letter-spacing: .1em; text-transform: uppercase; }
+.vs-pass__past { padding: 4px 9px; border-radius: 999px; background: rgba(11, 46, 99, .08); color: var(--navy); letter-spacing: .04em; }
+.vs-pass__city { margin: 4px 0 10px; font: 800 clamp(2.4rem, 5vw, 4rem)/1 var(--display); text-transform: uppercase; color: var(--navy); }
+.vs-pass__city span { color: var(--red); }
+.vs-pass__rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0; border-top: 2px dashed rgba(11, 46, 99, .25); }
+.vs-pass__rows > div { padding: 14px 0; border-bottom: 2px dashed rgba(11, 46, 99, .25); }
+.vs-pass__rows > div:nth-child(2) { padding-left: 16px; border-left: 2px dashed rgba(11, 46, 99, .25); }
+.vs-pass__venue { grid-column: 1 / -1; }
+.vs-pass__rows dt { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: var(--red); font: 700 .75rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; }
+.vs-pass__rows dt svg { width: 16px; height: 16px; }
+.vs-pass__rows dd { margin: 0; font: 700 1.1rem/1.35 var(--display); }
+.vs-pass__foot { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+.vs-pass__stamp { flex: none; width: 74px; height: 74px; padding: 6px; border: 2px solid var(--navy); border-radius: 8px; fill: var(--navy); shape-rendering: crispEdges; }
+.vs-pass__foot p { margin: 0; font-size: .9rem; line-height: 1.5; color: var(--ku-muted); }
+.vs-pass__foot a { color: var(--red); font-weight: 700; }
+.vs-pass__stubs { display: grid; grid-template-rows: 1fr 1fr; border-left: 3px dashed rgba(251, 240, 217, .6); border-radius: 0 26px 26px 0; overflow: hidden; background: var(--navy); }
+.vs-stub { display: grid; place-items: center; align-content: center; gap: 8px; width: clamp(110px, 11vw, 140px); padding: 16px 10px; color: var(--cream); text-align: center; text-decoration: none; font: 700 .88rem/1.2 var(--display); transform-origin: 0 50%; transition: background .25s, transform .45s cubic-bezier(.34, 1.56, .64, 1); }
+.vs-stub + .vs-stub { border-top: 3px dashed rgba(251, 240, 217, .35); }
+.vs-stub svg { width: 30px; height: 30px; color: var(--yellow); }
+.vs-stub:hover, .vs-stub:focus-visible { background: var(--red); transform: rotate(4deg) translateX(4px); }
+.vs-stub:focus-visible { outline: 3px solid var(--yellow); outline-offset: -3px; }
+
+.vs-map { position: relative; min-height: 360px; margin: 0; overflow: hidden; border: 8px solid #fff; border-radius: 26px; background: var(--sky); box-shadow: 0 14px 28px rgba(7, 28, 73, .14); rotate: 1deg; }
+.vs-map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+/* A small pin that hops in the venue label; Google's map marks the exact spot itself. */
+.vs-map__pin { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: #fff; animation: vs-bounce 2.2s cubic-bezier(.34, 1.56, .64, 1) infinite; }
+.vs-map__pin svg { width: 15px; height: 15px; }
+@keyframes vs-bounce { 0%, 100% { translate: 0 0; } 40% { translate: 0 -5px; } 60% { translate: 0 0; } }
+.vs-map figcaption { position: absolute; left: 12px; bottom: 12px; display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--navy); color: var(--cream); font: 700 .88rem/1 var(--display); pointer-events: none; }
+
+/* Good to know */
+.vs-h { margin: clamp(40px, 5vw, 64px) 0 18px; color: var(--navy); font: 800 clamp(1.6rem, 3vw, 2.4rem)/1.1 var(--display); text-transform: uppercase; }
+.vs-tips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.vs-tip { position: relative; display: grid; align-content: start; gap: 6px; height: 100%; padding: 20px; border-radius: var(--r-lg); background: #fff; color: var(--navy); text-decoration: none; transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s; }
+a.vs-tip:hover, a.vs-tip:focus-visible { transform: translateY(-5px) rotate(-1deg); box-shadow: 0 14px 26px rgba(7, 28, 73, .14); }
+.vs-tip__icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 6px; border-radius: 16px; background: var(--tone); }
+.vs-tip__icon svg { width: 26px; height: 26px; }
+.vs-tip b { font: 800 1.2rem/1.2 var(--display); }
+.vs-tip span:not(.vs-tip__icon) { line-height: 1.5; opacity: .85; }
+.vs-tip__go { position: absolute; top: 20px; right: 20px; width: 20px; height: 20px; color: var(--red); transition: transform .3s; }
+a.vs-tip:hover .vs-tip__go { transform: translateX(4px); }
+
+/* Need help? */
+.vs-help { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 20px 30px; margin-top: 18px; padding: clamp(20px, 3vw, 30px); border-radius: var(--r-lg); background: var(--navy); color: var(--cream); }
+.vs-help h2 { margin: 0; color: var(--yellow); font: 800 clamp(1.5rem, 2.6vw, 2rem)/1.1 var(--display); text-transform: uppercase; }
+.vs-help__btns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.vs-help__btns a { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 12px 14px; border-radius: 16px; background: rgba(255, 255, 255, .08); color: var(--cream); text-decoration: none; font: 600 .9rem/1.25 var(--display); transition: background .2s, transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+.vs-help__btns a:hover, .vs-help__btns a:focus-visible { background: var(--yellow); color: var(--navy); transform: translateY(-3px); }
+.vs-help__btns svg { flex: none; width: 22px; height: 22px; }
+.vs-help__btns span { display: grid; min-width: 0; overflow-wrap: anywhere; }
+.vs-help__btns small { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+
+/* Tablets and phones */
+@media (max-width: 1100px) {
+  .vs-help { grid-template-columns: 1fr; }
+  .vs-help__btns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .vs-grid { grid-template-columns: 1fr; }
+  .vs-tips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .vs-pass { grid-template-columns: 1fr; rotate: 0deg; }
+  .vs-pass__body { border-radius: 22px 22px 0 0; padding: 22px 20px;
+    -webkit-mask: radial-gradient(circle at 0 100%, transparent 14px, #000 14.5px) left / 51% 100% no-repeat, radial-gradient(circle at 100% 100%, transparent 14px, #000 14.5px) right / 51% 100% no-repeat;
+    mask: radial-gradient(circle at 0 100%, transparent 14px, #000 14.5px) left / 51% 100% no-repeat, radial-gradient(circle at 100% 100%, transparent 14px, #000 14.5px) right / 51% 100% no-repeat; }
+  .vs-pass__rows { grid-template-columns: 1fr; }
+  .vs-pass__rows > div:nth-child(2) { padding-left: 0; border-left: 0; }
+  .vs-pass__stubs { grid-template-rows: none; grid-template-columns: 1fr 1fr; border-left: 0; border-top: 3px dashed rgba(251, 240, 217, .6); border-radius: 0 0 22px 22px; }
+  .vs-stub { width: auto; padding: 14px 8px; }
+  .vs-stub + .vs-stub { border-top: 0; border-left: 3px dashed rgba(251, 240, 217, .35); }
+  .vs-map { min-height: 260px; rotate: 0deg; }
+  .vs-tips { grid-template-columns: 1fr; }
+  .vs-tip { grid-template-columns: auto 1fr; column-gap: 14px; }
+  .vs-tip__icon { grid-row: span 2; margin: 0; }
+  .vs-help__btns { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vs-pass, .vs-stub, .vs-tip, .vs-next, .vs-help__btns a { transition: none; }
+  .vs-map__pin, .vs-next > i::after { animation: none; }
+}

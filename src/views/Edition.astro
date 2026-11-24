@@ -3,16 +3,14 @@ import Base from "../layouts/Base.astro";
 import Crumbs from "../components/Crumbs.astro";
 import Clouds from "../components/Clouds.astro";
 import Icon from "../components/Icon.astro";
-import EditionCard from "../components/EditionCard.astro";
-import NextEdition from "../components/NextEdition.astro";
-import SpeakerCard from "../components/SpeakerCard.astro";
-import GalleryGrid from "../components/GalleryGrid.astro";
-import { galleryFor } from "../data/gallery";
+import Landmark from "../components/Landmark.astro";
+import Portrait from "../components/Portrait.astro";
+import { galleryFor, coverFor, focusOf } from "../data/gallery";
 import { speakersFor } from "../data/speakers";
 import { editions, neighbours, type Edition } from "../data/editions";
 import { formatRange, formatTime, isUpcoming, localePath, t, type Lang } from "../i18n";
 import { eventLd, mapsUrl } from "../lib/schema";
-import { org, festivalSocial } from "../site.config";
+import { org, festivalSocial, bookSeatUrl } from "../site.config";
 
 interface Props { lang: Lang; e: Edition }
 const { lang, e } = Astro.props;
@@ -34,126 +32,181 @@ const crumbs = [
 ];
 const ev = eventLd(e, lang, site, og);
 const announced = speakersFor(e.slug);
-const others = editions.filter((x) => x.slug !== e.slug).slice(0, 3);
+const others = editions.filter((x) => x.slug !== e.slug);
 const { prev, next } = neighbours(e.slug);
 const allPhotos = galleryFor(e.slug);
-// A preview on the edition page (two rows on desktop, four on phones); the full set is in the About gallery.
-const photos = allPhotos.slice(0, 8);
+// A filmstrip of up to 14 photos; the full set is in the About gallery.
+const photos = allPhotos.slice(0, 14);
 const label = (x: Edition) => (hi ? `${x.city.hi} ${x.year}` : `${x.city.en} ${x.year}`);
+const cover = coverFor(e.slug);
+const dated = !!(e.start && e.end);
+const seat = bookSeatUrl ?? null;
+const [lead, ...rest] = e.body[lang];
+const photoStyle = (sp: { focus: string; zoom: number; shift?: string }) =>
+  `object-position:${sp.focus};transform-origin:${sp.focus};transform:${sp.shift ? `translate(${sp.shift.replace(" ", ", ")}) ` : ""}scale(${sp.zoom})`;
+const startIso = dated ? `${e.start}T${e.startTime ?? "11:00"}:00+05:30` : "";
+const endIso = dated ? `${e.end}T${e.endTime ?? "20:00"}:00+05:30` : "";
 ---
+
 <Base lang={lang} route={route} title={title} description={description} crumbs={crumbs} jsonLd={ev ? [ev] : []}>
-  <section class="page-hero">
-    <Clouds items={[{ x: "70%", y: "-10%", w: 260 }, { x: "88%", y: "45%", w: 180, flip: true }]} />
-    <div class="wrap">
+  <section class:list={["page-hero", "ed-hero", { "ed-hero--art": !cover }]}>
+    <div class="ed-hero__bg" aria-hidden="true">
+      {cover ? <img src={cover.src} alt="" decoding="async" style={`object-position:${focusOf(cover)}`} /> : <Landmark slug={e.slug} class="ed-hero__art" />}
+    </div>
+    <div class="wrap ed-hero__in">
       <Crumbs lang={lang} items={crumbs} />
-      <p class="eyebrow">{up ? s.upcoming : s.past} · {e.state[lang]}</p>
-      <h1>{hi ? `किताब उत्सव ${e.city.hi} ${e.year}` : `Kitab Utsav ${e.city.en} ${e.year}`}</h1>
-      <p class="lead">{e.summary[lang]}</p>
+      <p class="ed-hero__kick"><span class:list={["ed-tag", up && "ed-tag--live"]}>{up && <i aria-hidden="true"></i>}{up ? s.upcoming : s.past}</span>{e.state[lang]}</p>
+      <h1 class="ed-hero__title"><span class="ed-hero__ku">{hi ? "किताब उत्सव" : "Kitab Utsav"}</span><b>{e.city[lang]}</b><em>{e.year}</em></h1>
+
+      <div class="ed-strip">
+        <div class="ed-strip__facts">
+          <span><Icon name="calendar" /><b>{s.dates}</b>{when}</span>
+          {e.startTime && e.endTime && <span><Icon name="clock" /><b>{s.time}</b>{formatTime(e.startTime, lang)} {hi ? "से" : "to"} {formatTime(e.endTime, lang)}</span>}
+          <span><Icon name="pin" /><b>{s.venue}</b>{e.venue ? e.venue[lang].split(",")[0] : (hi ? "घोषणा जल्द" : "To be announced")}</span>
+        </div>
+        <div class="ed-strip__acts">
+          {up && dated && (
+            <span class="ed-count" data-countdown data-start={startIso} data-end={endIso} aria-label={hi ? "उत्सव शुरू होने में" : "Time until the festival opens"}>
+              <span><b data-unit="d">00</b><small>{s.days}</small></span>
+              <span><b data-unit="h">00</b><small>{s.hours}</small></span>
+              <span><b data-unit="m">00</b><small>{s.minutes}</small></span>
+            </span>
+          )}
+          {up ? (
+            <a class="ed-btn ed-btn--main" href={seat ?? festivalSocial[0].url} {...(seat ? {} : { target: "_blank", rel: "noopener" })}>{seat ? s.bookSeat : (hi ? "ख़बर सबसे पहले पाएँ" : "Hear about it first")}<Icon name="arrowUpRight" /></a>
+          ) : (
+            photos.length > 0 && <a class="ed-btn ed-btn--main" href="#photos">{hi ? "तस्वीरें देखें" : "See the photos"}<Icon name="camera" /></a>
+          )}
+          {e.mapQuery && <a class="ed-btn" href={mapsUrl(e.mapQuery)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>}
+          {up && dated && <a class="ed-btn" href={`/ics/${e.slug}.ics`} download><Icon name="calendar" />{s.addToCal}</a>}
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="section" style="padding-top:32px">
-    <div class="wrap detail-grid">
-      <div class="prose">
-        {e.body[lang].map((p) => <p>{p}</p>)}
-
-        {e.stats && (
+  <section class="section ed-story">
+    <div class="wrap ed-story__in">
+      <div>
+        <p class="eyebrow">{hi ? "कहानी" : "The story"}</p>
+        {lead ? <p class="ed-lead">{lead}</p> : <p class="ed-lead">{e.summary[lang]}</p>}
+        {rest.length > 0 && <div class="ed-prose">{rest.map((p) => <p>{p}</p>)}</div>}
+        {e.highlights && e.highlights[lang].length > 0 && (
           <>
-            <h2>{s.inNumbers}</h2>
-            <ul class="stats">{e.stats.map((st) => <li><b>{st.value}</b><span>{st.label[lang]}</span></li>)}</ul>
+            <h2 class="ed-h3">{s.highlights}</h2>
+            <ul class="ed-highlights">{e.highlights[lang].map((h) => <li>{h}</li>)}</ul>
           </>
         )}
-
-        {e.highlights && (
-          <>
-            <h2>{s.highlights}</h2>
-            <ul>{e.highlights[lang].map((h) => <li>{h}</li>)}</ul>
-          </>
-        )}
-
         {up && (
-          <>
-            <h2>{s.nav.programme}</h2>
-            <p>
-              {hi ? "दिन-वार सत्र, वक्ता और समय " : "Day-wise sessions, speakers and timings are on the "}
-              <a href={localePath(lang, "/programme/")}>{hi ? "कार्यक्रम पेज" : "programme page"}</a>
-              {hi ? " पर हैं।" : "."}
-            </p>
-          </>
+          <p class="ed-prog">
+            <Icon name="list" />
+            <span>{hi ? "दिन-वार सत्र, वक्ता और समय " : "Day-wise sessions, speakers and timings are on the "}<a href={localePath(lang, "/programme/")}>{hi ? "कार्यक्रम पेज" : "programme page"}</a>{hi ? " पर हैं।" : "."}</span>
+          </p>
         )}
       </div>
-
-      <aside>
-        {up ? (
-          <NextEdition e={e} lang={lang} heading="p" />
-        ) : (
-          <div class="card">
-            <ul class="info">
-              <li><Icon name="calendar" /><span><b>{s.dates}</b>{when}</span></li>
-              {e.startTime && e.endTime && <li><Icon name="clock" /><span><b>{s.time}</b>{formatTime(e.startTime, lang)} {hi ? "से" : "to"} {formatTime(e.endTime, lang)}</span></li>}
-              {e.venue && <li><Icon name="pin" /><span><b>{s.venue}</b>{e.venue[lang]}</span></li>}
-              <li><Icon name="book" /><span><b>{s.organiser}</b>{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</span></li>
-            </ul>
-            <div class="btns">
-              {e.mapQuery && <a class="btn" href={mapsUrl(e.mapQuery)} target="_blank" rel="noopener"><Icon name="pin" />{s.directions}</a>}
-              <a class="btn" href={org.url} target="_blank" rel="noopener">{s.nav.shop}</a>
-            </div>
-          </div>
+      <aside class="ed-side">
+        {e.stats && (
+          <ul class="ed-stats" aria-label={s.inNumbers}>
+            {e.stats.map((st, i) => <li style={`--tilt:${[-3, 2.5, -2, 3][i % 4]}deg;--tone:var(--${["yellow", "sky", "lime", "lilac"][i % 4]})`}><b>{st.value}</b>{st.label[lang]}</li>)}
+          </ul>
         )}
+        <div class="ed-venue">
+          <p class="ed-venue__k">{s.venue}</p>
+          <p class="ed-venue__v">{e.venue ? e.venue[lang] : (hi ? "स्थान की घोषणा जल्द होगी।" : "The venue will be announced soon.")}</p>
+          <p class="ed-venue__k">{s.organiser}</p>
+          <p class="ed-venue__v">{hi ? "राजकमल प्रकाशन समूह" : "Rajkamal Prakashan Samuh"}</p>
+          <a class="ed-venue__shop" href={org.url} target="_blank" rel="noopener">{s.nav.shop} <Icon name="arrowUpRight" /></a>
+        </div>
       </aside>
     </div>
   </section>
 
   {announced.length > 0 && (
-    <section class="section" aria-labelledby="speakers">
+    <section class="section ed-people" aria-labelledby="speakers">
       <div class="wrap">
         <div class="section-head"><div><p class="eyebrow">{hi ? "मिलिए" : "Meet"}</p><h2 class="h2" id="speakers">{up ? (hi ? "अब तक घोषित वक्ता" : "Speakers announced so far") : (hi ? "मंच पर" : "On stage")}</h2></div></div>
-        <div class="grid grid--3">{announced.map((sp) => <SpeakerCard s={sp} lang={lang} />)}</div>
+        <ul class="ed-faces">
+          {announced.map((sp) => (
+            <li>
+              <a class="ed-face" href={localePath(lang, `/resources/#${sp.slug}`)}>
+                <span class="ed-face__pic">
+                  {sp.photo ? <img src={sp.photo} alt="" loading="lazy" decoding="async" />
+                    : sp.stagePhoto ? <img src={sp.stagePhoto.src} alt="" loading="lazy" decoding="async" style={photoStyle(sp.stagePhoto)} />
+                    : <Portrait s={sp} lang={lang} size="md" />}
+                </span>
+                <b>{sp.name[lang]}</b>
+                <span>{sp.role[lang]}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )}
 
   {photos.length > 0 && (
-    <section class="section" aria-labelledby="photos">
+    <section class="section ed-photos" id="photos" aria-labelledby="photos-h">
       <div class="wrap">
         <div class="section-head">
-          <div><p class="eyebrow">{hi ? "गैलरी" : "Gallery"}</p><h2 class="h2" id="photos">{hi ? `${e.city.hi}, तस्वीरों में` : `${e.city.en} in pictures`}</h2></div>
+          <div><p class="eyebrow">{hi ? "गैलरी" : "Gallery"}</p><h2 class="h2" id="photos-h">{hi ? `${e.city.hi}, तस्वीरों में` : `${e.city.en} in pictures`}</h2></div>
           <a class="link-more" href={localePath(lang, `/about/#gallery-${e.slug}`)}>{hi ? `पूरी गैलरी (${allPhotos.length})` : `Full gallery (${allPhotos.length})`}</a>
         </div>
-        <GalleryGrid items={photos} lang={lang} />
+      </div>
+      <div class="ed-film" data-filmstrip>
+        <ul>
+          {photos.map((ph, i) => (
+            <li style={`--tilt:${[-2, 1.5, -1, 2, -1.5][i % 5]}deg`}>
+              <button type="button" class="ed-film__ph" data-src={ph.src} data-cap={ph.caption[lang]} data-credit={ph.credit ?? ""} data-href={ph.href ?? ""} aria-label={hi ? `बड़ा देखें: ${ph.caption[lang]}` : `View larger: ${ph.caption[lang]}`}>
+                <img src={ph.src} alt={ph.caption[lang]} loading="lazy" decoding="async" />
+                <span class="ed-film__cap">{ph.caption[lang]}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )}
 
-  {(prev || next) && (
-    <nav class="wrap edition-pager" aria-label={hi ? "पिछला और अगला संस्करण" : "Previous and next edition"}>
-      {prev ? (
-        <a class="edition-pager__link" href={localePath(lang, `/editions/${prev.slug}/`)} rel="prev">
-          <small><Icon name="arrowLeft" />{hi ? "पिछला पड़ाव" : "Previous stop"}</small>
-          <b>{label(prev)}</b><span>{formatRange(prev, lang)}</span>
-        </a>
-      ) : <span />}
-      {next ? (
-        <a class="edition-pager__link edition-pager__link--next" href={localePath(lang, `/editions/${next.slug}/`)} rel="next">
-          <small>{hi ? "अगला पड़ाव" : "Next stop"}<Icon name="arrowRight" /></small>
-          <b>{label(next)}</b><span>{formatRange(next, lang)}</span>
-        </a>
-      ) : (
-        <a class="edition-pager__link edition-pager__link--next is-soon" href={festivalSocial[0].url} target="_blank" rel="noopener">
-          <small>{hi ? "अगला पड़ाव" : "Next stop"}<Icon name="arrowRight" /></small>
-          <b>{hi ? "घोषणा जल्द" : "Announcing soon"}</b><span>{hi ? "ख़बर पाने के लिए जुड़ें" : "Sign up to hear first"}</span>
-        </a>
-      )}
-    </nav>
-  )}
+  <nav class="wrap ed-route" aria-label={hi ? "पिछला और अगला संस्करण" : "Previous and next edition"}>
+    {prev ? (
+      <a class="ed-route__stop" href={localePath(lang, `/editions/${prev.slug}/`)} rel="prev">
+        <span class="ed-route__dir"><Icon name="arrowLeft" />{hi ? "पिछला पड़ाव" : "Previous stop"}</span>
+        <b>{label(prev)}</b><span>{formatRange(prev, lang)}</span>
+      </a>
+    ) : <span />}
+    <span class="ed-route__line" aria-hidden="true"><i></i></span>
+    {next ? (
+      <a class="ed-route__stop ed-route__stop--next" href={localePath(lang, `/editions/${next.slug}/`)} rel="next">
+        <span class="ed-route__dir">{hi ? "अगला पड़ाव" : "Next stop"}<Icon name="arrowRight" /></span>
+        <b>{label(next)}</b><span>{formatRange(next, lang)}</span>
+      </a>
+    ) : (
+      <a class="ed-route__stop ed-route__stop--next is-soon" href={festivalSocial[0].url} target="_blank" rel="noopener">
+        <span class="ed-route__dir">{hi ? "अगला पड़ाव" : "Next stop"}<Icon name="arrowRight" /></span>
+        <b>{hi ? "घोषणा जल्द" : "Announcing soon"}</b><span>{hi ? "ख़बर पाने के लिए जुड़ें" : "Follow to hear first"}</span>
+      </a>
+    )}
+  </nav>
 
-  <section class="section" aria-labelledby="others">
+  <section class="section ed-others" aria-labelledby="others">
     <div class="wrap">
       <div class="section-head">
         <h2 class="h2" id="others">{s.otherEditions}</h2>
         <a class="link-more" href={localePath(lang, "/about/#editions")}>{s.allEditions}</a>
       </div>
-      <div class="grid grid--3">{others.map((x) => <EditionCard e={x} lang={lang} />)}</div>
     </div>
+    <ul class="ed-cards">
+      {others.map((x) => {
+        const c = coverFor(x.slug);
+        return (
+          <li>
+            <a class="ed-card" href={localePath(lang, `/editions/${x.slug}/`)}>
+              <span class="ed-card__pic">{c ? <img src={c.src} alt="" loading="lazy" decoding="async" style={`object-position:${focusOf(c)}`} /> : <Landmark slug={x.slug} class="ed-card__art" />}</span>
+              <span class="ed-card__t"><b>{x.city[lang]}</b> {x.year}</span>
+              <span class="ed-card__d">{formatRange(x, lang)}</span>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
   </section>
 </Base>

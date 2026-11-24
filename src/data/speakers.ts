@@ -266,7 +266,7 @@ const headliners: Record<string, Pick<Speaker, "bio" | "stagePhoto">> = {
       hi: "हिन्दी उपन्यासकार और कथाकार। 'रेत समाधि' के डेज़ी रॉकवेल द्वारा किए अनुवाद 'टूम ऑफ़ सैंड' को 2022 का अंतरराष्ट्रीय बुकर पुरस्कार मिला, किसी भारतीय भाषा से अनूदित पहली किताब को। अन्य उपन्यासों में 'माई' और 'हमारा शहर उस बरस'।",
       en: "Hindi novelist and story writer. 'Ret Samadhi', in Daisy Rockwell's translation 'Tomb of Sand', won the 2022 International Booker Prize, the first book translated from an Indian language to do so. Her other novels include 'Mai' and 'Hamara Shahar Us Baras'.",
     },
-    stagePhoto: { src: "/gallery/indore-2026/indore-2026-082.webp", focus: "72.2% 30.3%", zoom: 3.1, shift: "-22.2% 19.7%" },
+    stagePhoto: { src: "/speakers/geetanjali-shree-stage.webp", focus: "50% 45%", zoom: 1.4 },
   },
   "piyush-mishra": {
     bio: {
