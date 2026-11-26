@@ -31,8 +31,9 @@ const links = [
   { href: L("/visit/"), label: s.nav.visit },
   { href: L("/faq/"), label: s.nav.faq },
 ];
-// The wordmark, one akshara per span so each can fill in on its own (conjuncts kept whole).
-const word = hi ? ["कि", "ता", "ब", " ", "उ", "त्स", "व"] : [..."KITAB UTSAV"];
+// Hindi stays as two whole words so each keeps its unbroken headline (shirorekha); English is
+// spread letter by letter.
+const word = hi ? ["किताब", " ", "उत्सव"] : [..."KITAB UTSAV"];
 ---
 <footer class="foot foot--chapter">
   <a class="fend" href={seat}>
