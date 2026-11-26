@@ -1,14 +1,29 @@
 {
+  "id": "/",
   "name": "किताब उत्सव | Kitab Utsav",
   "short_name": "किताब उत्सव",
-  "description": "राजकमल प्रकाशन समूह का पुस्तक और साहित्य उत्सव",
-  "start_url": "/",
+  "description": "राजकमल प्रकाशन समूह का घूमता पुस्तक और साहित्य उत्सव। Rajkamal Prakashan Samuh's travelling Hindi book festival.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
   "lang": "hi-IN",
+  "dir": "ltr",
   "background_color": "#ffffff",
-  "theme_color": "#114b9c",
+  "theme_color": "#de2026",
+  "categories": ["books", "education", "entertainment", "lifestyle"],
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
-    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+    { "src": "/icons/icon-192-any.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512-any.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "आयोजन · Events", "short_name": "आयोजन", "url": "/programme/?source=pwa", "icons": [{ "src": "/icons/icon-192-any.png", "sizes": "192x192" }] },
+    { "name": "कैसे पहुँचें · Visit", "short_name": "पहुँचें", "url": "/visit/?source=pwa", "icons": [{ "src": "/icons/icon-192-any.png", "sizes": "192x192" }] },
+    { "name": "लेखक · Authors", "short_name": "लेखक", "url": "/resources/?source=pwa", "icons": [{ "src": "/icons/icon-192-any.png", "sizes": "192x192" }] },
+    { "name": "English", "short_name": "English", "url": "/en/?source=pwa", "icons": [{ "src": "/icons/icon-192-any.png", "sizes": "192x192" }] }
   ]
 }

@@ -1,0 +1,25 @@
+---
+/** Shown by the service worker (public/sw.js) for a page that isn't saved yet while offline. */
+import Base from "../layouts/Base.astro";
+---
+<Base lang="hi" route="/offline/" title="आप ऑफ़लाइन हैं · You're offline" description="इंटरनेट से जुड़ते ही किताब उत्सव फिर खुलेगा।" noindex alternates={false} altPath="/en/">
+  <section class="offline-card">
+    <div class="wrap">
+      <p class="big" aria-hidden="true">📚</p>
+      <h1 class="h2">आप ऑफ़लाइन हैं · You're offline</h1>
+      <p class="lead" style="margin:14px auto 28px">यह पेज अभी सहेजा नहीं गया है। इंटरनेट से जुड़ते ही यह खुल जाएगा। जो पेज आप पहले देख चुके हैं, वे बिना इंटरनेट भी खुलेंगे।<br />This page isn't saved yet. It will open once you're back online; pages you've already visited work offline.</p>
+      <div class="btns" style="justify-content:center">
+        <a class="btn btn--primary" href="/">किताब उत्सव</a>
+        <a class="btn" href="/en/">Kitab Utsav (English)</a>
+        <button class="btn" type="button" onclick="location.reload()">फिर कोशिश करें · Try again</button>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .offline-card { margin: var(--g, 14px); padding: clamp(40px, 7vw, 90px) 20px; border-radius: var(--r-lg, 28px); background: var(--cream, #fbf0d9); color: var(--navy, #0b2e63); text-align: center; }
+  .offline-card .big { margin: 0 0 6px; font-size: clamp(3.5rem, 9vw, 5.5rem); line-height: 1; }
+  .offline-card .h2 { color: var(--navy, #0b2e63); }
+  .offline-card .lead { max-width: 52ch; color: var(--navy, #0b2e63); opacity: .85; }
+  .offline-card .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+</style>
