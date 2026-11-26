@@ -61,6 +61,8 @@
 .fword.is-in .fword__g { color: #fff; -webkit-text-stroke-color: #fff; translate: 0 0; }
 @media (hover: hover) { .fword.is-in .fword__g:hover { translate: 0 -.08em; transition-delay: 0s; } }
 .fword__gap { flex: 0 0 .25em; }
+/* Hindi: the two words sit at the ends with the space between them, letters joined. */
+.fword:lang(hi) .fword__gap { flex: 1 1 auto; }
 
 /* Phones: the call stacks; links stay two across; contact below. */
 @media (max-width: 900px) {
