@@ -29,7 +29,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes("/404") && !/\/(en\/)?2\/$/.test(new URL(page).pathname) && !/\/(en\/)?(editions|gallery)\/$/.test(new URL(page).pathname),
+      filter: (page) => !page.includes("/404") && !page.includes("/offline/") && !/\/(en\/)?2\/$/.test(new URL(page).pathname) && !/\/(en\/)?(editions|gallery)\/$/.test(new URL(page).pathname),
       i18n: {
         defaultLocale: "hi",
         locales: { hi: "hi-IN", en: "en-IN" },
